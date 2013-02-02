@@ -18,27 +18,6 @@ class ModsymSpace(Category):
         def random_element():
             pass
 
-        def weight(self):
-            """
-            Return the weight of this distribution space.  The standard
-            caveat applies, namely that the weight of `Sym^k` is
-            defined to be `k`, not `k+2`.
-
-            OUTPUT:
-
-            - nonnegative integer
-
-            EXAMPLES::
-
-                sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
-                sage: D = Distributions(0, 7); D
-                Space of 7-adic distributions with k=0 action and precision cap 20
-                sage: D.weight()
-                0
-                sage: Distributions(389, 7).weight()
-                389
-            """
-            return self._k
 
         def zero_element(self, M=None):
             """
@@ -221,8 +200,9 @@ class ModsymSpace(Category):
                 val.normalize()
             return self
         def normalize():
-            pass
+            
         def valuation(self, p=None):
+            	return min([self.data[j].valuation() for j in range(len(self.data))])
             pass
         def scale():
             pass
