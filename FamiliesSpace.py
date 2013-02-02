@@ -19,9 +19,9 @@ class FamiliesSpace(Parent):
             - M the number of moments
             - d the maximum allowed w-adic precision
 
-		OUTPUT:
+        OUTPUT:
         
-		A family of distributions with data as specified by the inputs.
+        A family of distributions with data as specified by the inputs.
 
         	"""
 		#
@@ -115,5 +115,3 @@ def normalize(F,p,r,N):
 
 
 ## produces a random distribution with values in S_w  (i.e. the coefficient of w^j has valuation at least j*c_p
-
-
