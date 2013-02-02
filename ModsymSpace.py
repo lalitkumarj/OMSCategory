@@ -147,6 +147,79 @@ class ModsymSpace(Category):
             
 
     class ElementMethods:
+        def __init__(self,map_data,parent,construct = False):
+            #ModuleElement.__init__(self, parent)
+            if construct:
+                self._map = map_data
+            else:
+                self._map = ManinMap(parent._coefficients, parent._source, map_data)
+        def _repr_(self):
+            r"""
+            Returns the print representation of the symbol.
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi._repr_()
+                'Modular symbol with values in Sym^0 Q^2'
+            """
+            return "Modular symbol with values in %s"%(self.parent().coefficient_module())
+            
+        def dict(self):
+            r"""
+            Returns dictionary on the modular symbol self, where keys are generators and values are the corresponding values of self on generators
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi.dict()
+                {[1 0]
+                [0 1]: -1/5, [ 0 -1]
+                [ 1  3]: 3/2, [-1 -1]
+                [ 3  2]: -1/2}
+            """
+            return self._map._dict
+        def values(self):
+            r"""
+            Returns the values of the symbol self on our chosen generators (generators are listed in self.dict().keys())
+
+            EXAMPLES::
+
+                 sage: E = EllipticCurve('11a')
+                 sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                 sage: phi = ps_modsym_from_elliptic_curve(E)
+                 sage: phi.values()
+                 [-1/5, 3/2, -1/2]
+                 sage: phi.dict().keys()
+                 [
+                 [1 0]  [ 0 -1]  [-1 -1]
+                 [0 1], [ 1  3], [ 3  2]
+                 ]
+                 sage: phi.values() == phi.dict().values()
+                 True
+            """
+            return list(self._map._dict.values())
+        def _normalize(self):
+            """
+            Normalizes all of the values of the symbol self
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi._normalize()
+                Modular symbol with values in Sym^0 Q^2
+                sage: phi._normalize().values()
+                [-1/5, 3/2, -1/2]
+            """
+            for val in self._map:
+                val.normalize()
+            return self
         def normalize():
             pass
         def valuation(self, p=None):
