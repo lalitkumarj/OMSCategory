@@ -18,28 +18,6 @@ class ModsymSpace(Category):
         def random_element():
             pass
 
-        def weight(self):
-            """
-            Return the weight of this distribution space.  The standard
-            caveat applies, namely that the weight of `Sym^k` is
-            defined to be `k`, not `k+2`.
-
-            OUTPUT:
-
-            - nonnegative integer
-
-            EXAMPLES::
-
-                sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
-                sage: D = Distributions(0, 7); D
-                Space of 7-adic distributions with k=0 action and precision cap 20
-                sage: D.weight()
-                0
-                sage: Distributions(389, 7).weight()
-                389
-            """
-            return self._k
-
         def zero_element(self, M=None):
             """
             Return zero element in the M-th approximating module.
@@ -153,6 +131,7 @@ class ModsymSpace(Category):
                 self._map = map_data
             else:
                 self._map = ManinMap(parent._coefficients, parent._source, map_data)
+            self.parent = parent
         def _repr_(self):
             r"""
             Returns the print representation of the symbol.
@@ -220,6 +199,29 @@ class ModsymSpace(Category):
             for val in self._map:
                 val.normalize()
             return self
+        def __cmp__(self, other):
+            """
+            Checks if self == other
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi == phi
+                True
+                sage: phi == 2*phi
+                False
+                sage: psi = ps_modsym_from_elliptic_curve(EllipticCurve('37a'))
+                sage: psi == phi
+                False
+            """
+            gens = self.parent.source().gens()
+            for g in gens:
+                c = cmp(self._map[g], other._map[g])
+                if c: return c
+            return 0
+
         def normalize():
             pass
         def valuation(self, p=None):
