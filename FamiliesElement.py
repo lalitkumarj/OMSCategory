@@ -72,11 +72,11 @@ class FamiliesElement(SageObject):
 
     def specialize(self,k):
         """evaluates at ((1+p)^k-1)/p"""
-        assert k % (self.p - 1) == self.disc(), "Wrong component of weight space"
-        w=self.gen()
+        assert k % (self.parent.p - 1) == self.parent._disc, "Wrong component of weight space"
+        w=self.parent.gen()
         v=[]
         for j in range(0,self.num_moments()):
-            v=v+[Rational(self.moment(j).substitute(w=((1+self.p)^k-1)/self.p))]
+            v=v+[Rational(self.moment(j).substitute(w=((1+self.parent.p)^k-1)/self.parent.p))]
         return dist(self.p,k,vector(v),self.char())
 
     def valuation(self):
