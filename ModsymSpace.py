@@ -18,7 +18,6 @@ class ModsymSpace(Category):
         def random_element():
             pass
 
-
         def zero_element(self, M=None):
             """
             Return zero element in the M-th approximating module.
@@ -132,6 +131,7 @@ class ModsymSpace(Category):
                 self._map = map_data
             else:
                 self._map = ManinMap(parent._coefficients, parent._source, map_data)
+            self.parent = parent
         def _repr_(self):
             r"""
             Returns the print representation of the symbol.
@@ -182,6 +182,7 @@ class ModsymSpace(Category):
                  True
             """
             return list(self._map._dict.values())
+
         def _normalize(self):
             """
             Normalizes all of the values of the symbol self
@@ -199,20 +200,300 @@ class ModsymSpace(Category):
             for val in self._map:
                 val.normalize()
             return self
-        def normalize():
-            
-        def valuation(self, p=None):
-            	return min([self.data[j].valuation() for j in range(len(self.data))])
-            pass
-        def scale():
-            pass
-        def is_zero():
-            pass
-        def _rmul_():
-            pass
-        def lift():
-            pass
-        def find_scalar()
-        def _is_malformed()
-        def act_right()
+
+        def __cmp__(self, other):
+            """
+            Checks if self == other
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi == phi
+                True
+                sage: phi == 2*phi
+                False
+                sage: psi = ps_modsym_from_elliptic_curve(EllipticCurve('37a'))
+                sage: psi == phi
+                False
+            """
+            gens = self.parent._source.gens()
+            for g in gens:
+                c = cmp(self._map[g], other._map[g])
+                if c: return c
+            return 0
+
+        def _add_(self, right):
+            """
+            Returns self + right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi + phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi + phi).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map + right._map, self.parent, construct=True)
+
+        def _lmul_(self, right):
+            """
+            Returns self * right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: 2*phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (2*phi).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map * right, self.parent, construct=True)
+
+        def _rmul_(self, right):
+            """
+            Returns self * right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi*2
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi*2).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map * right, self.parent, construct=True)
+
+        def _sub_(self, right):
+            """
+            Returns self - right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi - phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi - phi).values()
+                [0, 0, 0]
+            """
+            return self.__class__(self._map - right._map, self.parent, construct=True)
+    
+        def _get_prime(self, p=None, alpha = None, allow_none=False):
+            """
+            Combines a prime specified by the user with the prime from the parent.
+
+            INPUT:
+
+            - ``p`` -- an integer or None (default None); if specified
+              needs to match the prime of the parent.
+
+            - ``alpha`` -- an element or None (default None); if p-adic
+              can contribute a prime.
+
+            - ``allow_none`` -- boolean (default False); whether to allow
+              no prime to be specified.
+
+            OUTPUT:
+
+            - a prime or None.  If ``allow_none`` is False then a
+              ValueError will be raised rather than returning None if no
+              prime can be determined.
+
+            EXAMPLES::
+
+                sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
+                sage: D = Distributions(0, 5, 10);  M = PSModularSymbols(Gamma0(2), coefficients=D)
+                sage: f = M(1); f._get_prime()
+                5
+                sage: f._get_prime(5)
+                5
+                sage: f._get_prime(7)
+                Traceback (most recent call last):
+                ...
+                ValueError: inconsistent prime
+                sage: f._get_prime(alpha=Qp(5)(1))
+                5
+                sage: D = Symk(0);  M = PSModularSymbols(Gamma0(2), coefficients=D)
+                sage: f = M(1); f._get_prime(allow_none=True) is None
+                True
+                sage: f._get_prime(alpha=Qp(7)(1))
+                7
+                sage: f._get_prime(7,alpha=Qp(7)(1))
+                7
+                sage: f._get_prime()
+                Traceback (most recent call last):
+                ...
+                ValueError: you must specify a prime
+            """
+            pp = self.parent.prime()
+            ppp = ((alpha is not None) and hasattr(alpha.parent(),'prime') and alpha.parent().prime()) or None
+            p = ZZ(p) or pp or ppp
+            if not p:
+                if not allow_none:
+                    raise ValueError("you must specify a prime")
+            elif (pp and p != pp) or (ppp and p != ppp):
+                raise ValueError("inconsistent prime")
+            return p
+
+        def plus_part(self):
+            r"""
+            Returns the plus part of self -- i.e. self + self | [1,0,0,-1].
+
+            Note that we haven't divided by 2.  Is this a problem?
+
+            OUTPUT:
+
+            - self + self | [1,0,0,-1]
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
+                True
+            """
+            return self * minusproj + self
+
+        def minus_part(self):
+            r"""
+            Returns the minus part of self -- i.e. self - self | [1,0,0,-1]
+
+            Note that we haven't divided by 2.  Is this a problem?
+
+            OUTPUT:
+
+            - self - self | [1,0,0,-1]
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: (phi.plus_part()+phi.minus_part()) == phi * 2
+                True
+            """
+            return self - self * minusproj
+
+        def hecke(self, ell, algorithm="prep"):
+            r"""
+            Returns self | `T_{\ell}` by making use of the precomputations in
+            self.prep_hecke()
+
+            INPUT:
+
+            - ``ell`` -- a prime
+
+            - ``algorithm`` -- a string, either 'prep' (default) or
+              'naive'
+
+            OUTPUT:
+
+            - The image of this element under the hecke operator
+              `T_{\ell}`
+
+            ALGORITHMS:
+
+            - If ``algorithm == 'prep'``, precomputes a list of matrices
+              that only depend on the level, then uses them to speed up
+              the action.
+
+            - If ``algorithm == 'naive'``, just acts by the matrices
+              defining the Hecke operator.  That is, it computes
+              sum_a self | [1,a,0,ell] + self | [ell,0,0,1],
+              the last term occurring only if the level is prime to ell.
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi.hecke(2) == phi * E.ap(2)
+                True
+                sage: phi.hecke(3) == phi * E.ap(3)
+                True
+                sage: phi.hecke(5) == phi * E.ap(5)
+                True
+                sage: phi.hecke(101) == phi * E.ap(101)
+                True
+
+                sage: all([phi.hecke(p, algorithm='naive') == phi * E.ap(p) for p in [2,3,5,101]])
+                True
+            """
+            return self.__class__(self._map.hecke(ell, algorithm), self.parent, construct=True)
+
+        def valuation(self, p):
+            r"""
+            Returns the valuation of self at `p`.
+
+            Here the valuation is the minimum of the valuations of the values of self.
+
+            INPUT:
+
+            - ``p`` - prime
+
+            OUTPUT:
+
+            - The valuation of self at `p`
+
+            EXAMPLES::
+
+               sage: E = EllipticCurve('11a')
+               sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+               sage: phi = ps_modsym_from_elliptic_curve(E)
+               sage: phi.values()
+               [-1/5, 3/2, -1/2]
+               sage: phi.valuation(2)
+               -1
+               sage: phi.valuation(3)
+               0
+               sage: phi.valuation(5)
+               -1
+               sage: phi.valuation(7)
+               0
+            """
+            return min([val.valuation(p) for val in self._map])
+
+        def diagonal_valuation(self, p):
+            """
+            Retuns the minimum of the diagonal valuation on the values of self
+
+            INPUT:
+
+            - ``p`` -- a positive integral prime
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi.diagonal_valuation(2)
+                -1
+                sage: phi.diagonal_valuation(3)
+                0
+                sage: phi.diagonal_valuation(5)
+                -1
+                sage: phi.diagonal_valuation(7)
+                0
+            """
+            return min([val.diagonal_valuation(p) for val in self._map])
 
