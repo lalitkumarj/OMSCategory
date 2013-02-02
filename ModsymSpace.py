@@ -182,6 +182,7 @@ class ModsymSpace(Category):
                  True
             """
             return list(self._map._dict.values())
+
         def _normalize(self):
             """
             Normalizes all of the values of the symbol self
@@ -216,25 +217,403 @@ class ModsymSpace(Category):
                 sage: psi == phi
                 False
             """
-            gens = self.parent.source().gens()
+            gens = self.parent._source.gens()
             for g in gens:
                 c = cmp(self._map[g], other._map[g])
                 if c: return c
             return 0
 
-        def normalize():
-            pass
-        def valuation(self, p=None):
-            pass
-        def scale():
-            pass
-        def is_zero():
-            pass
-        def _rmul_():
-            pass
-        def lift():
-            pass
-        def find_scalar()
-        def _is_malformed()
-        def act_right()
+        def _add_(self, right):
+            """
+            Returns self + right
 
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi + phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi + phi).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map + right._map, self.parent, construct=True)
+
+        def _lmul_(self, right):
+            """
+            Returns self * right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: 2*phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (2*phi).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map * right, self.parent, construct=True)
+
+        def _rmul_(self, right):
+            """
+            Returns self * right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi*2
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi*2).values()
+                [-2/5, 3, -1]
+            """
+            return self.__class__(self._map * right, self.parent, construct=True)
+
+        def _sub_(self, right):
+            """
+            Returns self - right
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi - phi
+                Modular symbol with values in Sym^0 Q^2
+                sage: (phi - phi).values()
+                [0, 0, 0]
+            """
+            return self.__class__(self._map - right._map, self.parent, construct=True)
+    
+        def _get_prime(self, p=None, alpha = None, allow_none=False):
+            """
+            Combines a prime specified by the user with the prime from the parent.
+
+            INPUT:
+
+            - ``p`` -- an integer or None (default None); if specified
+              needs to match the prime of the parent.
+
+            - ``alpha`` -- an element or None (default None); if p-adic
+              can contribute a prime.
+
+            - ``allow_none`` -- boolean (default False); whether to allow
+              no prime to be specified.
+
+            OUTPUT:
+
+            - a prime or None.  If ``allow_none`` is False then a
+              ValueError will be raised rather than returning None if no
+              prime can be determined.
+
+            EXAMPLES::
+
+                sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
+                sage: D = Distributions(0, 5, 10);  M = PSModularSymbols(Gamma0(2), coefficients=D)
+                sage: f = M(1); f._get_prime()
+                5
+                sage: f._get_prime(5)
+                5
+                sage: f._get_prime(7)
+                Traceback (most recent call last):
+                ...
+                ValueError: inconsistent prime
+                sage: f._get_prime(alpha=Qp(5)(1))
+                5
+                sage: D = Symk(0);  M = PSModularSymbols(Gamma0(2), coefficients=D)
+                sage: f = M(1); f._get_prime(allow_none=True) is None
+                True
+                sage: f._get_prime(alpha=Qp(7)(1))
+                7
+                sage: f._get_prime(7,alpha=Qp(7)(1))
+                7
+                sage: f._get_prime()
+                Traceback (most recent call last):
+                ...
+                ValueError: you must specify a prime
+            """
+            pp = self.parent.prime()
+            ppp = ((alpha is not None) and hasattr(alpha.parent(),'prime') and alpha.parent().prime()) or None
+            p = ZZ(p) or pp or ppp
+            if not p:
+                if not allow_none:
+                    raise ValueError("you must specify a prime")
+            elif (pp and p != pp) or (ppp and p != ppp):
+                raise ValueError("inconsistent prime")
+            return p
+
+        def plus_part(self):
+            r"""
+            Returns the plus part of self -- i.e. self + self | [1,0,0,-1].
+
+            Note that we haven't divided by 2.  Is this a problem?
+
+            OUTPUT:
+
+            - self + self | [1,0,0,-1]
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
+                True
+            """
+            return self * minusproj + self
+
+        def minus_part(self):
+            r"""
+            Returns the minus part of self -- i.e. self - self | [1,0,0,-1]
+
+            Note that we haven't divided by 2.  Is this a problem?
+
+            OUTPUT:
+
+            - self - self | [1,0,0,-1]
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: (phi.plus_part()+phi.minus_part()) == phi * 2
+                True
+            """
+            return self - self * minusproj
+
+        def hecke(self, ell, algorithm="prep"):
+            r"""
+            Returns self | `T_{\ell}` by making use of the precomputations in
+            self.prep_hecke()
+
+            INPUT:
+
+            - ``ell`` -- a prime
+
+            - ``algorithm`` -- a string, either 'prep' (default) or
+              'naive'
+
+            OUTPUT:
+
+            - The image of this element under the hecke operator
+              `T_{\ell}`
+
+            ALGORITHMS:
+
+            - If ``algorithm == 'prep'``, precomputes a list of matrices
+              that only depend on the level, then uses them to speed up
+              the action.
+
+            - If ``algorithm == 'naive'``, just acts by the matrices
+              defining the Hecke operator.  That is, it computes
+              sum_a self | [1,a,0,ell] + self | [ell,0,0,1],
+              the last term occurring only if the level is prime to ell.
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi.hecke(2) == phi * E.ap(2)
+                True
+                sage: phi.hecke(3) == phi * E.ap(3)
+                True
+                sage: phi.hecke(5) == phi * E.ap(5)
+                True
+                sage: phi.hecke(101) == phi * E.ap(101)
+                True
+
+                sage: all([phi.hecke(p, algorithm='naive') == phi * E.ap(p) for p in [2,3,5,101]])
+                True
+            """
+            return self.__class__(self._map.hecke(ell, algorithm), self.parent, construct=True)
+
+        def valuation(self, p):
+            r"""
+            Returns the valuation of self at `p`.
+
+            Here the valuation is the minimum of the valuations of the values of self.
+
+            INPUT:
+
+            - ``p`` - prime
+
+            OUTPUT:
+
+            - The valuation of self at `p`
+
+            EXAMPLES::
+
+               sage: E = EllipticCurve('11a')
+               sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+               sage: phi = ps_modsym_from_elliptic_curve(E)
+               sage: phi.values()
+               [-1/5, 3/2, -1/2]
+               sage: phi.valuation(2)
+               -1
+               sage: phi.valuation(3)
+               0
+               sage: phi.valuation(5)
+               -1
+               sage: phi.valuation(7)
+               0
+            """
+            return min([val.valuation(p) for val in self._map])
+
+        def diagonal_valuation(self, p):
+            """
+            Retuns the minimum of the diagonal valuation on the values of self
+
+            INPUT:
+
+            - ``p`` -- a positive integral prime
+
+            EXAMPLES::
+
+                sage: E = EllipticCurve('11a')
+                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+                sage: phi = ps_modsym_from_elliptic_curve(E)
+                sage: phi.values()
+                [-1/5, 3/2, -1/2]
+                sage: phi.diagonal_valuation(2)
+                -1
+                sage: phi.diagonal_valuation(3)
+                0
+                sage: phi.diagonal_valuation(5)
+                -1
+                sage: phi.diagonal_valuation(7)
+                0
+            """
+            return min([val.diagonal_valuation(p) for val in self._map])
+
+#        @cached_method
+#        def is_Tq_eigensymbol(self,q,p=None,M=None):
+#            r"""
+#            Determines if self is an eigenvector for `T_q` modulo `p^M`
+#
+#            INPUT:
+#
+#            - ``q`` -- prime of the Hecke operator
+#
+#            - ``p`` -- prime we are working modulo
+#
+#            - ``M`` -- degree of accuracy of approximation
+#
+#            OUTPUT:
+#
+#            - True/False
+#
+#            EXAMPLES::
+#
+#                sage: E = EllipticCurve('11a')
+#                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#                sage: phi = ps_modsym_from_elliptic_curve(E)
+#                sage: phi.values()
+#                [-1/5, 3/2, -1/2]
+#                sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#                sage: phi_ord.is_Tq_eigensymbol(2,3,10)
+#                True
+#                sage: phi_ord.is_Tq_eigensymbol(2,3,100)
+#                False
+#                sage: phi_ord.is_Tq_eigensymbol(2,3,1000)
+#                False
+#                sage: phi_ord.is_Tq_eigensymbol(3,3,10)
+#                True
+#                sage: phi_ord.is_Tq_eigensymbol(3,3,100)
+#                False
+#            """
+#            try:
+#                aq = self.Tq_eigenvalue(q, p, M)
+#                return True
+#            except ValueError:
+#                return False
+#
+#        # what happens if a cached method raises an error?  Is it recomputed each time?
+#        @cached_method
+#        def Tq_eigenvalue(self, q, p=None, M=None, check=True):
+#            r"""
+#            Eigenvalue of `T_q` modulo `p^M`
+#
+#            INPUT:
+#
+#            - ``q`` -- prime of the Hecke operator
+#
+#            - ``p`` -- prime we are working modulo (default: None)
+#
+#            - ``M`` -- degree of accuracy of approximation (default: None)
+#
+#            - ``check`` -- check that `self` is an eigensymbol
+#
+#            OUTPUT:
+#
+#            - Constant `c` such that `self|T_q - c * self` has valuation greater than
+#              or equal to `M` (if it exists), otherwise raises ValueError
+#
+#            EXAMPLES::
+#
+#                sage: E = EllipticCurve('11a')
+#                sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#                sage: phi = ps_modsym_from_elliptic_curve(E)
+#                sage: phi.values()
+#                [-1/5, 3/2, -1/2]
+#                sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#                sage: phi_ord.Tq_eigenvalue(2,3,10) + 2
+#                O(3^10)
+#
+#                sage: phi_ord.Tq_eigenvalue(3,3,10)
+#                2 + 3^2 + 2*3^3 + 2*3^4 + 2*3^6 + 3^8 + 2*3^9 + O(3^10)
+#                sage: phi_ord.Tq_eigenvalue(3,3,100)
+#                Traceback (most recent call last):
+#                ...
+#                ValueError: not a scalar multiple
+#            """
+#            qhecke = self.hecke(q)
+#            gens = self.parent.source().gens()
+#            if p is None:
+#                p = self.parent.prime()
+#            i = 0
+#            g = gens[i]
+#            verbose("Computing eigenvalue")
+#            while self._map[g].is_zero(p, M):
+#                if not qhecke._map[g].is_zero(p, M):
+#                    raise ValueError("not a scalar multiple")
+#                i += 1
+#                try:
+#                    g = gens[i]
+#                except IndexError:
+#                    raise ValueError("self is zero")
+#            aq = self._map[g].find_scalar(qhecke._map[g], p, M, check)
+#            if check:
+#                verbose("Checking that this is actually an eigensymbol")
+#                if p is None or M is None:
+#                    for g in gens[1:]:
+#                        if qhecke._map[g] != aq * self._map[g]:
+#                            raise ValueError("not a scalar multiple")
+#                elif (qhecke - aq * self).valuation(p) < M:
+#                    raise ValueError("not a scalar multiple")
+#            return aq
+#
+#        def is_ordinary(self,p=None):
+#            if p == None:
+#                if self.parent.prime() == None:
+#                    raise ValueError("need to specify a prime")
+#                p = self.parent.prime()
+#            else:
+#                if (self.parent.prime() != p) and (self.parent.prime() != None):
+#                    raise ValueError("prime does not match coefficient module's prime")                
+#            ap = self.Tq_eigenvalue(p)
+#            if self.base_ring().is_exact() and (self.base_ring() != QQ):
+#                    raise ValueError("not implemented yet")  ## need to specify a prime of number field, 
+#                                                             ## but then you need underlying prime to apply Hecke
+#            return ap.valuation(p) == 0
+#        
