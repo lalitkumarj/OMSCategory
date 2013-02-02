@@ -6,7 +6,7 @@ from sage.structure.sage_object import SageObject
 #################################################################################################################
 
 class FamiliesSpace(Parent):
-	def __init__(self,p,deg,r,moments,char=None):
+	def __init__(self,p,M_max,d_max,r,char=None):
 	        """
 		Initializes a familiy of distributions
 
@@ -16,6 +16,8 @@ class FamiliesSpace(Parent):
 			- r -- an integer from 0 to p-2 marking our specified disc in weight space (whose tame char is omega^r)
 			- moments -- a vector of power series in w which are the moments of our distribution
 			- char -- optional argument which is a Dirichlet character (denoting the nebentype character)
+            - M the maximum allowed p-adic precision
+            - d the maximum allowed w-adic precision
 
 		OUTPUT:
         
@@ -23,46 +25,24 @@ class FamiliesSpace(Parent):
 
         	"""
 		self.p=p
-		self.deg=deg
+        self.M_max = M_max
+		self.d_max=d_max
 		self._disc=r     ##  this r is an integer from 0 to p-2 which represents which disc in weight space we are working on
-		self.moments=moments
 		if char != None:
 			self._char = char
 		else:
 			self._char = DirichletGroup(1,QQ).0
+        Parent.__init__(self,category=MSCoefficientModule)
+        Element = FamiliesElement
 			
 	def __repr__(self):
-		return repr(self.moments)
-
-	def moment(self,n):
-		return self.moments[n]
+		return "Space of families of distributions" 
 
 	def char(self):
 		return self._char
 
 	def disc(self):
 		return self._disc
-
-	def num_moments(self):
-		return len(self.moments)
-
-	def change_deg(self,new_deg):
-		assert new_deg<=self.deg, "can only lower degree"
-		v=[self.moments[a].truncate(new_deg) for a in range(self.num_moments())]
-		return dist_fam(self.p,new_deg,self.disc(),vector(v),self.char())
-
-	def truncate(self):
-		v=self.moments
-		w=[v[j].truncate(self.deg) for j in range(self.num_moments())]
-		return dist_fam(self.p,self.deg,self.disc(),vector(w),self.char())
-
-	def __add__(self,right):
-#		assert self.num_moments()==right.num_moments(), "the accuracies are different"
-#		assert self.deg==right.deg, "the degrees in w are different"
-		return dist_fam(self.p,self.deg,self.disc(),self.moments+right.moments,self.char())
-
-	def scale(self,left):
-		return dist_fam(self.p,self.deg,self.disc(),(left*self.moments),self.char()).truncate()
 
 	def __sub__(self,right):
 		return self+right.scale(-1)
@@ -73,22 +53,9 @@ class FamiliesSpace(Parent):
 	def zero(self):
 		return dist_fam(self.p,self.deg,self.disc(),vector([self.moment(0)*0 for i in range(0,len(self.moments))]),self.char())
 	
-	def is_zero(self):
-		"""Return true if all of self's moments are zero."""
-		return self.moments.is_zero()
-
 	def gen(self):
 		""" Returns the variable of the moments of the distribution (i.e. w)"""
 		return self.moment(0).parent().gen()
-
-	def specialize(self,k):
-		"""evaluates at ((1+p)^k-1)/p"""
-		assert k % (self.p - 1) == self.disc(), "Wrong component of weight space"
-		w=self.gen()
-		v=[]
-		for j in range(0,self.num_moments()):
-			v=v+[Rational(self.moment(j).substitute(w=((1+self.p)^k-1)/self.p))]
-		return dist(self.p,k,vector(v),self.char())
 
 	def valuation(self):
 		return min([val(self.moment(j),self.p) for j in range(self.num_moments())])
