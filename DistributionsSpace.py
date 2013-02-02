@@ -14,28 +14,34 @@ from sage.modular.pollack_stevens.dist import get_dist_classes, Dist_long, iScal
 import sage.rings.ring as ring
 
 
-class DistributionSpace(Parent):
+class DistributionsSpace(Parent):
+    r"""
+    INPUT:
+        
+    - `k` -- nonnegative integer
+    - `p` -- prime number or None
+    - ``prec_cap`` -- positive integer or None
+    - ``base`` -- ring or None
+    - ``symk`` -- bool or None
+    - ``character`` -- a dirichlet character or None
+    - ``tuplegen`` -- None or callable that turns 2x2 matrices into a 4-tuple
+    - ``act_on_left`` -- bool (default: False)
+        
+    EXAMPLES:: #must be updated
+        
+    sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
+    sage: Distributions(20, 3, 10)              # indirect doctest
+    Space of 3-adic distributions with k=20 action and precision cap 10
+    """
+    
     def __init__(self, k, p=None, prec_cap=None, base=None, symk=None, character=None, act_on_left=False):
+        
         """
-       INPUT:
-
-       - `k` -- nonnegative integer
-       - `p` -- prime number or None
-       - ``prec_cap`` -- positive integer or None
-       - ``base`` -- ring or None
-       - ``symk`` -- bool or None
-       - ``character`` -- a dirichlet character or None
-       - ``tuplegen`` -- None or callable that turns 2x2 matrices into a 4-tuple
-       - ``act_on_left`` -- bool (default: False)
-
-       EXAMPLES::
-
-           sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
-           sage: Distributions(20, 3, 10)              # indirect doctest
-           Space of 3-adic distributions with k=20 action and precision cap 10
-       """
+        See ``DistributionSpace`` for full documentation.
+        """
+        
         Parent.__init__(self,category=MSCoefficientModule)
-        Element = DistributionElementPy
+        Element = DistributionElementPy #do we want elements to be DistributionElementPy or DistributionElementBase
 
         k = ZZ(k)
         if p is None:
@@ -59,7 +65,7 @@ class DistributionSpace(Parent):
 
     def _repr_(self):
         """
-    EXAMPLES::
+        EXAMPLES::
 
         sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         sage: Distributions(0, 5, 10)._repr_()
@@ -74,9 +80,9 @@ class DistributionSpace(Parent):
 
     def change_ring(self, new_base_ring):
         """
-    Return space of distributions like this one, but with the base ring changed.
+        Return space of distributions like this one, but with the base ring changed.
 
-    EXAMPLES::
+        EXAMPLES::
 
         sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         sage: D = Distributions(0, 7, 4); D
@@ -88,15 +94,15 @@ class DistributionSpace(Parent):
         sage: D2.base_ring()
         7-adic Field with capped relative precision 20
         """
-        return Distributions(k=self._k, p=self._p, prec_cap=self._prec_cap, base=new_base_ring, character=self._character, tuplegen=self._act._tuplegen, act_on_left=self._act.is_left())
+        return DistributionsSpace(k=self._k, p=self._p, prec_cap=self._prec_cap, base=new_base_ring, character=self._character, tuplegen=self._act._tuplegen, act_on_left=self._act.is_left())
 
     def specialize(self, new_base_ring=None):
         """
-    Return distribution space got by specializing to Sym^k, over
-    the new_base_ring.  If new_base_ring is not given, use current
-    base_ring.
+        Return distribution space got by specializing to Sym^k, over
+        the new_base_ring.  If new_base_ring is not given, use current
+        base_ring.
 
-    EXAMPLES::
+        EXAMPLES::
 
         sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         sage: D = Distributions(0, 7, 4); D
@@ -114,5 +120,5 @@ class DistributionSpace(Parent):
             raise NotImplementedError
         if new_base_ring is None:
             new_base_ring = self.base_ring()
-        return Symk(k=self._k, base=new_base_ring, tuplegen=self._act._tuplegen, act_on_left=self._act.is_left())
+        return SymkSpace(k=self._k, base=new_base_ring, tuplegen=self._act._tuplegen, act_on_left=self._act.is_left())
 
