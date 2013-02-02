@@ -37,7 +37,7 @@ class DistributionsSpace(Parent):
     def __init__(self, k, p=None, prec_cap=None, base=None, symk=None, character=None, act_on_left=False):
         
         """
-        See ``DistributionSpace`` for full documentation.
+        See ``DistributionsSpace`` for full documentation.
         """
         
         Parent.__init__(self,category=MSCoefficientModule)
