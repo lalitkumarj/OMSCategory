@@ -205,3 +205,4 @@ class ElementMethods:
         def _is_malformed()
         def act_right()
 
+        def find_scalar

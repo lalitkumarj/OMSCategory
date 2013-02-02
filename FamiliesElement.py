@@ -25,7 +25,7 @@ class FamiliesElement(SageObject):
 
         	"""
         self.parent = parent
-		self.moments=moments
+	self.moments=moments
         self.M = self.parent.M_max
         self.d = self.parent.d_max
 
