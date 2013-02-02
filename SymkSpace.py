@@ -6,7 +6,7 @@ class SymkSpace(Parent):
             p = base.prime()
         else:
             p = None
-        Distributions_abstract.__init__(self, k, p, k+1, base, character, tuplegen, act_on_left)
+        DistributionsSpace.__init__(self, k, p, k+1, base, character, tuplegen, act_on_left)
 
     def _repr_(self):
         """
