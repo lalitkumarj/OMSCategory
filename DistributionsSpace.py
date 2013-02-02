@@ -10,7 +10,7 @@ from sage.rings.integer_ring import ZZ
 #from sage.structure.coerce_actions import LeftModuleAction, RightModuleAction
 #from sage.matrix.all import MatrixSpace
 #from sage.rings.fast_arith import prime_range
-from sage.modular.pollack_stevens.dist import get_dist_classes, Dist_long, iScale
+#from sage.modular.pollack_stevens.dist import get_dist_classes, Dist_long, iScale
 #import sage.rings.ring as ring
 
 
@@ -34,7 +34,7 @@ class DistributionsSpace(Parent):
     Space of 3-adic distributions with k=20 action and precision cap 10
     """
     
-    def __init__(self, k, p=None, prec_cap=None, base=None, symk=None, character=None, act_on_left=False):
+    def __init__(self, k, p=None, prec_cap=None, base=None, symk=None, character=None, act_on_left=False): #what does symk do?
         
         """
         See ``DistributionsSpace`` for full documentation.
