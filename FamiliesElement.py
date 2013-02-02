@@ -44,7 +44,7 @@ class FamiliesElement(SageObject):
         w=[v[j].truncate(self.d) for j in range(self.num_moments())]
         return FamiliesElement(vector(w),self.M,self.d,self.parent)
 
-    def change_deg(self,new_d):
+    def change_d(self,new_d):
         assert new_d<=self.d, "can only lower degree"
         v=[self.moments[a].truncate(new_d) for a in range(self.num_moments())]
         return FamiliesElement(vector(v),self.M,new_d,self.parent)
