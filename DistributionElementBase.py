@@ -1,4 +1,4 @@
-cdef class Dist(ModuleElement):
+cdef class DistributionElementBase(ModuleElement):
     r"""
         The main p-adic distribution class, implemented as per the paper
         'Overconvergent Modular Symbols and p-adic L-functions' by Pollack
