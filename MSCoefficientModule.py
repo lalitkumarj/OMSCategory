@@ -192,13 +192,17 @@ class MSCoefficientModule(Category):
             return [self(v) for v in V.basis()]
 
 
-class ElementMethods:
+    class ElementMethods:
         def normalize():
             pass
-        def valuation(Self, p=None);
-        def scale
-        def is_zero
-        def _rmul_
+        def valuation(self, p=None):
+            pass
+        def scale():
+            pass
+        def is_zero():
+            pass
+        def _rmul_():
+            pass
         def lift():
             pass
         def find_scalar()

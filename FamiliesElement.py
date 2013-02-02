@@ -80,9 +80,12 @@ class FamiliesElement(SageObject):
         return dist(self.p,k,vector(v),self.char())
 
     def valuation(self):
-        return min([val(self.moment(j),self.parent.p) for j in range(self.num_moments())])
+        return min([val(a,self.parent.p) for a in self.moment()])
 
     def normalize(self):
+        """
+        foo
+        """
         N=self.num_moments()
         v=[]
         p = self.parent.p
@@ -102,13 +105,19 @@ class FamiliesElement(SageObject):
         mu=FamiliesElement(vector(v),self.M,self.d,self.parent)
         return mu
 
+    def act_by_ps_fam(self,F):
+        gam=form_acting_matrix_on_dist_fam(F)
+        v=(Matrix(self.moments)*gam)[0]
+        w=[v[j].truncate(self.deg) for j in range(self.num_moments())]
+        return dist_fam(self.p,self.deg,self.disc(),vector(w),self.char())
+
     def act_right_weight_zero(self,gam):
         a=gam[0,0]
         b=gam[0,1]
         c=gam[1,0]
         d=gam[1,1]
         G=form_acting_matrix_on_dist(self.p,self.num_moments(),0,a,b,c,d)
-        return dist_fam(self.p,self.deg,self.disc(),(Matrix(self.moments)*G)[0],self.char())
+        return FamiliesElement((Matrix(self.moments)*G)[0],self.M,self.d,self.parent)
 
     def act_right(self,gam):
         w=self.gen()
@@ -136,13 +145,6 @@ def form_acting_matrix_on_dist_fam(F):
         list.insert(0,0)
         list.pop()
     return Matrix(v).transpose()
-
-def normalize(F,p,r,N):
-    v=F.list()
-    M=ceil((N-r)*(p-2)/(p-1))
-    v=[v[a]%(p^M) for a in range(len(v))]
-    S=F.parent()
-    return S(v)
 
 def val(F,p):
     v=F.list()
