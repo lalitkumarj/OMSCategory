@@ -4,9 +4,7 @@ import modsym_space
 class ModsymFamiliesSpace(Parent):
 
     def __init__(self,p,N,M,d_max,r,char=None):
-        #initialize the manin relations
-        #do other stuff??
-        Parent.__init__(self,category=ModsymSpace)
+        Parent.__init__(self,category=ModsymSpace())
         Element = ModsymFamiliesElement
         self.manin_relations = ManinRelations(N*p)#????????
         self.coefficient_module = FamiliesSpace(p,M,d,r,prec,char)
