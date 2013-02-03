@@ -1,3 +1,4 @@
 ## generic files to ignore
 *~
 *.swp
+*.pyc
