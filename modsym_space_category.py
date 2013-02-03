@@ -12,8 +12,8 @@ class ModsymSpace(Category):
         def coefficient_module():
             pass
         
-        def prime():
-            if self._p is None:
+        def prime(self):
+            if self.p is None:
                 raise ValueError, "not a space of p-adic distributions"
 
 
@@ -65,7 +65,7 @@ class ModsymSpace(Category):
                 sage: D.precision_cap()
                 390
             """
-            return self._prec_cap
+            return (self.M_max,self.d_max)
 
         def approx_module(self, M=None):
             """
@@ -124,6 +124,8 @@ class ModsymSpace(Category):
             pass
         def char(self):
             return self.coefficient_module.char()
+        def weight(self):
+            pass
 
     class ElementMethods:
         def __init__(self,map_data,parent,construct = False):

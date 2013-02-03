@@ -105,6 +105,7 @@ class MSCoefficientModule(Category):
             """
             return self(self.approx_module(M)(0))
 
+        zero = zero_element
         def precision_cap(self):
             """
             Return the precision cap on distributions.

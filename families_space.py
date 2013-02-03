@@ -51,7 +51,7 @@ class FamiliesSpace(Parent):
 
 
 	def zero(self):
-		return FamiliesElement(vector([0 for i in length(self.M_max)]),self.M_max,self.d_max,self)
+		return FamiliesElement(vector([0 for i in range(self.M_max)]),self.M_max,self.d_max,self)
 	
 	def gen(self):
 		""" Returns the variable of the moments of the distribution (i.e. w)"""
@@ -69,7 +69,7 @@ class FamiliesSpace(Parent):
 		return mus
 
 
-	def random_element(self):
+	def random_element(self,prec_cap):
 		v = []
 		pM = self.p ** self.M_max
 		pjs = []
