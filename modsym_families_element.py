@@ -1,5 +1,5 @@
 #IMPLEMENT Hecke
-class ModsymFamiliesElement(Element):
+class ModsymFamiliesElement:
 	
 	
 

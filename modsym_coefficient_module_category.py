@@ -1,8 +1,11 @@
 from sage.categories.all import Category
 
 class MSCoefficientModule(Category):
+    def super_categories(self):
+        return []
+
     def __repr__(self):
-        print "Category of Corfficient Modules"
+        return "Category of Modular Symbol Coefficient Modules"
 
     class ParentMethods:
         def _repr_(self):
@@ -205,8 +208,9 @@ class MSCoefficientModule(Category):
             pass
         def lift():
             pass
-        def find_scalar()
-        def _is_malformed()
-        def act_right()
-
-        def find_scalar
+        def find_scalar():
+            pass
+        def _is_malformed():
+            pass
+        def act_right():
+            pass

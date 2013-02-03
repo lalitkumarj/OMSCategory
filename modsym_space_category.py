@@ -1,13 +1,14 @@
 from sage.categories.all import Category
 
 class ModsymSpace(Category):
+    def super_categories(self):
+        return []
+
     def __repr__(self):
-        print "Category of Modular Symbol Spaces"
+        return "Category of Modular Symbol Spaces"
+
 
     class ParentMethods:
-        def _repr_(self):
-            pass
-
         def coefficient_module():
             pass
         
@@ -15,8 +16,6 @@ class ModsymSpace(Category):
             if self._p is None:
                 raise ValueError, "not a space of p-adic distributions"
 
-        def random_element():
-            pass
 
         def zero_element(self, M=None):
             """
@@ -122,7 +121,9 @@ class ModsymSpace(Category):
             pass
 
         def basis(self, M=None):
-            
+            pass
+        def char(self):
+            return self.coefficient_module.char()
 
     class ElementMethods:
         def __init__(self,map_data,parent,construct = False):

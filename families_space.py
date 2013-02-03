@@ -1,5 +1,8 @@
 from sage.structure.sage_object import SageObject
-
+from sage.modular.dirichlet import DirichletGroup
+from sage.rings.all import ZZ, QQ
+from sage.all import *
+import modsym_coefficient_module_category
 #################################################################################################################
 ##  A family of distributions -- i.e. an element of D \hat{\otimes} A(W_r) -- is represented by a vector whose 
 ##  i-th entry is the i-th moment of the distribution (which is a power series in w).
@@ -25,24 +28,21 @@ class FamiliesSpace(Parent):
 
         	"""
 		#
-	
-		self.A = PowerSeries(Zp(p,prec))
-		self.w = A.gen()
+		Parent.__init__(self,category=MSCoefficientModule())
+		Element = FamiliesElement
+		
+		self.A = PowerSeriesRing(Zp(p,prec),'w')
 		self.p=p
+		self.w = self.A.gen()
 		self.M_max = M_max
 		self.d_max=d_max
 		self._disc=r     ##  this r is an integer from 0 to p-2 which represents which disc in weight space we are working on
+		
 		if char != None:
 			self._char = char
 		else:
-			self._char = DirichletGroup(1,QQ).0
-		
-	Parent.__init__(self,category=MSCoefficientModule)
-        Element = FamiliesElement
+			self._char = DirichletGroup(1,QQ)[0]
 			
-	def __repr__(self):
-		return "Space of families of distributions" 
-
 	def char(self):
 		return self._char
 
@@ -50,8 +50,8 @@ class FamiliesSpace(Parent):
 		return self._disc
 
 
-	def zero(self,length):
-		return FamiliesElement(vector([0 for i in range(0,length)]),self.M_max,self.d_max,self)
+	def zero(self):
+		return FamiliesElement(vector([0 for i in length(self.M_max)]),self.M_max,self.d_max,self)
 	
 	def gen(self):
 		""" Returns the variable of the moments of the distribution (i.e. w)"""
@@ -70,26 +70,25 @@ class FamiliesSpace(Parent):
 
 
 	def random_element(self):
-	v = []
-	R = w.parent()
-	pM = self.p ** M_max
-	pjs = []
-	comp_pjs = True
-	cur_pow = -1	#for computing pjs
-	for a in range(M):
-		flist = []
-		for j in range(self.deg):
-			if comp_pjs:
-				test_pow = ceil(j * (p-2)/(p-1))
-				if test_pow > cur_pow:
-					cur_pow = test_pow
-					pjs.append(self.p ** cur_pow)
-				else:
-					pjs.append(pjs[-1])
-			flist.append(pjs[j] * ZZ(floor(random() * pM)))
-		comp_pjs = False
-		v.append(R(flist))
-	return FamiliesElement(vector(v),M_max,self.deg,self).normalize()
+		v = []
+		pM = self.p ** self.M_max
+		pjs = []
+		comp_pjs = True
+		cur_pow = -1	#for computing pjs
+		for a in range(self.M_max):
+			flist = []
+			for j in range(self.d_max):
+				if comp_pjs:
+					test_pow = ceil(j * (self.p-2)/(self.p-1))
+					if test_pow > cur_pow:
+						cur_pow = test_pow
+						pjs.append(self.p ** cur_pow)
+					else:
+						pjs.append(pjs[-1])
+				flist.append(pjs[j] * ZZ(floor(random() * pM)))
+			comp_pjs = False
+			v.append((self.A)(flist))
+		return FamiliesElement(vector(v),self.M_max,self.d_max,self)
 
 
 

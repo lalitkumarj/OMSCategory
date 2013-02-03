@@ -7,7 +7,7 @@ from sage.structure.sage_object import SageObject
 
 class FamiliesElement(SageObject):
     def __init__(self,moments,M,d,parent):
-            """
+        """
         Initializes a familiy of distributions
 
         INPUT:
