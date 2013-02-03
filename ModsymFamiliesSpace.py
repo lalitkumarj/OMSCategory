@@ -38,33 +38,35 @@ class ModsymFamiliesSpace(ModsymSpace):
 ##  r -- integer between 0 and p-2 indicating which disc on weight space we are working
 ##  w -- variable which is just carried around because I had trouble with symbols being defined over different rings
 #####################################################################################################################
-    def random_OMS_fam(TestTorsion=False):
-    if self.char == None:
-        self.char = DirichletGroup(1,QQ).0
-    manin = self.manin_relations
-    t2 = 0
-    t3 = 0
-    if (self.p == 2) and (len(manin.gens()) > 0):
-        t2 = 1
-    if (self.p == 3) and (len(manin.gens()) > 0):
-        t3 = 1
-    MM = M + t2 + t3 + 1 + floor(log(self.M)/log(self.p))
-
-    v = []
-    ## this loop runs through each generator (different from D_infty) and picks a random value for that generator
-    for g in manin.gens():
+    def random_OMS_fam(prec=None, TestTorsion=False):
+        if self.char == None:
+            self.char = DirichletGroup(1,QQ).0
+        if prec is None:
+            M = self.precision_cap()
             
-        mus = coefficient_module.random_element()
-        if not (g in manin.reps_with_two_tor) and not (g in manin.reps_with_three_tor)):
-                    v = v + [mus]
-        elif (g in manin.reps):
-            ## Case of two torsion (See [PS] section 4.1)
-            v = v + [1/2*(mus - mus*g)]
-        else:
-            ## Case of three torsion (See [PS] section 4.1)    
-            v = v + [(2*mus - mus*g - 1/3*mus*gam**2]
-
-       t = coefficient_module.zero()
+        manin = self.source()
+        t2 = 0
+        t3 = 0
+        if (self.prime() == 2) and (len(manin.reps_with_two_torsion()) > 0):
+            t2 = 1
+        if (self.prime() == 3) and (len(manin.reps_with_three_torsion()) > 0):
+            t3 = 1
+        MM = M + t2 + t3 + 1 + floor(log(self.M)/log(self.p))
+        
+        v = []
+        ## this loop runs through each generator (different from D_infty) and picks a random value for that generator
+        for g in manin.gens():
+            mus = coefficient_module.random_element()
+            if not (g in manin.reps_with_two_tor) and not (g in manin.reps_with_three_tor)):
+                v = v + [mus]
+            elif (g in manin.reps):
+                ## Case of two torsion (See [PS] section 4.1)
+                v = v + [1/2*(mus - mus*g)]
+            else:
+                ## Case of three torsion (See [PS] section 4.1)    
+                v = v + [(2*mus - mus*g - 1/3*mus*gam**2]
+        
+        t = coefficient_module.zero()
     ## This loops adds up around the boundary of fundamental domain except the two verticle lines
     for g in manin.gens():
         if  not (g in manin.reps_with_two_tor) and not (g in manin.reps_with_three_tor)):
