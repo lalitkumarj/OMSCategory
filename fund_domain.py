@@ -104,16 +104,10 @@ class PSModularSymbolsDomain(SageObject):
 
         self._gens = [reps[i] for i in self._indices]
         self._ngens = len(indices)
-        print "rels",type(rels)
-        print "reps",type(reps)
         self._rels = rels
         self._rel_dict = {}
         for j, L in enumerate(rels):
-            print type(reps[j]),reps[j]
-            print [(d, A, reps[i]) for (d, A, i) in L]
-            print "AAAAAAAAAA",hash(reps[j]),type(reps[j])
-            self._rel_dict[reps[j]] = 0
-#self._rel_dict[reps[j]] = [(d, A, reps[i]) for (d, A, i) in L]
+            self._rel_dict[reps[j]] = [(d, A, reps[i]) for (d, A, i) in L]
         ## A list of lists of triples (d, A, i), one for each coset
         ## representative of Gamma_0(N) (ordered to correspond to the
         ## representatives of self.reps) expressing the value of a
