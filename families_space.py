@@ -3,6 +3,7 @@ from sage.modular.dirichlet import DirichletGroup
 from sage.rings.all import ZZ, QQ
 from sage.all import *
 import modsym_coefficient_module_category
+from families4 import WeightKAction_fam
 #################################################################################################################
 ##  A family of distributions -- i.e. an element of D \hat{\otimes} A(W_r) -- is represented by a vector whose 
 ##  i-th entry is the i-th moment of the distribution (which is a power series in w).
@@ -42,6 +43,8 @@ class FamiliesSpace(Parent):
 			self._char = char
 		else:
 			self._char = DirichletGroup(1,QQ)[0]
+        act = WeightKAction_fam(self,self.char(),None,False)
+        self.register_action(act)
 			
 	def char(self):
 		return self._char
@@ -51,7 +54,7 @@ class FamiliesSpace(Parent):
 
 
 	def zero(self):
-		return FamiliesElement(vector([0 for i in length(self.M_max)]),self.M_max,self.d_max,self)
+		return FamiliesElement(vector([0 for i in range(self.M_max)]),self.M_max,self.d_max,self)
 	
 	def gen(self):
 		""" Returns the variable of the moments of the distribution (i.e. w)"""
@@ -69,7 +72,7 @@ class FamiliesSpace(Parent):
 		return mus
 
 
-	def random_element(self):
+	def random_element(self,prec_cap):
 		v = []
 		pM = self.p ** self.M_max
 		pjs = []
