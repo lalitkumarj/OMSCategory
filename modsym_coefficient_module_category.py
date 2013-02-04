@@ -1,50 +1,43 @@
-from sage.categories.all import Category
+from sage.categories.category_types import Category_module
+#from category_types import Category_module (this file will be in the Categories
+# folder when we're done)
 
-class MSCoefficientModule(Category):
+class MSCoefficientModule(Category_module):
     def super_categories(self):
-        return []
-
-    def __repr__(self):
-        return "Category of Modular Symbol Coefficient Modules"
-
+        from sage.categories.modules import Modules
+        return [Modules(self.base_ring())]
+    
+    #def __repr__(self):
+    #    return "Category of Modular Symbol Coefficient Modules"
+    
     class ParentMethods:
-        @abstract_method
         def involution(self):
-            """ """
-
+            """
+            This returns the involution on this space of modular symbols. This
+            depends on how the action is defined.
+            """
+            return self.action().involution()
+        
         @abstract_method(optional = True)
         def prime(self):
-            """An optional method to return p."""
-
+            """
+            An optional method to return p. Currently, the convention is to set
+            the prime to 0 if over a ring such as QQ or CC, but this could
+            change.
+            """
+        
         @abstract_method
         def weight(self):
             """ """
-
+        
         @abtract_method
         def character(self):
             """ """
-
+        
         #Not sure if we need to require a definition for action on each side.
         @abstract_method
-        def action_right(self, g_right):
-            """Act by g_right on the right."""
-
-        @abstract_method
-        def action_left(self, g_left):
-            """Act by g_left on the left."""
-
-        @abtract_method
-        def random_element():
-            """ """
-
-        @abstract_method
-        def zero_element(self, M=None):
-            """ """
-
-
+        def action(self):
+            """Returns the action that acts on this coefficient module."""
+        
     class ElementMethods:
-
-        @abstract_method
-        def is_zero():
-            """ """
-
+        pass
