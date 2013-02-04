@@ -7,9 +7,9 @@ class ModularSymbolSpaces(Category_module):
         from sage.categories.modules import Modules
         return [Modules(self.base_ring())]
     
-    def required_methods(self):
-        return { "parent"  : abstract_methods_of_class(self.parent_class),
-                 "element" : abstract_methods_of_class(self.element_class) }
+    #def required_methods(self):
+    #    return { "parent"  : abstract_methods_of_class(self.parent_class),
+    #             "element" : abstract_methods_of_class(self.element_class) }
     
     # This might be done automagically!
     #def __repr__(self):
@@ -33,22 +33,27 @@ class ModularSymbolSpaces(Category_module):
             
         @abstract_method
         def source(self):
-            """ """
+            """
+            
+            """
             
         @abstract_method
         def hecke(self):
-            """ NOT IMPLEMENTED IN PARENT CURRENTLY. Implemented in PSmodularsymbolelement. Should this be an element method?"""
+            """
+            
+            """
         
         @abstract_method(optional = True)
         def prime(self):
-           """ """
+           """
+           
+           """
         
     class ElementMethods:
 
         @abstract_method
-        def call(self):
-            """ There is a _call in the action ... is this the same thing?"""
-
+        def _call_(self):
+            """ There is a _call in the action ... is this the same thing? No."""
         
         def plus_part(self):
             r"""
@@ -69,9 +74,8 @@ class ModularSymbolSpaces(Category_module):
                 sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
                 True
             """
-            #?????????????
-            return self.parent.involution() + self
-
+            return self + self.action().involution()
+        
         def minus_part(self):
             r"""
             Returns the minus part of self -- i.e. self - self | [1,0,0,-1]
@@ -91,5 +95,4 @@ class ModularSymbolSpaces(Category_module):
                 sage: (phi.plus_part()+phi.minus_part()) == phi * 2
                 True
             """
-            return self - self.parent.involution()
-
+            return self - self.action().involution()
