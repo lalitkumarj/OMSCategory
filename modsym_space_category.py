@@ -1,8 +1,9 @@
-from sage.categories.all import Category
+from sage.categories.category_types import Category_module
 
-class ModularSymbolSpaces(Category):
+class ModularSymbolSpaces(Category_module):
     def super_categories(self):
-        return Modules
+        from sage.categories.modules import Modules
+        return [Modules(self.base_ring())]
 
     def __repr__(self):
         return "Category of Modular Symbol Spaces"
