@@ -66,10 +66,9 @@ class PSModularSymbols_constructor(UniqueFactory):
 
 PSModularSymbols = PSModularSymbols_constructor('PSModularSymbols')
 
-class ModularSymbolSpace_generic(Parent):
+class ModularSymbolSpace_generic(Module):
     """
     This is the parent class for the generic category of modular symbol spaces. 
-    ALL modular symbol spaces are REQUIRED TO INHTERIT FROM THIS CLASS.
 
     A class for spaces of modular symbols that use Glenn Stevens'
     conventions.
@@ -109,7 +108,11 @@ class ModularSymbolSpace_generic(Parent):
             sage: M = PSModularSymbols(Gamma0(2), coefficients=D, sign=1); M.sign()
             1        
         """
-        Module.__init__(self, coefficients.base_ring())
+        #NEW
+        R = coefficients.base_ring()
+        Parent.__init__(self, base = R, category = ModularSymbolSpaces(R))
+        #NEW
+        
         if sign not in [0,-1,1]:
             # sign must be be 0, -1 or 1
             raise ValueError, "sign must be 0, -1, or 1"
