@@ -1,30 +1,47 @@
 from sage.categories.category_types import Category_module
+#from category_types import Category_module (this file will be in the Categories
+# folder when we're done)
 
 class ModularSymbolSpaces(Category_module):
     def super_categories(self):
         from sage.categories.modules import Modules
         return [Modules(self.base_ring())]
-
-    def __repr__(self):
-        return "Category of Modular Symbol Spaces"
-
-
+    
+    def required_methods(self):
+        return { "parent"  : abstract_methods_of_class(self.parent_class),
+                 "element" : abstract_methods_of_class(self.element_class) }
+    
+    # This might be done automagically!
+    #def __repr__(self):
+    #    return "Category of Modular Symbol Spaces"
+    
     class ParentMethods:
         @abstract_method
         def coefficient_module(self):
-            """ """
-        @abstract_method(optional = True)
-        def prime(self):
-           """ """
+            r"""
+            A space of modular symbols is a certain set of homormophisms. This
+            returns the target space, which should be in the category
+            :class:`MSCoefficientModules` over the same base ring as self.
+            """
+        
         @abstract_method
         def character(self):
-            """REALLY??? CURRENT GENERIC DOES NOT CONTAIN THIS """
+            #REALLY??? CURRENT GENERIC DOES NOT CONTAIN THIS
+            """
+            
+            """
+            
         @abstract_method
         def source(self):
             """ """
+            
         @abstract_method
         def hecke(self):
             """ NOT IMPLEMENTED IN PARENT CURRENTLY. Implemented in PSmodularsymbolelement. Should this be an element method?"""
+        
+        @abstract_method(optional = True)
+        def prime(self):
+           """ """
         
     class ElementMethods:
 
