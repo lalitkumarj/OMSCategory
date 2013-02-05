@@ -11,7 +11,7 @@
 #*****************************************************************************
 
 #from sage.structure.sage_object import SageObject
-#from sage.rings.integer_ring import ZZ
+from sage.rings.integer_ring import ZZ
 #from sage.rings.rational_field import QQ
 #from sage.rings.polynomial.all import PolynomialRing
 from sage.rings.power_series_ring import PowerSeriesRing
@@ -20,7 +20,7 @@ from sage.rings.power_series_ring import PowerSeriesRing
 #from sage.modules.free_module_element import vector, zero_vector
 #from sage.matrix.matrix cimport Matrix
 #from sage.matrix.matrix_space import MatrixSpace
-#from sage.matrix.all import matrix
+from sage.matrix.all import matrix
 #from sage.misc.prandom import random
 #from sage.functions.other import floor
 #from sage.structure.element cimport RingElement, Element
@@ -49,6 +49,7 @@ from sage.modular.pollack_stevens.sigma0 import Sigma0
 #include "cdefs.pxi"
 
 from sage.categories.action import Action
+from sage.structure.element import ModuleElement
 
 class WeightKAction_generic(Action):
     def __init__(self, Dk, character, adjuster, on_left, dettwist, padic=False):
@@ -56,7 +57,7 @@ class WeightKAction_generic(Action):
         self._adjuster = adjuster
         self._character = character
         self._dettwist = dettwist
-        self._p = Dk._p
+        #self._p = Dk._p
         self._actmat = {}
         self._maxprecs = {}
         if character is None:
@@ -67,7 +68,11 @@ class WeightKAction_generic(Action):
         #if not self._symk:
         #    self._Np = self._Np.lcm(self._p)
         if padic:
-            self._Np = self._Np.lcm(self._p)
+            try:
+                self._p = Dk._p
+                self._Np = self._Np.lcm(self._p)
+            except AttributeError:
+                pass
             Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring(), adjuster=self._adjuster), Dk, on_left, operator.mul)
         else:
             Action.__init__(self, Sigma0(self._Np, base_ring=ZZ, adjuster=self._adjuster), Dk, on_left, operator.mul)

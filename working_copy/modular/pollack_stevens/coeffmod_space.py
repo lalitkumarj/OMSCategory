@@ -1,5 +1,7 @@
 from sage.modules.module import Module
 from sage.modular.pollack_stevens.coeffmod_element import *
+from sage.structure.parent import Parent
+from sage.categories.modsym_coefficient_module_category import MSCoefficientModules
 
 class CoefficientModule_generic(Module):
     def __init__(self, k, base=None, character=None, \
