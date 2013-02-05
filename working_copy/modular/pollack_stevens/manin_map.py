@@ -42,8 +42,8 @@ sage: f(M2Z([2,3,4,5]))
 from sage.rings.arith import convergents
 from sage.misc.misc import verbose
 from sage.matrix.matrix_integer_2x2 import MatrixSpace_ZZ_2x2, Matrix_integer_2x2
-from sigma0 import Sigma0
-from fund_domain import t00, t10, t01, t11, Id, basic_hecke_matrix, M2Z
+from sage.modular.pollack_stevens.sigma0 import Sigma0
+from sage.modular.pollack_stevens.fund_domain import t00, t10, t01, t11, Id, basic_hecke_matrix, M2Z
 
 def unimod_matrices_to_infty(r, s):
     r"""

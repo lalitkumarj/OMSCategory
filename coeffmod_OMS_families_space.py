@@ -40,10 +40,10 @@ FamiliesOfOMS = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     def __init__(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
                  character=None, adjuster=None, act_on_left=False, \
-                 dettwist=None, variable_name = 'w', \
-                 action_class = WeightKAction_fam):
+                 dettwist=None, action_class = WeightKAction_fam, \
+                 variable_name = 'w'):
         #TODO: deal input of prec_cap
-        self._prec_cap = _prec_cap
+        self._prec_cap = prec_cap
         
         if base is None:
             if base_coeffs is None:
@@ -56,7 +56,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         self._p = base.base_ring().prime()
         CoefficientModule_generic.__init__(self, k, base=base, \
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
-                 dettwist=dettwist)
+                 dettwist=dettwist, action_class=action_class, padic=True)
         
     def prime(self):
         return self._p

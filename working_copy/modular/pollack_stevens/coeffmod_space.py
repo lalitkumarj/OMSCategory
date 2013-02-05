@@ -1,4 +1,4 @@
-from sage.modules.modules import Module
+from sage.modules.module import Module
 from sage.modular.pollack_stevens.coeffmod_element import *
 
 class CoefficientModule_generic(Module):

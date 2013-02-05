@@ -176,8 +176,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         #ensures there's a p in the level.
         #self._Np = self._Np.lcm(self._p)
         self._autfactors = {}
-        WeightKAction.__init___(self, Dk, character, adjuster, on_left, dettwist, \
-                                padic=True):
+        WeightKAction.__init__(self, Dk, character, adjuster, on_left, dettwist, \
+                                padic=True)
     
     def clear_cache(self):
         #Only difference is that it clears the cache for automorphy factors.
