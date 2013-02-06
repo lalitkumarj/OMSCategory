@@ -3,7 +3,7 @@ Assumptions:
     *the "working_copy" folder of our git repository is located at /path/to/working_copy/
     *(recommended) you've cloned your main branch of sage and this clone is your active branch
 
-# 1. Make sure assumptions are true, in paritular you should have a copy of our git repository on your computer
+# 1. Make sure assumptions are true, in particular you should have a copy of our git repository on your computer
 
 # 2. Apply patches to the Sage library:
      sage -sh
@@ -19,6 +19,9 @@ Assumptions:
      ln -s /path/to/working_copy/modular/pollack_stevens .
      cd $SAGE_ROOT/devel/sage/sage/modular/overconvergent/
      ln -s /path/to/working_copy/modular/overconvergent/pollack .
+     cd $SAGE_ROOT/devel/sage/sage/categories/
+     ln -s /path/to/working_copy/categories/modsym_space_category.py .
+     ln -s /path/to/working_copy/categories/modsym_coefficient_module_category.py .
 
 # 4. Rebuild:
      sage -b
