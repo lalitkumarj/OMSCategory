@@ -1,3 +1,10 @@
+from sage.modules.module import Module
+from sage.structure.parent import Parent
+from sage.categories.modsym_space_category import ModularSymbolSpaces
+
+from sage.modular.pollack_stevens.fund_domain import ManinRelations
+from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
+
 class ModularSymbolSpace_generic(Module):
     def __init__(self, group, coefficients, sign=0, element_class = ModularSymbolElement_generic):
         R = coefficients.base_ring()

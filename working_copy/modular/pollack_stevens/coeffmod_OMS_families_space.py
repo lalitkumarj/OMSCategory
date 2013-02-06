@@ -1,3 +1,14 @@
+import sage.rings.ring as ring
+
+from sage.structure.factory import UniqueFactory
+from sage.rings.integer_ring import ZZ
+from sage.rings.power_series_ring import PowerSeriesRing
+from sage.misc.cachefunc import cached_method
+
+from sage.modular.pollack_stevens.sigma0 import _default_adjuster
+from sage.modular.pollack_stevens.coeffmod_space import CoefficientModule_generic
+from sage.modular.pollack_stevens.coeffmod_element import WeightKAction_OMS_fam
+
 class CoeffMod_OMS_Families_factory(UniqueFactory):
     def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
@@ -33,14 +44,14 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
     def create_object(self, version, key):
         k, p, base, character, adjuster, act_on_left, dettwist = key
         return CoeffMod_OMS_Families_space(k, p=p, base=base, character=character, \
-                 adjuster=adjust, act_on_left=act_on_left, dettwist=dettwist)
+                 adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
 FamiliesOfOMS = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
 
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     def __init__(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
                  character=None, adjuster=None, act_on_left=False, \
-                 dettwist=None, action_class = WeightKAction_fam, \
+                 dettwist=None, action_class = WeightKAction_OMS_fam, \
                  variable_name = 'w'):
         #TODO: deal input of prec_cap
         self._prec_cap = prec_cap

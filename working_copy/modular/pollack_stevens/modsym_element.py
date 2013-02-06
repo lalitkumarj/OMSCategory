@@ -1,3 +1,10 @@
+import operator
+
+from sage.categories.action import Action
+from sage.structure.element import ModuleElement
+
+from sage.modular.pollack_stevens.manin_map import ManinMap
+
 class ModSymAction(Action):
     def __init__(self, actor, MSspace):
         Action.__init__(self, actor, MSspace, False, operator.mul)

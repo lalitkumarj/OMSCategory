@@ -13,6 +13,7 @@ class CoefficientModule_generic(Module):
         self._character = character
         self._adjuster=adjuster
         self._dettwist=dettwist
+        print action_class
         self._act = action_class(self, character, adjuster, act_on_left, dettwist, padic=padic)
     
     # Category framework

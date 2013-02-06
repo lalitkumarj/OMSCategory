@@ -52,7 +52,7 @@ from sage.categories.action import Action
 from sage.structure.element import ModuleElement
 
 class WeightKAction_generic(Action):
-    def __init__(self, Dk, character, adjuster, on_left, dettwist, padic=False):
+    def __init__(self, Dk, character, adjuster, on_left, dettwist):
         self._k = Dk._k
         self._adjuster = adjuster
         self._character = character
@@ -67,15 +67,15 @@ class WeightKAction_generic(Action):
         #Do something about this in a derived class
         #if not self._symk:
         #    self._Np = self._Np.lcm(self._p)
-        if padic:
-            try:
-                self._p = Dk._p
-                self._Np = self._Np.lcm(self._p)
-            except AttributeError:
-                pass
-            Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring(), adjuster=self._adjuster), Dk, on_left, operator.mul)
-        else:
-            Action.__init__(self, Sigma0(self._Np, base_ring=ZZ, adjuster=self._adjuster), Dk, on_left, operator.mul)
+        #if padic:
+        #    try:
+        #        self._p = Dk._p
+        #        self._Np = self._Np.lcm(self._p)
+        #    except AttributeError:
+        #        pass
+        #    Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring(), adjuster=self._adjuster), Dk, on_left, operator.mul)
+        #else:
+        #    Action.__init__(self, Sigma0(self._Np, base_ring=ZZ, adjuster=self._adjuster), Dk, on_left, operator.mul)
     
     def clear_cache(self):
         r"""
@@ -176,13 +176,15 @@ class WeightKAction_generic(Action):
 class WeightKAction_OMS_fam(WeightKAction_generic):
     """
     """
-    def __init__(self, Dk, character, adjuster, on_left, dettwist):
+    def __init__(self, Dk, character, adjuster, on_left, dettwist, padic=True):
         #Only difference is that it adds a cache for automorphy factors and
         #ensures there's a p in the level.
         #self._Np = self._Np.lcm(self._p)
         self._autfactors = {}
-        WeightKAction.__init__(self, Dk, character, adjuster, on_left, dettwist, \
-                                padic=True)
+        WeightKAction_generic.__init__(self, Dk, character, adjuster, on_left, dettwist)
+        self._Np = self._Np.lcm(Dk._p)
+        Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring().base_ring(), \
+                        adjuster=self._adjuster), Dk, on_left, operator.mul)
     
     def clear_cache(self):
         #Only difference is that it clears the cache for automorphy factors.

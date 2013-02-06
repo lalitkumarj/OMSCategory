@@ -1,5 +1,8 @@
 # This should be cythoned once it's done.
 
+from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
+from sage.rings.integer_ring import ZZ
+
 class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     # Implementation currently ignores ordp
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=parent):
@@ -18,10 +21,10 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     #    return len(self._moments)
     
     def precision_relative(self):
-        return [Integer(len(self._moments)), self._var_prec]
+        return [ZZ(len(self._moments)), self._var_prec]
     
     def precision_absolute(self):
-        return [Integer(len(self._moments)) + self.ordp, self._var_prec]
+        return [ZZ(len(self._moments)) + self.ordp, self._var_prec]
     
     def normalize(self):
         #customized
