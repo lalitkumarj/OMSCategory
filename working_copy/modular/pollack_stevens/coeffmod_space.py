@@ -6,14 +6,15 @@ from sage.categories.modsym_coefficient_module_category import MSCoefficientModu
 class CoefficientModule_generic(Module):
     def __init__(self, k, base=None, character=None, \
                  adjuster=None, act_on_left=False, dettwist=None, \
-                 action_class = WeightKAction_generic, padic=False):
-        self.Element = CoefficientModuleElement_generic
+                 action_class = WeightKAction_generic, \
+                 element_class = CoefficientModuleElement_generic, padic=False):
+        self.Element = element_class
         Parent.__init__(self, base, category=MSCoefficientModules(base))
         self._k = k
         self._character = character
         self._adjuster=adjuster
         self._dettwist=dettwist
-        print action_class
+        #print action_class
         self._act = action_class(self, character, adjuster, act_on_left, dettwist, padic=padic)
     
     # Category framework
