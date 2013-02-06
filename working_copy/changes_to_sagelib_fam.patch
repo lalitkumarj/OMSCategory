@@ -1,0 +1,51 @@
+# HG changeset patch
+# User Robert Harron <rharron@math.wisc.edu>
+# Date 1360165693 21600
+# Node ID 341d22bbdbf998d554f9417330274fae93c8a038
+# Parent  f15c22727ca0159fe236ecd83c415bea2ec05cb4
+Preliminary changes to sage library for OMS families code.
+
+diff --git a/sage/modular/all.py b/sage/modular/all.py
+--- a/sage/modular/all.py
++++ b/sage/modular/all.py
+@@ -36,4 +36,4 @@
+ 
+ from cusps_nf import NFCusp, NFCusps, NFCusps_clear_cache, Gamma0_NFCusps
+ 
+-from btquotients.all import *
++#from btquotients.all import *
+diff --git a/sage/modular/modform/element.py b/sage/modular/modform/element.py
+--- a/sage/modular/modform/element.py
++++ b/sage/modular/modform/element.py
+@@ -19,7 +19,7 @@
+ from sage.modules.free_module_element import vector
+ from sage.misc.misc import verbose
+ from sage.modular.dirichlet import DirichletGroup
+-from sage.modular.pollack_stevens.space import ps_modsym_from_simple_modsym_space
++#from sage.modular.pollack_stevens.space import ps_modsym_from_simple_modsym_space
+ 
+ def is_ModularFormElement(x):
+     """
+@@ -846,7 +846,7 @@
+             Modular symbol with values in Sym^0 Q^2
+         """
+         M = self.modular_symbols(sign)
+-        return ps_modsym_from_simple_modsym_space(M)
++        return #ps_modsym_from_simple_modsym_space(M)
+ 
+     def _defining_modular_symbols(self):
+         """
+diff --git a/sage/schemes/elliptic_curves/ell_rational_field.py b/sage/schemes/elliptic_curves/ell_rational_field.py
+--- a/sage/schemes/elliptic_curves/ell_rational_field.py
++++ b/sage/schemes/elliptic_curves/ell_rational_field.py
+@@ -1245,8 +1245,8 @@
+             sage: E.PS_modular_symbol()    
+             Modular symbol with values in Sym^0 Q^2
+         """
+-        from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+-        return ps_modsym_from_elliptic_curve(self)
++        #from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
++        return #ps_modsym_from_elliptic_curve(self)
+ 
+     def newform(self):
+         r"""

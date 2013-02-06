@@ -49,6 +49,17 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
 FamiliesOfOMS = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
 
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
+    r"""
+    EXAMPLES::
+    
+        sage: D = FamiliesOfOMS(0, base=PowerSeriesRing(Zp(3, 10), default_prec=5)); D
+        Families of overconvergent distributions of weight 0 over ??
+        sage: D.prime()
+        5
+        sage: D.precision_cap()
+        [10, 5]
+    """
+    
     def __init__(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
                  character=None, adjuster=None, act_on_left=False, \
                  dettwist=None, action_class = WeightKAction_OMS_fam, \
@@ -68,7 +79,16 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         CoefficientModule_generic.__init__(self, k, base=base, \
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, padic=True)
-        
+    
+    def _repr_(self):
+        s = "Families of overconvergent distributions on the disc %s " % (self._k)
+        if self._character is not None:
+            s += "twisted by %s " % (self._character)
+        if self._dettwist is not None:
+            s += "and det^%s " % (self._dettwist)
+        s += "over %" % (self.base_ring())
+        return s
+    
     def prime(self):
         return self._p
     
