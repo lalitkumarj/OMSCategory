@@ -17,7 +17,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             elif moments == 0:
                 moments = parent.approx_module(parent._prec_cap[0], parent._prec_cap[1])(moments)
             else:
-                moments = parent.approx_module(1, parent.precision_cap()[1])([moments])
+                moments = parent.approx_module(parent._prec_cap[0], parent.precision_cap()[1])([moments]*parent._prec_cap[0])
         self._moments = moments
         #if var_prec is None:
         #    self._var_prec = parent._prec_cap[1]
@@ -31,6 +31,20 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     def _repr_(self):
         
         return repr(self._moments)
+    
+    def _lmul_(self, right):
+        """
+        Scalar multiplication self*right.
+        """
+        if right.is_zero():
+            return self.parent().zero()
+        return self.parent()(self._moments*right)
+    
+    def _rmul_(self, left):
+        """
+        Scalar multiplication left*self.
+        """
+        return self._lmul_(left)
     
     def precision_relative(self):
         return [ZZ(len(self._moments)), self._var_prec]

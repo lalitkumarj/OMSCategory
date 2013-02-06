@@ -50,6 +50,7 @@ from sage.modular.pollack_stevens.sigma0 import Sigma0
 
 from sage.categories.action import Action
 from sage.structure.element import ModuleElement
+from sage.modular.pollack_stevens.families_util import automorphy_factor_matrix
 
 class WeightKAction_generic(Action):
     def __init__(self, Dk, character, adjuster, on_left, dettwist):
@@ -194,9 +195,9 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
     
     def _compute_aut_factor_matrix(self, g, M):
         #compute the power series
-        D = self.underlying_set()
+        D = self.domain()
         p_prec, var_prec = D.precision_cap()
-        a, b, c, d = self._adjuster(g)
+        a, b, c, d = self._adjuster(g._mat)
         return automorphy_factor_matrix(D.prime(), a, c, self._k, \
                                 self._character, M, var_prec, D.base_ring())
     
@@ -234,7 +235,7 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
             else:
                 base_ring = Zmod(self._p**M)
         else:
-            base_ring = self.underlying_set().base_ring()
+            base_ring = self.domain().base_ring()
         #cdef Matrix B = matrix(base_ring,M,M)
         B = matrix(base_ring,M,M) #
         if M == 0:
@@ -249,7 +250,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         #tim = verbose("Made matrix",tim)
         for col in range(M):
             for row in range(M):
-                B.set_unsafe(row, col, t[row])
+                #B.set_unsafe(row, col, t[row])
+                B[row, col] = t[row]
             t *= scale
         #verbose("Finished loop",tim)
         # the changering here is annoying, but otherwise we have to change ring each time we multiply
@@ -261,8 +263,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         return B
     
     def get_action_matrices(self, g, M):
-        g = M2Z(g)
-        g.set_immutable()
+        #g = M2Z(g)
+        #g.set_immutable()
         if not self._maxprecs.has_key(g):
             AF = self._compute_aut_factor_matrix(g, M)
             self._autfactors[g] = {M : AF}
@@ -291,8 +293,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         return [AF, A]
     
     def _call_(self, v, g):
-        AF, A = get_action_matrices(self, g, len(v.moments))
-        return v.parent()((v.moments * AF) * A)
+        AF, A = self.get_action_matrices(g, len(v._moments))
+        return v.parent()((v._moments * AF) * A)
 
 class CoefficientModuleElement_generic(ModuleElement):
     pass

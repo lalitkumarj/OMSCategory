@@ -53,7 +53,7 @@ def _prec_cap_parser(prec_cap):
         return [p_prec, var_prec]
 
 class CoeffMod_OMS_Families_factory(UniqueFactory):
-    def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
+    def create_key(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None, variable_name = 'w'):
         if base is None:
