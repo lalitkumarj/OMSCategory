@@ -50,6 +50,37 @@ cdef long maxordp = (1L << (sizeof(long) * 8 - 2)) - 1
 include "stdsage.pxi"
 include "cdefs.pxi"
 
+def is_this_prime(n):
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+cdef long are_you_prime(long n):
+    cdef long i = 2
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+
+def pi_of_x(x):
+    count = 0
+    for n in range(2, x+1):
+        if is_this_prime(n):
+            count += 1
+    return count
+
+cdef long primes_less_than(long x):
+    cdef long count = 0
+    cdef long n = 2
+    for n in range(2, x+1):
+        if are_you_prime(n):
+            count += 1
+    return count
+
+def come_on(long x):
+    return primes_less_than(x)
+
 #def get_dist_classes(p, prec_cap, base, symk):
 #    r"""
 #    Determines the element and action classes to be used for given inputs.
