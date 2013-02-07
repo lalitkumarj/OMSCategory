@@ -32,6 +32,9 @@ class CoefficientModule_generic(Module):
         return self._act
     # End category framework
     
+    def _an_element_(self):
+        return self(0)
+    
     def change_ring(self, new_base_ring):
         pass #TODO
     

@@ -159,15 +159,22 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         #Should/can we do something about the variable's precision
         return self.base_ring()**p_prec
     
-    def random_element(self, prec):
-        pass #TODO
+    def random_element(self, prec=None):
+        if prec == None:
+            prec = self._prec_cap
+        else:
+            prec = _prec_cap_parser(prec)
+        return self(self.approx_module(prec[0], prec[1]).random_element())
     
     def clear_cache(self):
         self.approx_module.clear_cache()
         self._act.clear_cache()
     
-    def _an_element(self):
-        pass #TODO
+    def _an_element_(self):
+        if self._prec_cap[0] > 1:
+            return self([2,1])
+        else:
+            return self([1])
     
     def specialize(self, k):
         pass #TODO
