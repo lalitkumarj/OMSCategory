@@ -53,7 +53,7 @@ def _prec_cap_parser(prec_cap):
         return [p_prec, var_prec]
 
 class CoeffMod_OMS_Families_factory(UniqueFactory):
-    def create_key(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
+    def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None, variable_name = 'w'):
         if base is None:
@@ -66,6 +66,10 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
                 base_coeffs = Zp(p, prec = prec_cap[0])
             elif not isinstance(base_coeffs, ring.Ring):
                 raise TypeError("base_coeffs must be a ring if base is None")
+            elif prec_cap is None:
+                raise ValueError("Must specify a precision cap or a base ring.")
+            else:
+                prec_cap = _prec_cap_parser(prec_cap)
             base = PowerSeriesRing(base_coeffs, name=variable_name, default_prec=prec_cap[1])
         base_coeffs = None
         p = base.base_ring().prime()
@@ -176,5 +180,10 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         else:
             return self([1])
     
-    def specialize(self, k):
-        pass #TODO
+    def specialize(self, k, return_map=False):
+        from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
+        D = OverconvergentDistributions(k, base=self.base_ring().base_ring(), prec_cap=self._prec_cap, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist)
+        if not return_map:
+            return D
+        else:
+            return D, None
