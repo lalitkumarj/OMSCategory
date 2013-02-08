@@ -42,6 +42,8 @@ from sage.libs.flint.zmod_poly cimport *, zmod_poly_t
 from sage.libs.flint.long_extras cimport *
 
 from sigma0 import Sigma0
+from sage.rings.padics.factory import Zp
+from sage.rings.padics.factory import ZpCA
 
 cdef long overflow = 1 << (4*sizeof(long)-1)
 cdef long underflow = -overflow
@@ -49,6 +51,28 @@ cdef long maxordp = (1L << (sizeof(long) * 8 - 2)) - 1
 
 include "stdsage.pxi"
 include "cdefs.pxi"
+
+cpdef pAdicCappedAbsoluteElement convert_check(Integer p, Integer a):
+    cdef pAdicCappedAbsoluteElement _a
+    R = ZpCA(p, 500)
+    _a = R(a)
+    return _a
+
+def slow_convert_check(p, a):
+    R = ZpCA(p, 500)
+    _a = R(a)
+    return _a
+
+cpdef Integer logp_fcn(Integer p, Integer p_prec, Integer z):
+    """this is the *function* on Z_p^* which sends z to log_p(z) using a power series truncated at p_prec terms"""
+    #R = ZpCA(p, 2 * p_prec)
+    R = Zp(p, 2 * p_prec)
+    z = ZZ((z / R.teichmuller(z)).normalize())
+    cdef int m
+    return sum([((-1) ** (m - 1)) * ((z - 1) ** m) / m for m in range(1, p_prec)])
+
+def testme(n):
+    print sizeof(long)
 
 def is_this_prime(n):
     for i in range(2, n):
@@ -70,16 +94,20 @@ def pi_of_x(x):
             count += 1
     return count
 
-cdef long primes_less_than(long x):
-    cdef long count = 0
-    cdef long n = 2
-    for n in range(2, x+1):
-        if are_you_prime(n):
-            count += 1
-    return count
-
-def come_on(long x):
-    return primes_less_than(x)
+cdef class prime_counter(Matrix):
+    def __init__(self):
+        pass
+    
+    cdef long primes_less_than(self, long x):
+        cdef long count = 0
+        cdef long n = 2
+        for n in range(2, x+1):
+            if are_you_prime(n):
+                count += 1
+        return count
+    
+    def plt(self, x):
+        return self.primes_less_than(x)
 
 #def get_dist_classes(p, prec_cap, base, symk):
 #    r"""

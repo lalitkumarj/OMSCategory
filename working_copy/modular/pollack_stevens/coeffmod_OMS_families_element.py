@@ -1,6 +1,7 @@
 # This should be cythoned once it's done.
 
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
+from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 from sage.rings.integer_ring import ZZ
 
 class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
@@ -13,7 +14,9 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         self._var_prec = var_prec
         if check:
             if isinstance(moments, CoeffMod_OMS_Families_element):
-                moment = moments._moments.change_ring(parent.base_ring())
+                moments = moments._moments.change_ring(parent.base_ring())
+            #if isinstance(moments, CoeffMod_OMS_element):
+            #    moments = self.parent().approx_module(p_prec=len(moments._moments), var_prec=self.parent().precision_cap()[1])(moments._moments)
             elif hasattr(moments, '__len__'):
                 M = len(moments)
                 moments = parent.approx_module(M)(moments)
@@ -33,7 +36,6 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     #def _relprec(self):
     #    return len(self._moments)
     def _repr_(self):
-        
         return repr(self._moments)
     
     def _add_(self, right):
@@ -61,8 +63,6 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         """
         Scalar multiplication self*right.
         """
-        if right.is_zero():
-            return self.parent().zero()
         return self.parent()(self._moments*right)
     
     def _rmul_(self, left):
@@ -72,8 +72,6 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return self._lmul_(left)
     
     def __eq__(self, other):
-        if other.is_zero():
-            return self.is_zero()
         parent_prec = self.parent()._prec_cap
         var_prec = min(self._var_prec, parent_prec[1], other._var_prec)
         p_prec = min(len(self._moments), parent_prec[0], len(other._moments))
@@ -87,7 +85,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     
     def __nonzero__(self):
         """
-        Checks that zelf is non-zero up to precision ...
+        Checks that self is non-zero up to precision ...
         """
         parent_prec = self.parent()._prec_cap
         var_prec = min(self._var_prec, parent_prec[1])
@@ -137,7 +135,17 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         pass    #TODO
     
     def solve_diff_eqn(self):
-        pass    #TODO important!
+        M = len(self._moments)
+        D0 = self.parent().specialize(0)
+        mus = self.parent().zero()
+        v = [1] + [0]*(M-1)
+        for j in range(M):
+            mu = D0(v)
+            nus = self.parent()(mu.solve_diff_eqn())
+            mus += nus
+            v.pop()
+            v.insert(0, 0)
+        return
 
 def _add_big_ohs_list(f, prec_cap):
     r"""

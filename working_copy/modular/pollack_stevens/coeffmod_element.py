@@ -296,5 +296,117 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         AF, A = self.get_action_matrices(g, len(v._moments))
         return v.parent()((v._moments * AF) * A)
 
+#This class should eventually be moved into its own file
+class WeightKAction_OMS(WeightKAction_generic):
+    """
+    """
+    def __init__(self, Dk, character, adjuster, on_left, dettwist, padic=True):
+        #ensures there's a p in the level.
+        #self._Np = self._Np.lcm(self._p)
+        self._autfactors = {}
+        WeightKAction_generic.__init__(self, Dk, character, adjuster, on_left, dettwist)
+        self._Np = self._Np.lcm(Dk._p)
+        Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring().base_ring(), \
+                        adjuster=self._adjuster), Dk, on_left, operator.mul)
+    
+    def clear_cache(self):
+        self._actmat = {}
+        self._maxprecs = {}
+    
+    #TODO: much of this should be moved to a separte utility file
+    #cpdef _compute_acting_matrix(self, g, M):
+    def _compute_acting_matrix(self, g, M):
+        r"""
+        
+
+        INPUT:
+
+        - ``g`` -- an instance of
+          :class:`sage.matrices.matrix_integer_2x2.Matrix_integer_2x2`
+          or :class:`sage.matrix.matrix_generic_dense.Matrix_generic_dense`
+
+        - ``M`` -- a positive integer giving the precision at which
+          ``g`` should act.
+
+        OUTPUT:
+
+        - 
+
+        EXAMPLES::
+
+            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
+        """
+        #tim = verbose("Starting")
+        a, b, c, d = self._adjuster(g)
+        # if g.parent().base_ring().is_exact():
+        #     self._check_mat(a, b, c, d)
+        k = self._k
+        if g.parent().base_ring() is ZZ:
+            if self._symk:
+                base_ring = QQ
+            else:
+                base_ring = Zmod(self._p**M)
+        else:
+            base_ring = self.domain().base_ring()
+        #cdef Matrix B = matrix(base_ring,M,M)
+        B = matrix(base_ring,M,M) #
+        if M == 0:
+            return B.change_ring(self.codomain().base_ring())
+        R = PowerSeriesRing(base_ring, 'y', default_prec = M)
+        y = R.gen()
+        #tim = verbose("Checked, made R",tim)
+        # special case for small precision, large weight
+        scale = (b+d*y)/(a+c*y)
+        t = (a+c*y)**k # will already have precision M
+        #cdef long row, col #
+        #tim = verbose("Made matrix",tim)
+        for col in range(M):
+            for row in range(M):
+                #B.set_unsafe(row, col, t[row])
+                B[row, col] = t[row]
+            t *= scale
+        #verbose("Finished loop",tim)
+        # the changering here is annoying, but otherwise we have to change ring each time we multiply
+        B = B.change_ring(self.codomain().base_ring())
+        if self._character is not None:
+            B *= self._character(a)
+        if self._dettwist is not None:
+            B *= (a*d - b*c)**(self._dettwist)
+        return B
+    
+    def acting_matrix(self, g, M):
+        g = g.matrix()
+        if not self._maxprecs.has_key(g):
+            A = self._compute_acting_matrix(g, M)
+            self._actmat[g] = {M:A}
+            self._maxprecs[g] = M
+            return A
+        else:
+            mats = self._actmat[g]
+            if mats.has_key(M):
+                return mats[M]
+            maxprec = self._maxprecs[g]
+            if M < maxprec:
+                A = mats[maxprec][:M,:M] # submatrix; might want to reduce precisions
+                mats[M] = A
+                return A
+            if M < 2*maxprec:
+                maxprec = 2*maxprec
+            else:
+                maxprec = M
+            self._maxprecs[g] = maxprec
+            mats[maxprec] = self._compute_acting_matrix(g, maxprec) # could lift from current maxprec
+            if M == maxprec:
+                return mats[maxprec]
+            A = mats[maxprec][:M,:M] # submatrix; might want to reduce precisions
+            mats[M] = A
+            return A
+    
+    def _call_(self, v, g):
+        A = self.acting_matrix(g, len(v._moments))
+        ans = v.parent()(v._moments * A)
+        ans.ordp = v.ordp   #may be redundant
+        return ans
+
 class CoefficientModuleElement_generic(ModuleElement):
     pass
