@@ -59,25 +59,34 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         """
         return self._lmul_(left)
     
-    def __eq__(self, other):
-        parent_prec = self.parent()._prec_cap
-        #print other, type(other)
-        prec = min(len(self._moments), parent_prec, len(other._moments))    #this is a problem for checking bla == 0
-        for i in range(prec):
-            if self._moments[i].add_bigoh(prec - i) != other._moments[i].add_bigoh(prec - i):
-                return False
-        return True
+    #def __eq__(self, other):
+    #    parent_prec = self.parent()._prec_cap
+    #    #print other, type(other)
+    #    prec = min(len(self._moments), parent_prec, len(other._moments))    #this is a problem for checking bla == 0
+    #    for i in range(prec):
+    #        if self._moments[i].add_bigoh(prec - i) != other._moments[i].add_bigoh(prec - i):
+    #            return False
+    #    return True
     
-    def __nonzero__(self):
-        """
-        Checks that self is non-zero up to precision ...
-        """
-        parent_prec = self.parent()._prec_cap
-        prec = min(len(self._moments), parent_prec)
+    #def __nonzero__(self):
+    #    """
+    #    Checks that self is non-zero up to precision ...
+    #    """
+    #    parent_prec = self.parent()._prec_cap
+    #    prec = min(len(self._moments), parent_prec)
+    #    for i in range(prec):
+    #        if self._moments[i].add_bigoh(prec - i) != 0:
+    #            return True
+    #    return False
+    def _cmp_(left, right):
+        #ignores ord p for now
+        prec = min(left.precision_relative(), right.precision_relative())
+        print right
         for i in range(prec):
-            if self._moments[i].add_bigoh(prec - i) != 0:
-                return True
-        return False
+            c = cmp(left._moments[i], right._moments[i])
+            if c:
+                return c
+        return 0
     
     def is_zero(self, prec=None):
         if prec is None:
@@ -95,7 +104,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def normalize(self):
         #customized
-        M = len(moments)
+        M = self.precision_relative()
         for i in range(M):
             self._moments[i] = self._moments[i].add_bigoh(M-i)
         return self

@@ -123,7 +123,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         M = len(moments)
         R = self.parent().base_ring()
         #new_moments = [m.add_bigoh(self._var_prec) for m in self._moments]
-        new_moments = []
+        #new_moments = []
         for i in range(M):
             cutoff = ceil((M-i) * self._cp)
             f = moments[i].list()
