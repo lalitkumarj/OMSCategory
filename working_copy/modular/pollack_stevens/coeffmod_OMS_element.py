@@ -78,10 +78,10 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     #        if self._moments[i].add_bigoh(prec - i) != 0:
     #            return True
     #    return False
-    def _cmp_(left, right):
+    def __cmp__(left, right):
         #ignores ord p for now
         prec = min(left.precision_relative(), right.precision_relative())
-        print right
+        #print right
         for i in range(prec):
             c = cmp(left._moments[i], right._moments[i])
             if c:

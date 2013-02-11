@@ -52,6 +52,29 @@ def _prec_cap_parser(prec_cap):
             raise ValueError("Precisions should be at least 1.")
         return [p_prec, var_prec]
 
+#def _factor_Dir_char(chi, p):
+#    r"""
+#    Given a Dirichlet character `\chi` of conductor exactly divisible by the prime
+#    `p`, returns a pair 
+#    
+#    `(\chi_p, \chi^\prime)` such that `\chi=\chi_p\chi^\prime`,
+#    `\chi_p` has level dividing `p`, and `\chi^\prime` has conductor prime to `p`
+#    (but
+#    
+#    EXAMPLES::
+#    
+#        sage: chi = DirichletGroup(3*5*49)
+#    """
+#    #FINISH THIS
+#    if p == 2:
+#        raise NotImplementedError
+#    DG = chi.parent()
+#    unit_gens = DG.unit_gens()
+#    for u in unit_gens:
+#        if u % p != 1:
+#            break
+#    return
+
 class CoeffMod_OMS_Families_factory(UniqueFactory):
     def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
@@ -73,8 +96,17 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
             base = PowerSeriesRing(base_coeffs, name=variable_name, default_prec=prec_cap[1])
         base_coeffs = None
         p = base.base_ring().prime()
-        k = ZZ(k % (p-1))
-        
+        k_shift = 0
+        #if character is not None:
+        #    #Should we ensure character is primitive?
+        #    cond_val = character.conductor().valuation(p)
+        #    if cond_val > 1:
+        #        raise ValueError("Level must not be divisible by p^2.")
+        #    elif cond_val == 1:
+        #        pass
+        #    else:
+        #        pass
+        k = ZZ((k + k_shift) % (p-1))
         #if prec_cap is None:
         #    prec_cap = [base.base_ring().precision_cap, base.default_prec()]
         #else:
@@ -138,6 +170,13 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
             s += "and det^%s " % (self._dettwist)
         s += "over %s" % (self.base_ring())
         return s
+        
+    def weight(self):
+        r"""
+        Returns the non-negative integer less than or equal to `p-1` that encodes
+        the disc of weight space on which this family lives.
+        """
+        return self._k
     
     def prime(self):
         return self._p

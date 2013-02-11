@@ -38,6 +38,12 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     def _repr_(self):
         return repr(self._moments)
     
+    def character(self):
+        """
+        Returns the tame character of self.
+        """
+        return self._character
+    
     def _add_(self, right):
         return self._addsub(right, False)
     
@@ -71,31 +77,45 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         """
         return self._lmul_(left)
     
-    def __eq__(self, other):
+    def __cmp__(self, other):
         parent_prec = self.parent()._prec_cap
         var_prec = min(self._var_prec, parent_prec[1], other._var_prec)
         p_prec = min(len(self._moments), parent_prec[0], len(other._moments))
         for i in range(p_prec):
             selflist = _add_big_ohs_list(self._moments[i], [((p_prec - i) * self._cp).ceil(), var_prec])
             otherlist = _add_big_ohs_list(other._moments[i], [((p_prec - i) * self._cp).ceil(), var_prec])
-            for j in range(len(selflist)):
-                if selflist[j] != otherlist[j]:
-                    return False
-        return True
+            c = cmp(selflist, otherlist)
+            if c:
+                return c
+        return 0
     
-    def __nonzero__(self):
-        """
-        Checks that self is non-zero up to precision ...
-        """
-        parent_prec = self.parent()._prec_cap
-        var_prec = min(self._var_prec, parent_prec[1])
-        p_prec = min(len(self._moments), parent_prec[0])
-        for i in range(p_prec):
-            selflist = _add_big_ohs_list(self._moments[i], [((p_prec - i) * self._cp).ceil(), var_prec])
-            for c in selflist:
-                if c != 0:
-                    return True
-        return False
+#    def __nonzero__(self):
+#        """
+#        Checks that self is non-zero up to precision ...
+#        """
+#        parent_prec = self.parent()._prec_cap
+#        var_prec = min(self._var_prec, parent_prec[1])
+#        p_prec = min(len(self._moments), parent_prec[0])
+#        for i in range(p_prec):
+#            selflist = _add_big_ohs_list(self._moments[i], [((p_prec - i) * self._cp).ceil(), var_prec])
+#            for c in selflist:
+#                if c != 0:
+#                    return True
+#        return False
+    
+    def _coerce_map_from_(self, other):
+        if isinstance(other, CoeffMod_OMS_Families_element) \
+            and other._k  == self._k \
+            and self._character == other._character \
+            and self.base_ring().has_coerce_map_from(other.base_ring()):
+            return True
+        elif isinstance(other, CoeffMod_OMS_element):
+            #kdiff = other._k - self._k
+            #self._character = other._character
+            #and self.base_ring().has_coerce_map_from(other.base_ring()):
+            return False
+        else:
+            return False
     
     def is_zero(self, prec=None):
         if prec is None:
