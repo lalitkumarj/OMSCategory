@@ -56,8 +56,14 @@ def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
         aut += LB(arg) * (w ** n)
     aut *= (ta ** k)
     if not (chi is None):
-        aut *= chi(a)    
-    return Sequence(aut)
+        aut *= chi(a)
+    aut = aut.list()
+    len_aut = len(aut)
+    if len_aut == p_prec:
+        return aut
+    elif len_aut > p_prec:
+        return aut[:p_prec]
+    return aut + [R.zero_element()] * (p_prec - len_aut)
 
 #@cached_function
 def automorphy_factor_matrix(p, a, c, k, chi, p_prec, var_prec, R):
