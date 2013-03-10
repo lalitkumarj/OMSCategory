@@ -14,11 +14,21 @@ def ps_normalize(f, p, p_prec):
     S = f.parent()
     return S(v)
 
-def logp_fcn(p, p_prec, z):
-    """this is the *function* on Z_p^* which sends z to log_p(z) using a power series truncated at p_prec terms"""
+def logp_fcn(p, p_prec, a):
+    r"""
+    INPUT:
+    
+    - ``p``: prime
+    - ``p_prec: desired ``p``-adic precision
+    - ``z``
+    
+    OUTPUT:
+    
+    - The ``p``-adic logarithm of 
+    this is the *function* on Z_p^* which sends z to log_p(z) using a power series truncated at p_prec terms"""
     R = Qp(p, 2 * p_prec)
-    z = z / R.teichmuller(z)
-    return sum([((-1) ** (m - 1)) * ((z - 1) ** m) / m for m in range(1, p_prec)])
+    a = a / R.teichmuller(a)
+    return sum([((-1) ** (m - 1)) * ((a - 1) ** m) / m for m in range(1, p_prec)])
 
 def logpp(p, p_prec):
     """returns the (integral) power series for log_p(1+p*z) -- extra p here!"""
@@ -45,6 +55,13 @@ def logpp_binom(n, p, p_prec):
     return ps_normalize(ans.truncate(p_prec), p, p_prec)
 
 def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
+    """
+    EXAMPLES::
+        
+        sage: from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
+        sage: automorphy_factor_vector(3, 1, 3, 0, None, 4, 3, PowerSeriesRing(ZpCA(3), 'w'))
+        [1 + O(3^20), O(3^21) + (3 + 3^2 + 2*3^3 + O(3^21))*w + (3^2 + 2*3^3 + O(3^22))*w^2, O(3^22) + (3^2 + 2*3^3 + O(3^22))*w + (2*3^2 + O(3^22))*w^2, O(3^22) + (3^2 + 3^3 + O(3^22))*w + (2*3^3 + O(3^23))*w^2]
+    """
     S = PolynomialRing(R, 'z')
     z = S.gens()[0]
     w = R.gen()
@@ -65,8 +82,30 @@ def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
         return aut[:p_prec]
     return aut + [R.zero_element()] * (p_prec - len_aut)
 
+def new_automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
+    #if not R.is_capped_relative():
+    #    Rcr =
+    if p_prec > R.precision_cap():
+        raise ValueError("Specified p-adic precision, p_prec, should be at most that of R.")
+    S = PolynomialRing(R, 'z')
+    z = S.gens()[0]
+    w = R.gen()
+    aut = S(R1, p_prec)
+    ta = R.teichmuller(R(a, p_prec))
+    
 #@cached_function
 def automorphy_factor_matrix(p, a, c, k, chi, p_prec, var_prec, R):
+    """
+    EXAMPLES::
+        
+        sage: from sage.modular.pollack_stevens.families_util import automorphy_factor_matrix
+        sage: automorphy_factor_matrix(3, 1, 3, 0, None, 4, 3, PowerSeriesRing(ZpCA(3), 'w'))
+        [                                                          1 + O(3^20)                                                                     0                                                                     0                                                                     0]
+        [O(3^20) + (3 + 3^2 + 2*3^3 + O(3^20))*w + (3^2 + 2*3^3 + O(3^20))*w^2                                                           1 + O(3^20)                                                                     0                                                                     0]
+        [          O(3^20) + (3^2 + 2*3^3 + O(3^20))*w + (2*3^2 + O(3^20))*w^2 O(3^20) + (3 + 3^2 + 2*3^3 + O(3^20))*w + (3^2 + 2*3^3 + O(3^20))*w^2                                                           1 + O(3^20)                                                                     0]
+        [            O(3^20) + (3^2 + 3^3 + O(3^20))*w + (2*3^3 + O(3^20))*w^2           O(3^20) + (3^2 + 2*3^3 + O(3^20))*w + (2*3^2 + O(3^20))*w^2 O(3^20) + (3 + 3^2 + 2*3^3 + O(3^20))*w + (3^2 + 2*3^3 + O(3^20))*w^2                                                           1 + O(3^20)]
+    """
+    #RH: there's a problem when p_prec = 1
     aut = automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R)
     M = Matrix(R, p_prec)
     for c in range(min(p_prec, len(aut))):

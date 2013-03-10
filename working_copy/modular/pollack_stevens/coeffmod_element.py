@@ -198,6 +198,7 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         D = self.domain()
         p_prec, var_prec = D.precision_cap()
         a, b, c, d = self._adjuster(g._mat)
+        #print D.prime(), a, c, self._k, self._character, M, var_prec, D.base_ring()
         return automorphy_factor_matrix(D.prime(), a, c, self._k, \
                                 self._character, M, var_prec, D.base_ring())
     
@@ -294,7 +295,9 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
     
     def _call_(self, v, g):
         AF, A = self.get_action_matrices(g, len(v._moments))
-        return v.parent()((v._moments * AF) * A)
+        w = (v._moments * AF) * A
+        Elem = v.parent().Element
+        return Elem(w, v.parent(), ordp=v.ordp, check=False)
 
 #This class should eventually be moved into its own file
 class WeightKAction_OMS(WeightKAction_generic):

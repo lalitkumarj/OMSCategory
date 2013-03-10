@@ -27,8 +27,12 @@ def _prec_cap_parser(prec_cap):
         sage: _prec_cap_parser([7])
         [7, 7]
         sage: _prec_cap_parser(None)
+        Traceback (most recent call last):
+        ...
         ValueError: The case prec_cap is None should be dealt with prior to calling this function.
         sage: _prec_cap_parser([5, 0])
+        Traceback (most recent call last):
+        ...
         ValueError: Precisions should be at least 1.
     """
     if prec_cap is None:
@@ -48,8 +52,8 @@ def _prec_cap_parser(prec_cap):
     else:
         p_prec = ZZ(prec_cap[0])
         var_prec = ZZ(prec_cap[1])
-        if p_prec < 1 or var_prec < 1:
-            raise ValueError("Precisions should be at least 1.")
+#        if p_prec < 1 or var_prec < 1:
+#            raise ValueError("Precisions should be at least 1.")
         return [p_prec, var_prec]
 
 #def _factor_Dir_char(chi, p):
@@ -125,14 +129,14 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
         return CoeffMod_OMS_Families_space(k, p=p, base=base, character=character, \
                  adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
-FamiliesOfOMS = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
+FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
 
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     r"""
     EXAMPLES::
     
-        sage: from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOMS
-        sage: D = FamiliesOfOMS(0, base=PowerSeriesRing(Zp(3, 10), 'w', default_prec=5)); D
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
+        sage: D = FamiliesOfOverconvergentDistributions(0, base=PowerSeriesRing(Zp(3, 10), 'w', default_prec=5)); D
         Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 3-adic Ring with capped relative precision 10
         sage: D.prime()
         3
@@ -193,12 +197,13 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     def approx_module(self, p_prec=None, var_prec=None):
         if p_prec is None:
             p_prec = self._prec_cap[0]
-        else:
-            if var_prec is None:
-                var_prec = p_prec
-            p_prec, var_prec = _prec_cap_parser([p_prec, var_prec])
+        if var_prec is None:
+            var_prec = self._prec_cap[1]
+        p_prec, var_prec = _prec_cap_parser([p_prec, var_prec])
         if p_prec > self._prec_cap[0]:
             raise ValueError("p_prec must be less than or equal to the p-adic precision cap")
+        if var_prec > self._prec_cap[1]:
+            raise ValueError("var_prec must be less than or equal to the %s-adic precision cap"%(self.base_ring().variable_name()))
         #Should/can we do something about the variable's precision
         return self.base_ring()**p_prec
     
@@ -221,7 +226,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     
     def specialize(self, k, return_map=False):
         from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
-        D = OverconvergentDistributions(k, base=self.base_ring().base_ring(), prec_cap=self._prec_cap, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist)
+        D = OverconvergentDistributions(k, base=self.base_ring().base_ring(), prec_cap=self._prec_cap[0], character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist)
         if not return_map:
             return D
         else:

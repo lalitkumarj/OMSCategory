@@ -1,11 +1,15 @@
 # This should be cythoned once it's done.
 
+from copy import copy   #Not necessary in cython version
+from sage.rings.padics.padic_generic import pAdicGeneric
 from sage.rings.arith import binomial, bernoulli
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.rings.integer_ring import ZZ
 
+maxordp = 2 ** 14   #change this to what it is in dist.pyx
+
 class CoeffMod_OMS_element(CoefficientModuleElement_generic):
-    # Implementation currently ignores ordp
+    #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
         CoefficientModuleElement_generic.__init__(self, parent)
         #TODO: finish this
@@ -16,44 +20,84 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 M = len(moments)
                 moments = parent.approx_module(M)(moments)
             elif moments == 0:
-                moments = parent.approx_module(parent._prec_cap)(moments)
+                V = self.parent().approx_module(0)
+                moments = V([])
+                ordp = parent.precision_cap()
             else:
-                moments = parent.approx_module(parent._prec_cap)([moments]*parent._prec_cap)
+                moments = parent.approx_module(1)([moments])
+
         self._moments = moments
         #if var_prec is None:
         #    self._var_prec = parent._prec_cap[1]
         #else:
         #    self._var_prec = var_prec
-        self.ordp = 0   #eventually change this maybe
+        self.ordp = ordp
     
     #def _relprec(self):
     #    return len(self._moments)
     def _repr_(self):
-        return repr(self._moments)
+        #RH: "copied" from dist.pyx
+        self.normalize()
+        valstr = ""
+        if self.ordp == 1:
+            valstr = "%s * "%(self.parent().prime())
+        elif self.ordp != 0:
+            valstr = "%s^%s * "%(self.parent().prime(), self.ordp)
+        if len(self._moments) == 1:
+            return valstr + repr(self._moments[0])
+        else:
+            return valstr + repr(self._moments)
     
     def _add_(self, right):
+        #RH: "copied" from dist.pyx
         return self._addsub(right, False)
     
     def _sub_(self, right):
+        #RH: "copied" from dist.pyx
         return self._addsub(right, True)
     
     def _addsub(self, right, negate):
-        self_moments = self._moments
-        right_moments = right._moments
-        new_prec = min(len(self._moments), len(right._moments))
+        #RH: "copied" from dist.pyx
+        ans = self.parent()(0)
+        aprec = min(self.ordp + len(self._moments), right.ordp + len(right._moments))
+        ans.ordp = min(self.ordp, right.ordp)
+        rprec = aprec - ans.ordp
+        V = ans.parent().approx_module(rprec)
+        R = V.base_ring()
+        smoments = self._moments
+        rmoments = right._moments
+        if smoments.parent() is not V:
+            smoments = V(smoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(smoments)) if rprec > len(smoments) else []))
+        if rmoments.parent() is not V:
+            rmoments = V(rmoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(rmoments)) if rprec > len(rmoments) else []))
+        # We multiply by the relative power of p
+        if self.ordp > right.ordp:
+            smoments *= self.parent().prime()**(self.ordp - right.ordp)
+        elif self.ordp < right.ordp:
+            rmoments *= self.parent().prime()**(right.ordp - self.ordp)
         if negate:
-            new_moments = [self_moments[i] - right_moments[i] for i in range(new_prec)] 
-        else:
-            new_moments = [self_moments[i] + right_moments[i] for i in range(new_prec)]
-        return self.parent()(new_moments)
+            rmoments = -rmoments
+        ans._moments = smoments + rmoments
+        return ans
     
     def _lmul_(self, right):
         """
         Scalar multiplication self*right.
         """
-        return self.parent()(self._moments*right)
+        #RH: mostly "copied" from dist.pyx (is_exact_zero...)
+        ans = self.parent()(0)
+        p = self.parent().prime()
+        if right.is_zero():
+            ans._moments = self.parent().approx_module(0)([])
+            ans.ordp = self.parent().precision_cap()
+        else:
+            v, u = right.val_unit()
+            ans._moments = self._moments * u
+            ans.ordp = self.ordp + v
+        return ans
     
     def _rmul_(self, left):
+        #RH: "copied" from dist.pyx
         """
         Scalar multiplication left*self.
         """
@@ -79,37 +123,92 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     #            return True
     #    return False
     def __cmp__(left, right):
-        #ignores ord p for now
-        prec = min(left.precision_relative(), right.precision_relative())
-        #print right
-        for i in range(prec):
-            c = cmp(left._moments[i], right._moments[i])
-            if c:
-                return c
+        #RH: "copied" from dist.pyx
+        left = copy(left)
+        right = copy(right)
+        left.normalize()
+        right.normalize()
+        rprec = min(left.precision_relative(), right.precision_relative())
+        p = left.parent().prime()
+        if left.ordp > right.ordp:
+            shift = p ** (left.ordp - right.ordp)
+            for i in range(rprec):
+                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
+                if c: return c
+        elif left.ordp < right.ordp:
+            shift = p ** (right.ordp - left.ordp)
+            for i in range(rprec):
+                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
+                if c: return c
+        else:
+            for i in range(rprec):
+                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
+                if c: return c
         return 0
     
     def is_zero(self, prec=None):
+        #RH: Mostly "copied" from dist.pyx
+        n = self.precision_relative()
+        if n == 0:  #Should compare absolute prec first?
+            return True
+        aprec = self.precision_absolute()
         if prec is None:
-            prec = self.precision_relative()
-        for i in range(min(prec, len(self._moments))):
-            if self._moments[i].add_bigoh(prec - i) != 0:
-                return False
+            prec = n
+        elif prec > aprec:
+            return False    #Should this raise a PrecisionError instead
+        elif prec < aprec:
+            n -= (aprec - prec)
+            prec -= self.ordp
+        p = self.parent().prime()
+        usearg = True
+        try:
+            z = self.moment(0).is_zero(n)
+        except TypeError:
+            z = self.moment(0).is_zero()
+            use_arg = False
+        if not z: return False
+        for a in xrange(1, n):
+            if usearg:
+                z = self._unscaled_moment(a).is_zero(n-a)
+            else:
+                z = self._unscaled_moment(a).is_zero()
+            if not z: return False
         return True
     
     def precision_relative(self):
+        #RH: "copied" from dist.pyx
         return ZZ(len(self._moments))
     
     def precision_absolute(self):
-        return ZZ(len(self._moments)) + self.ordp
+        #RH: "copied" from dist.pyx
+        return ZZ(len(self._moments) + self.ordp)
+    
+    def valuation(self):
+        #RH: "copied" from dist.pyx (caveat: split off from an is_symk statement)
+        p = self.parent().prime()
+        n = self.precision_relative()
+        return self.ordp + min([n] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
-        #customized
-        M = self.precision_relative()
-        for i in range(M):
-            self._moments[i] = self._moments[i].add_bigoh(M-i)
+        #RH: "copied" from dist.pyx
+        V = self._moments.parent()
+        R = V.base_ring()
+        n = self.precision_relative()
+        p = self.parent().prime()
+        if isinstance(R, pAdicGeneric):
+            self._moments = V([self._moments[i].add_bigoh(n-i) for i in range(n)])
+        else:
+            self._moments = V([self._moments[i]%(p**(n-i)) for i in range(n)])
+        shift = self.valuation() - self.ordp
+        if shift != 0:
+            V = self.parent().approx_module(n-shift)
+            self.ordp += shift
+            self._moments = V([self._moments[i] // p**shift for i in range(n-shift)])
         return self
+        #customized
     
     def moment(self, n):
+        #RH: "copied" from dist.pyx
         r"""
         Returns the `n`-th moment.
 
@@ -122,9 +221,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         - the `n`-th moment, or a list of moments in the case that `n`
           is a slice.
 
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         """
         if self.ordp == 0:
             return self._unscaled_moment(n)
@@ -132,21 +228,36 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             return self.parent().prime()**(self.ordp) * self._unscaled_moment(n)
     
     def _unscaled_moment(self, n):
+        #RH: "copied" from dist.pyx
         r"""
         Returns the `n`-th moment, unscaled by the overall power of p stored in self.ordp.
         """
         return self._moments[n]
     
     def reduce_precision(self, new_prec):
-        pass    #TODO
+        #RH: adapted from dist.pyx
+        if new_prec > self.precision_relative():
+            raise ValueError("new_prec(=%s) must be less than relative precision of self."%(new_prec))
+        moments = self._moments[:new_prec]
+        ordp = self._ordp   #Should this be updated?
+        return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)  #should latter be true?
     
-    def lift(self, var_prec=None, variable_name='w'):
-        V = self.parent().lift(var_prec, variable_name)
-        #k = V._k
-        #p = V._p
-        #prec = V.precision_cap()
-        #R = V.base_ring()
-        return V([self.moment(i) for i in range(len(self._moments))])
+    def lift(self, DD=None):
+        #RH: should be good
+        r"""
+            This function lifts ``self`` into the space of families of overconvergent distributions ``DD``. If ``DD`` is None,
+            it creates the space of families of overconvergent distributions of appropriate weight, character, etc. Otherwise,
+            unlike simply coercing ``self`` into ``DD``, which would require compatibility of weights, actions, etc.,
+            this function just brutally lifts the moments of ``self`` into ``DD``
+        """
+        if DD is None:
+            DD = self.parent().lift()
+            return DD(self)
+        length = min(ZZ(len(self._moments)), DD.precision_cap()[0])
+        VV = DD.approx_module(length)
+        V = self.parent().approx_module(length)
+        new_moments = VV(self._moments[:length])
+        return DD.Element(new_moments, DD, ordp=self.ordp, check=False)
     
     def solve_diff_eqn(self):
         r"""
@@ -158,43 +269,80 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
 
         - a distribution v so that self = v | Delta, where Delta = [1, 1; 0, 1] - 1.
 
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         """
+        #RH: see tests.sage for randomized verification that this function works correctly
         # assert self._moments[0][0]==0, "not total measure zero"
         # print "result accurate modulo p^",self.moment(0).valuation(self.p)
         #v=[0 for j in range(0,i)]+[binomial(j,i)*bernoulli(j-i) for j in range(i,M)]
-        M = self.precision_relative()
+#        if self.is_zero():
+#            return self.parent()(0)
+#        if self._unscaled_moment(0) != 0:
+#            raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
+#        M = len(self._moments)
+#        if M == 1:
+#            return self.parent()(0)
+#        if M == 2:
+#            return self.parent()(self.moment(1))
+#        R = self.parent().base_ring()
+#        p = self.parent().prime()
+#        pm = p ** self.ordp
+#        shift = 0
+#        while pm <= M:   #looking in F_k(M-1)
+#            pm *= p
+#            shift += 1
+#        self.ordp += shift
+#        #K = R.fraction_field()
+#        V = self.parent().approx_module(M-1)
+#        bern = [bernoulli(i) for i in range(0,M-1,2)]
+#        #What about p=2
+#        minhalf = ~(-2)    #bernoulli(1)
+#        # bernoulli(1) = -1/2; the only nonzero odd bernoulli number
+#        v = [minhalf * self.moment(m) for m in range(M-1)] #(m choose m-1) * B_1 * mu[m]/m            
+#        for m in range(1,M):
+#            scalar = self.moment(m) / m
+#            for j in range(m-1,M-1,2):
+#                v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
+#        ordp = min(a.valuation(p) for a in v)
+#        #Is this correct in ramified extensions of QQp?
+#        if ordp < 0:
+#            print "This should never happen!"
+#            scalar = K(p) ** (-ordp)
+#            v = V([R(a * scalar) for a in v])
+#        elif ordp > 0:
+#            scalar = p ** ordp
+#            v = V([R(a // scalar) for a in v])
+#        else:
+#            v = V([R(a) for a in v])
+#        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp-shift, check=False)
+        if self.is_zero():
+            return self.parent()(0)
+        if self._unscaled_moment(0) != 0:
+            raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
+        M = len(self._moments)
+        if M == 1:
+            return self.parent()(0)
+        if M == 2:
+            return self.parent()(self.moment(1))
         R = self.parent().base_ring()
         K = R.fraction_field()
-        V = self._moments.parent()
-        v = [K(0) for i in range(M)]
-        bern = [bernoulli(i) for i in range(0,M,2)]
-        minhalf = ~K(-2)
+        V = self.parent().approx_module(M-1)
+        bern = [bernoulli(i) for i in range(0,M-1,2)]
+        minhalf = ~K(-2)    #bernoulli(1)
+        # bernoulli(1) = -1/2; the only nonzero odd bernoulli number
+        v = [minhalf * self.moment(m) for m in range(M-1)] #(m choose m-1) * B_1 * mu[m]/m            
         for m in range(1,M):
-            scalar = K(self.moment(m) / m)
-            # bernoulli(1) = -1/2; the only nonzero odd bernoulli number
-            v[m] += m * minhalf * scalar
-            for j in range(m-1,M,2):
+            scalar = K(self.moment(m)) * (~K(m))
+            for j in range(m-1,M-1,2):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
         p = self.parent().prime()
-        if p == 0:
-            if R.is_field():
-                ans = self.parent()(v)
-                ans.ordp = 0    #Is this redundant?
-            else:
-                newparent = self.parent().change_ring(K)
-                ans = newparent(v)
+        ordp = min(a.valuation(p) for a in v)
+        #Is this correct in ramified extensions of QQp?
+        if ordp < 0:
+            scalar = K(p) ** (-ordp)
+            v = V([R(a * scalar) for a in v])
+        elif ordp > 0:
+            scalar = K(p) ** ordp
+            v = V([R(a // scalar) for a in v])
         else:
-            ans = self.parent().zero()
-            ans.ordp = min(a.valuation(p) for a in v)
-            if ans.ordp < 0:
-                scalar = K(p) ** (-ans.ordp)
-                ans._moments = V([R(a * scalar) for a in v])
-            elif ans.ordp > 0:
-                scalar = K(p) ** ans.ordp
-                ans._moments = V([R(a // scalar) for a in v])
-            else:
-                ans._moments = V([R(a) for a in v])
-        return ans
+            v = V([R(a) for a in v])
+        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)

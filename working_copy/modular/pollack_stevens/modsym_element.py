@@ -9,8 +9,8 @@ class ModSymAction(Action):
     def __init__(self, actor, MSspace):
         Action.__init__(self, actor, MSspace, False, operator.mul)
 
-    def _call_(self, sym, g):
-        return sym.__class__(sym._map * g, sym.parent(), construct=True)
+    def _call_(self, symb, g):
+        return symb.__class__(symb._map * g, symb.parent(), construct=True)
 
 class ModularSymbolElement_generic(ModuleElement):
     def __init__(self, map_data, parent, construct = False):

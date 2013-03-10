@@ -45,6 +45,7 @@ class ModularSymbolSpace_generic(Module):
         r"""
         Returns the Hecke operator `T_\ell` as endomorphism of self.
         """
+        #Can this be written at this level?
         pass
     
     #def prime(self):
