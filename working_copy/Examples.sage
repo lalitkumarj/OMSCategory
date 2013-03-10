@@ -1,7 +1,7 @@
-from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOMS
-DD = FamiliesOfOMS(0, base=PowerSeriesRing(Zp(3, 10), 'w', default_prec=5));
+from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
+DD = FamiliesOfOverconvergentDistributions(0, base=PowerSeriesRing(ZpCA(3, 10), 'w', default_prec=5));
 print DD
-d = DD(1)
+d = DD([1]*10)
 print "d =", d
 print " "
 S0 = DD.action().actor()
@@ -14,9 +14,9 @@ print "This should equal d. Does it?", d == d2
 print "2*d =", 2*d
 
 from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
-D = OverconvergentDistributions(0, base=Zp(3, 10))
+D = OverconvergentDistributions(0, base=ZpCA(3, 10))
 print D
-d = D(1)
+d = D([1]*10)
 print "d =", d
 print " "
 S0 = D.action().actor()
