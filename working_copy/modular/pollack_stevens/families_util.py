@@ -1,3 +1,4 @@
+from sage.misc.cachefunc import cached_function
 from sage.structure.sequence import Sequence
 from sage.rings.padics.factory import Qp
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
@@ -54,6 +55,7 @@ def logpp_binom(n, p, p_prec):
     
     return ps_normalize(ans.truncate(p_prec), p, p_prec)
 
+@cached_function
 def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
     """
     EXAMPLES::
@@ -93,7 +95,7 @@ def new_automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
     aut = S(R1, p_prec)
     ta = R.teichmuller(R(a, p_prec))
     
-#@cached_function
+@cached_function
 def automorphy_factor_matrix(p, a, c, k, chi, p_prec, var_prec, R):
     """
     EXAMPLES::
