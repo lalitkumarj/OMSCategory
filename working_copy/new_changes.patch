@@ -1,10 +1,31 @@
 # HG changeset patch
 # User Robert Harron <rharron@math.wisc.edu>
-# Date 1362632802 21600
-# Node ID 31f78c19acec1bb06af9221e9655930a15ac8549
+# Date 1362990948 18000
+# Node ID 8fb2f8bf2220a9315345244052d5249ec3fb2817
 # Parent  5714ed3eab6a53acc9102d19ffadb4e970c9c331
 [mq]: OMS_families
 
+diff --git a/sage/matrix/matrix_integer_2x2.pyx b/sage/matrix/matrix_integer_2x2.pyx
+--- a/sage/matrix/matrix_integer_2x2.pyx
++++ b/sage/matrix/matrix_integer_2x2.pyx
+@@ -392,10 +392,13 @@
+             sage: m == n
+             False
+         """
+-        return mpz_cmp(left.a, (<Matrix_integer_2x2>right).a) or \
+-               mpz_cmp(left.b, (<Matrix_integer_2x2>right).b) or \
+-               mpz_cmp(left.c, (<Matrix_integer_2x2>right).c) or \
+-               mpz_cmp(left.d, (<Matrix_integer_2x2>right).d)
++        cdef int c = mpz_cmp(left.a, (<Matrix_integer_2x2>right).a) or \
++                     mpz_cmp(left.b, (<Matrix_integer_2x2>right).b) or \
++                     mpz_cmp(left.c, (<Matrix_integer_2x2>right).c) or \
++                     mpz_cmp(left.d, (<Matrix_integer_2x2>right).d)
++        if c < 0: return -1
++        if c > 0: return 1
++        return 0
+        
+     def __neg__(self):
+         """
 diff --git a/sage/modular/all.py b/sage/modular/all.py
 --- a/sage/modular/all.py
 +++ b/sage/modular/all.py
