@@ -408,6 +408,8 @@ class WeightKAction_OMS(WeightKAction_generic):
     def _call_(self, v, g):
         A = self.acting_matrix(g, len(v._moments))
         ans = v.parent()(v._moments * A)
+        #print "v =", v
+        #print "ans = ", v._moments * A
         ans.ordp = v.ordp   #may be redundant
         return ans
 

@@ -38,7 +38,8 @@ class CoeffMod_OMS_factory(UniqueFactory):
                 base = ZpCA(p)
             else:
                 base = ZpCA(p, prec_cap)
-        prec_cap = base.precision_cap()
+        if prec_cap is None:
+            prec_cap = base.precision_cap()
         p = base.prime()
         if adjuster is None:
             adjuster = _default_adjuster()
@@ -116,10 +117,23 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
     def change_ring(self, new_base_ring):
         if new_base_ring == self.base_ring():
             return self
-        return CoeffMod_OMS_space(self._k, base=new_base_ring, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist, action_class = self.action().__class__)
+        return OverconvergentDistributions(self._k, prec_cap = self._prec_cap, base=new_base_ring, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist)
+    
+    def change_precision(self, new_prec):
+        """
+            Returns an OMS coefficient module with same input data as self, but with precision cap ``new_prec``
+        """
+        if new_prec == self._prec_cap:
+            return self
+        base = self.base_ring()
+        if new_prec > base.precision_cap():
+            #THERE'S NO WAY TO EXTEND PRECISION ON BASE RING!!! This is a crappy hack:
+            base = ZpCA(self.prime(), new_prec)
+        return OverconvergentDistributions(self._k, prec_cap = new_prec, base=base, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist)
     
     @cached_method
     def approx_module(self, prec=None):
+        #print "prec_in, self._prec_cap", prec, self._prec_cap
         if prec is None:
             prec = self._prec_cap
         elif prec > self._prec_cap:

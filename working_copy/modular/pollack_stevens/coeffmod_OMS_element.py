@@ -1,6 +1,7 @@
 # This should be cythoned once it's done.
 
 from copy import copy   #Not necessary in cython version
+from sage.misc.misc import verbose
 from sage.rings.padics.padic_generic import pAdicGeneric
 from sage.rings.arith import binomial, bernoulli
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
@@ -17,8 +18,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if isinstance(moments, CoeffMod_OMS_element):
                 moments = moments._moments.change_ring(parent.base_ring())
             elif hasattr(moments, '__len__'):
-                M = len(moments)
-                moments = parent.approx_module(M)(moments)
+                M = min(len(moments), parent.precision_cap())
+                moments = parent.approx_module(M)(moments[:M])
             elif moments == 0:
                 V = self.parent().approx_module(0)
                 moments = V([])
@@ -175,6 +176,62 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if not z: return False
         return True
     
+    def find_scalar(self, other, M = None, check=True):
+        i = 0
+        n = self.precision_relative()
+        other_pr = other.precision_relative()
+        if n == 0:
+            raise ValueError("self is zero")
+## RP: This code doesn't seem right.  For instance, if the eigenvalue has positive valuation
+##     then the relative precision will go down.
+##        if n != other.precision_relative():
+##            raise ValueError("other should have the same number of moments")
+        verbose("n = %s"%n)
+        verbose("moment 0")
+        a = self._unscaled_moment(i)
+        verbose("a = %s"%(a))
+        p = self.parent().prime()
+        v = a.valuation(p)
+        while v >= n - i:
+            i += 1
+            verbose("p moment %s"%i)
+            try:
+                a = self._unscaled_moment(i)
+            except IndexError:
+                raise ValueError("self is zero")
+            v = a.valuation(p)
+        relprec = n - i - v
+#            verbose("p=%s, n-i=%s\nself.moment=%s, other.moment=%s"%(p, n-i, a, other._unscaled_moment(i)),level=2)
+## RP: This code was crashing because other may have too few moments -- so I added this bound with other's relative precision
+        if i < other_pr:
+            alpha = (other._unscaled_moment(i) / a).add_bigoh(n-i)
+        else:
+            alpha = (0*a).add_bigoh(other_pr-i)
+        verbose("alpha = %s"%(alpha))
+## RP: This code was crashing because other may have too few moments -- so I added this bound with other's relative precision
+        while i < other_pr-1:
+            i += 1
+            verbose("comparing p moment %s"%i)
+            a = self._unscaled_moment(i)
+            if check:
+#                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
+                if other._unscaled_moment(i) != alpha * a:
+                    raise ValueError("not a scalar multiple")
+            v = a.valuation(p)
+            if n - i - v > relprec:
+                verbose("Reseting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
+                relprec = n - i - v
+                alpha = (other._unscaled_moment(i) / a).add_bigoh(n-i)
+                verbose("alpha=%s"%(alpha))
+        if relprec < M:
+            raise ValueError("result not determined to high enough precision")
+        alpha = alpha * self.parent().prime()**(other.ordp - self.ordp)
+        verbose("alpha=%s"%(alpha))
+        try:
+            return self.parent().base_ring()(alpha)
+        except ValueError:
+            return alpha
+        
     def precision_relative(self):
         #RH: "copied" from dist.pyx
         return ZZ(len(self._moments))

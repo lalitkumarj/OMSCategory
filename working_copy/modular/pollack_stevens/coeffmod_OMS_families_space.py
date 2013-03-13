@@ -3,6 +3,7 @@ import sage.rings.ring as ring
 from sage.structure.factory import UniqueFactory
 from sage.rings.integer_ring import ZZ
 from sage.rings.power_series_ring import PowerSeriesRing
+from sage.rings.padics.factory import ZpCA
 from sage.misc.cachefunc import cached_method
 
 from sage.modular.pollack_stevens.sigma0 import _default_adjuster
@@ -39,12 +40,12 @@ def _prec_cap_parser(prec_cap):
         raise ValueError("The case prec_cap is None should be dealt with prior to calling this function.")
     if not isinstance(prec_cap, (list, tuple)):
         prec = ZZ(prec_cap)
-        if prec < 1:
+        if prec < 0:
             ValueError("prec_cap should be at least 1.")
         return [prec, prec]
     elif len(prec_cap) == 1:
         prec = ZZ(prec_cap[0])
-        if prec < 1:
+        if prec < 0:
             ValueError("prec_cap should be at least 1.")
         return [prec, prec]
     elif len(prec_cap) > 2:
@@ -191,7 +192,20 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     def change_ring(self, new_base_ring):
         if new_base_ring == self.base_ring():
             return self
-        return CoeffMod_OMS_Families_space(self._k, prec_cap=self._prec_cap, base=new_base_ring, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist, action_class = self.action().__class__, variable_name = self.base_ring().variable_name())
+        return FamiliesOfOverconvergentDistributions(self._k, prec_cap=self._prec_cap, base=new_base_ring, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist, variable_name = self.base_ring().variable_name())
+    
+    def change_precision(self, new_prec):
+        """
+            Returns a FamiliesOfOMS coefficient module with same input data as self, but with precision cap ``new_prec``
+        """
+        #print new_prec
+        if new_prec == self._prec_cap:
+            return self
+        base_coeffs = self.base_ring().base_ring()
+        if new_prec[0] > base_coeffs.precision_cap():
+            #THERE'S NO WAY TO EXTEND PRECISION ON BASE RING!!! This is a crappy hack:
+            base_coeffs = ZpCA(self.prime(), new_prec[0])
+        return FamiliesOfOverconvergentDistributions(self._k, prec_cap = new_prec, base_coeffs=base_coeffs, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist, variable_name = self.base_ring().variable_name())
         
     @cached_method
     def approx_module(self, p_prec=None, var_prec=None):

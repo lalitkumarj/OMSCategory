@@ -1,6 +1,7 @@
 # This should be cythoned once it's done.
 
 from copy import copy   #Not necessary in cython version
+from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
@@ -26,8 +27,9 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             elif hasattr(moments, '__len__'):
                 #Need to modify if uniformiser is not p
                 #Deal with var_prec
+                M = min(len(moments), parent.precision_cap()[0])
                 R = self.parent().base_ring()
-                moments = [R(x) for x in moments]
+                moments = [R(moments[i]) for i in range(M)]
                 ordp = min(map(lambda x : _padic_val_of_pow_series(x, p=p), moments))
                 if ordp == Infinity:
                     ordp = parent._prec_cap[0]
@@ -230,17 +232,84 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             return False
     
     def is_zero(self, prec=None):
+        s_prec_rel = self.precision_relative()
         if prec is None:
-            prec = self.precision_relative()
-        else:
-            from sage.modular.pollack_stevens.coeffmod_OMS_families_space import _prec_cap_parser
-            prec = _prec_cap_parser(prec)
-        for i in range(min(prec[0], len(self._moments))):
-            selflist = _add_big_ohs_list(self._moments[i], [((prec[0]-i)*self._cp).ceil(), prec[1]])
+            prec = s_prec_rel
+        elif not hasattr(moments, '__len__'):
+            prec = [ZZ(prec), None]
+        elif len(prec) > 2:
+            raise TypeError("prec must have length at most 2.")
+        if prec[0] > s_prec_rel[0] or prec[1] > s_prec_rel[1]:
+            return False
+        num_moments = min(prec[0], s_prec_rel[0]) if prec[0] is not None else s_prec_rel[0]
+        var_prec = min(prec[1], s_prec_rel[1]) if prec[1] is not None else s_prec_rel[1]
+        for i in range(num_moments):
+            selflist = _add_big_ohs_list(self._moments[i], [((num_moments-i)*self._cp).ceil(), var_prec])
             for c in selflist:
                 if c != 0:
                     return False
         return True
+    
+    def find_scalar(self, other, M = None, check=True):
+        n, s_var_prec = self.precision_relative()
+        other_pr, other_var_prec = other.precision_relative()
+        if n == 0:
+            raise ValueError("self is zero")
+        if M is None:
+            M = [n, s_var_prec]
+        elif not hasattr(moments, '__len__'):
+            M = [ZZ(M), ZZ(min(s_var_prec, other_var_prec))]
+        elif len(M) > 2:
+            raise TypeError("prec must have length at most 2.")
+        #elif not isinstance(M, (list, tuple)):
+        #    M = [M, None]
+        if min(s_var_prec, other_var_prec) < M[1]:
+            raise ValueError("Insufficient precision in variable (%s requested, min(%s, %s) obtained)"%(M[1], s_var_prec, other_var_prec))
+        i = 0
+        verbose("n = %s"%n)
+        verbose("moment 0")
+        a = self._unscaled_moment(i)
+        verbose("a = %s"%(a))
+        p = self.parent().prime()
+        v = _padic_val_of_pow_series(a, p)
+        R = self.parent().base_ring()
+        while v >= ceil((n - i) * self._cp):
+            i += 1
+            verbose("p moment %s"%i)
+            try:
+                a = self._unscaled_moment(i)
+            except IndexError:
+                raise ValueError("self is zero")
+            v = _padic_val_of_pow_series(a, p)
+        relprec = n - i - v
+        if i < other_pr:
+            alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
+        else:
+            alpha = R(_add_big_ohs_list(self.parent().base_ring()(0), [ceil((other_pr - i) * self._cp), min(s_var_prec, other_var_prec)]))
+        verbose("alpha = %s"%(alpha))
+        
+        while i < other_pr-1:
+            i += 1
+            verbose("comparing p moment %s"%i)
+            a = self._unscaled_moment(i)
+            if check:
+#                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
+                if other._unscaled_moment(i) != alpha * a:
+                    raise ValueError("not a scalar multiple")
+            v = _padic_val_of_pow_series(a, p)
+            if n - i - v > relprec:
+                verbose("Reseting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
+                relprec = n - i - v
+                alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
+                verbose("alpha=%s"%(alpha))
+        if relprec < M[0]:
+            raise ValueError("result not determined to high enough precision")
+        alpha = alpha * self.parent().prime()**(other.ordp - self.ordp)
+        verbose("alpha=%s"%(alpha))
+        try:
+            return R(alpha) #Do we need R(*) here?
+        except ValueError:
+            return alpha
     
     def precision_relative(self):
         #RH: copied from coeffmod_OMS_element.py
