@@ -264,16 +264,20 @@ class ManinMap(object):
             sage: f._compute_image_from_gens(MR.reps()[1])
             (10 + 10*11 + O(11^2), 8 + O(11))
         """
+        #print "B=", B
         L = self._manin.relations(B)
         # could raise KeyError if B is not a generator
         if len(L) == 0:
             t = self._codomain.zero_element()
         else:
             c, A, g = L[0]
-            try:
-                g1 = self._dict[self._manin.reps(g)] * A
-            except ValueError:
-                print "%s is not in Sigma0" % A
+            #try:
+            #    print self._dict[self._manin.reps(g)].parent().action().actor()
+            #    print A
+            #    g1 = self._dict[self._manin.reps(g)] * A
+            #except ValueError:
+            #    print "%s is not in Sigma0" % A
+            g1 = self._dict[self._manin.reps(g)] * A
             t = g1 * c
             for c, A, g in L[1:]:
                 g1 = self._dict[self._manin.reps(g)] * A
@@ -781,6 +785,7 @@ class ManinMap(object):
             sage: phi.Tq_eigenvalue(7,7,10)
             -2
         """
+        verbose("Compute full data.")
         self.compute_full_data()
         self.normalize()
         M = self._manin
@@ -788,6 +793,7 @@ class ManinMap(object):
             ## psi will denote self | T_ell
             psi = {}
             for g in M.gens():
+                verbose("Looping over generators; at generator %s"%(g))
                 ## v is a dictionary so that the value of self | T_ell
                 ## on g is given by
                 ## sum_h sum_A self(h) * A
