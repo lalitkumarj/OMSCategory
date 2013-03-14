@@ -296,7 +296,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if new_prec > self.precision_relative():
             raise ValueError("new_prec(=%s) must be less than relative precision of self."%(new_prec))
         moments = self._moments[:new_prec]
-        ordp = self._ordp   #Should this be updated?
+        ordp = self.ordp   #Should this be updated?
         return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)  #should latter be true?
     
     def lift(self, DD=None):
@@ -371,11 +371,16 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
 #        else:
 #            v = V([R(a) for a in v])
 #        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp-shift, check=False)
+        p = self.parent().prime()        
         if self.is_zero():
-            return self.parent()(0)
+            M = ZZ(self.precision_absolute())
+            mu = self.parent()(0)
+            mu.ordp = M-M.exact_log(p)-1
+            return mu
         if self._unscaled_moment(0) != 0:
             raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
-        M = len(self._moments)
+        M = ZZ(len(self._moments))
+        ## RP: This if should never happen -- the distribution must be 0 at this point if M==1
         if M == 1:
             return self.parent()(0)
         if M == 2:
@@ -391,7 +396,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             scalar = K(self.moment(m)) * (~K(m))
             for j in range(m-1,M-1,2):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
-        p = self.parent().prime()
         ordp = min(a.valuation(p) for a in v)
         #Is this correct in ramified extensions of QQp?
         if ordp < 0:
@@ -402,4 +406,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             v = V([R(a // scalar) for a in v])
         else:
             v = V([R(a) for a in v])
-        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
+        mu1 = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
+        e = self.ordp - mu1.ordp  ## this is the amount the valuation dropped
+        f = M.exact_log(p)        ## this is the amount we need it to drop
+        return mu1.reduce_precision(mu1.precision_relative()-(f-e))
+        
