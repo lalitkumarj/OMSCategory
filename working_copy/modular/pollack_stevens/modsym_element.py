@@ -6,6 +6,7 @@ from sage.categories.action import Action
 from sage.structure.element import ModuleElement
 
 from sage.modular.pollack_stevens.manin_map import ManinMap
+from sage.modular.pollack_stevens.sigma0 import Sigma0
 
 minusproj = [1,0,0,-1]
 

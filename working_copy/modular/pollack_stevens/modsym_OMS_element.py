@@ -8,14 +8,14 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
             p = self.parent().prime()
         elif p != self.parent().prime():
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
-        return min([val.valuation(p) for val in self._map])
+        return min([val.valuation() for val in self._map])
     
     def diagonal_valuation(self, p):
         if p is None:
             p = self.parent().prime()
         elif p != self.parent().prime():
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
-        return min([val.diagonal_valuation(p) for val in self._map])
+        return min([val.diagonal_valuation() for val in self._map])
     
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):

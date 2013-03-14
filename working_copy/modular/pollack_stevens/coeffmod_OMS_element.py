@@ -384,7 +384,12 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if M == 1:
             return self.parent()(0)
         if M == 2:
-            return self.parent()(self.moment(1))
+            if p == 2:
+                raise ValueError("Not enough accuracy to return anything")
+            else:
+                mu = self.parent()(self._unscaled_moment(1))
+                mu.ordp = self.ordp
+                return mu
         R = self.parent().base_ring()
         K = R.fraction_field()
         V = self.parent().approx_module(M-1)
@@ -406,8 +411,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             v = V([R(a // scalar) for a in v])
         else:
             v = V([R(a) for a in v])
-        mu1 = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
-        e = self.ordp - mu1.ordp  ## this is the amount the valuation dropped
+        mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
+        e = self.ordp - mu.ordp  ## this is the amount the valuation dropped
         f = M.exact_log(p)        ## this is the amount we need it to drop
-        return mu1.reduce_precision(mu1.precision_relative()-(f-e))
+        return mu.reduce_precision(mu.precision_relative()-(f-e))
         

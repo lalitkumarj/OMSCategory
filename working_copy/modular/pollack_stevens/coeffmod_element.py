@@ -372,7 +372,7 @@ class WeightKAction_OMS(WeightKAction_generic):
         # the changering here is annoying, but otherwise we have to change ring each time we multiply
         B = B.change_ring(self.codomain().base_ring())
         if self._character is not None:
-            B *= self._character(a)
+            B *= self._character(ZZ(a))
         if self._dettwist is not None:
             B *= (a*d - b*c)**(self._dettwist)
         return B
