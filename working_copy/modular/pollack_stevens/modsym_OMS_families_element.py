@@ -1,6 +1,7 @@
 from sage.misc.cachefunc import cached_method
 from sage.misc.misc import verbose
 from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
+#from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _padic_val_of_pow_series
 
 class ModSym_OMS_Families_element(ModularSymbolElement_generic):
     def valuation(self, p=None):
@@ -49,12 +50,17 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
                 raise ValueError("self is zero")
         aq = self._map[g].find_scalar(qhecke._map[g], M, check)
         verbose("Found eigenvalues of %s"%(aq))
+        R = self.parent().base_ring()   #needed for hack below
         if check:
             verbose("Checking that this is actually an eigensymbol")
             if p is None or M is None:
                 for g in gens[1:]:
-                    if qhecke._map[g] != aq * self._map[g]:
+                    #Hack
+                    if qhecke._map[g] != R(aq) * self._map[g]:
+                    #if qhecke._map[g] != aq * self._map[g]:
                         raise ValueError("not a scalar multiple")
-            elif (M is not None and qhecke - aq * self).valuation(p) < M[0]:
+            #Hack
+            elif (M is not None and qhecke - R(aq) * self).valuation(p) < M[0]:            
+            #elif (M is not None and qhecke - aq * self).valuation(p) < M[0]:
                 raise ValueError("not a scalar multiple")
         return aq

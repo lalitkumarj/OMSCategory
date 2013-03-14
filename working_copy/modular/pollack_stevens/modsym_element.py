@@ -329,7 +329,7 @@ class ModularSymbolElement_generic(ModuleElement):
                 raise ValueError("not a scalar multiple")
         return aq
     
-    def is_ordinary(self):
+    def is_ordinary(self, p=None):
         raise NotImplementedError
     
     def reduce_precision(self, M):
@@ -343,6 +343,11 @@ class ModularSymbolElement_generic(ModuleElement):
         Returns the number of moments of each value of self
         """
         return min([a.precision_absolute() for a in self._map])
+    
+    def normalize(self):
+        for val in self._map:
+            val.normalize()
+        return self
     
     #def __call__(self):
     #    pass

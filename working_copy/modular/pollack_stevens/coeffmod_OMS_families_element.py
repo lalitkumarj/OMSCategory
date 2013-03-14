@@ -1,5 +1,7 @@
 # This should be cythoned once it's done.
 
+#from sage.rings.power_series_ring import PowerSeriesRing
+
 from copy import copy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
@@ -263,8 +265,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             raise TypeError("prec must have length at most 2.")
         #elif not isinstance(M, (list, tuple)):
         #    M = [M, None]
-        if min(s_var_prec, other_var_prec) < M[1]:
-            raise ValueError("Insufficient precision in variable (%s requested, min(%s, %s) obtained)"%(M[1], s_var_prec, other_var_prec))
+        #if min(s_var_prec, other_var_prec) < M[1]:
+        #    raise ValueError("Insufficient precision in variable (%s requested, min(%s, %s) obtained)"%(M[1], s_var_prec, other_var_prec))
         i = 0
         verbose("n = %s"%n)
         verbose("moment 0")
@@ -282,10 +284,18 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 raise ValueError("self is zero")
             v = _padic_val_of_pow_series(a, p)
         relprec = n - i - v
+        var_prec = min(s_var_prec, other_var_prec)  #should this depend on w-adic valuation?
+        Rbase = R.base_ring()
+        RK = R.change_ring(Rbase.fraction_field())
         if i < other_pr:
-            alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
+            #Hack
+            alpha = RK(other._unscaled_moment(i)) / RK(a)
+            #alpha, var_prec_loss = _custom_ps_div(other._unscaled_moment(i), a)
+            #alpha = R(_add_big_ohs_list(alpha, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
+            #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
         else:
-            alpha = R(_add_big_ohs_list(self.parent().base_ring()(0), [ceil((other_pr - i) * self._cp), min(s_var_prec, other_var_prec)]))
+            #Fix var_prec??
+            alpha = RK([Rbase(0, ceil((n - i) * self._cp))], var_prec)
         verbose("alpha = %s"%(alpha))
         
         while i < other_pr-1:
@@ -294,22 +304,33 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             a = self._unscaled_moment(i)
             if check:
 #                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
+                #if other._unscaled_moment(i) != _add_big_ohs_list(alpha * a, [ceil((n - i) * self._cp), var_prec]):
                 if other._unscaled_moment(i) != alpha * a:
                     raise ValueError("not a scalar multiple")
             v = _padic_val_of_pow_series(a, p)
             if n - i - v > relprec:
-                verbose("Reseting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
+                verbose("Resetting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
                 relprec = n - i - v
-                alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
+                #Should we alter var_prec, too?
+                #Hack
+                alpha = RK(other._unscaled_moment(i)) / RK(a)
+                #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
                 verbose("alpha=%s"%(alpha))
         if relprec < M[0]:
             raise ValueError("result not determined to high enough precision")
+        #if var_prec < M[1]:
+        
         alpha = alpha * self.parent().prime()**(other.ordp - self.ordp)
         verbose("alpha=%s"%(alpha))
-        try:
-            return R(alpha) #Do we need R(*) here?
-        except ValueError:
-            return alpha
+        #Hack to workaround bug with power series
+        #RK = PowerSeriesRing(R.base_ring().fraction_field(), R.variable_name(), default_prec=R.default_prec()) #Hack because of bugs in power series
+        #alpha_list = _add_big_ohs_list(alpha, [relprec, M[1]])
+        #try:
+        #    return R(alpha)    #if alpha = O(p^7) + (... + O(p^7)*w + ..., then R(alpha) = O(p^8) + w * ()... if say 8 is prec of Rbase. BUG IN SAGE!
+        #    #return RK(alpha_list) #Do we need R(*) here?
+        #except ValueError:
+        #    return alpha
+        return alpha
     
     def precision_relative(self):
         #RH: copied from coeffmod_OMS_element.py
@@ -431,6 +452,7 @@ def _padic_val_unit_of_pow_series(f, p=None):
     return (v, u)
 
 def _add_big_ohs_list(f, prec_cap):
+    #There may be a problem if you pass the list [3, O(p^2)] to the power series ring. It will truncate all big-ohs after last "non-zero" entry
     r"""
     Returns a (padded) list of length (at most) ``prec_cap``[1] of the coefficients
     up to `p`-adic precision ``prec_cap``[0]. The input is checked. 
@@ -463,3 +485,41 @@ def _add_big_ohs_list(f, prec_cap):
     for i in range(0, min(f.degree(), var_prec)):
         flist[i] = flist[i].add_bigoh(p_prec)
     return flist
+
+#Hack to overcome lack of functionality in dividing power series
+#def _custom_ps_div(num, denom):
+#    #print "\n", num
+#    #print denom
+#    num_val = num.valuation()
+#    denom_val = denom.valuation()
+#    if denom_val == 0:
+#        prec = min(num.prec(), denom.prec())
+#        #print "\Val (0,0)"
+#        #print num[0]
+#        #print num
+#        R = num.parent()
+#        num_list = num.padded_list(prec)
+#        denom_list = denom.padded_list(prec)
+#        outlist = [num[0]/denom[0]]
+#        for i in range(1, prec):
+#            outlist.append(((num_list[i] - sum([denom_list[j] * outlist[i-j] for j in range(1, i + 1)])) / denom_list[0])) #.add_bigoh(prec - i)) #Why did I write this last part?
+#        ret = R(outlist, prec)
+#        #Hack around bug in power series
+#        #d = ret.degree()
+#        #missing = prec - d - 1
+#        #if missing == 0:
+#        #    return ret
+#        #w = R.gen()
+#        #B = R.base_ring()
+#        #for i in range(missing):
+#        #    shift = d + 1 + i
+#        #    ret += B(0, prec - shift) * w ** (shift)
+#        return [ret, prec]
+#    if denom_val > num_val:
+#        raise ValueError("Denominator must have smaller valuation than numerator.")
+#    if denom_val == num_val:
+#        alpha, new_prec = _custom_ps_div(num.valuation_zero_part(), denom.valuation_zero_part())
+#        return [alpha, new_prec - denom_val]
+#    val_diff = num_val - denom_val
+#    alpha, new_prec = _custom_ps_div(num >> val_diff, denom >> val_diff)
+#    return [alpha << val_diff, new_prec - val_diff]
