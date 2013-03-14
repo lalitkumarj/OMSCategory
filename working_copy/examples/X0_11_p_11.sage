@@ -7,7 +7,7 @@ p = 11
 k = 2
 r = (k-2) % (p-1)
 M = 8  #Number of moments
-var_prec = 4    #Precision on the variable
+var_prec = M    #Precision on the variable
 max_iter = 50   #Maximum number of iterations of Up in projection to ordinary part
 
 #Verification data
@@ -33,6 +33,12 @@ print "\nGenerating random modular symbol."
 sys.stdout.flush()
 before = walltime()
 Phis = MM.random_element()
+print "Time elapsed:", walltime() - before
+
+print "\nNormalizing the symbol."
+sys.stdout.flush()
+before = walltime()
+Phis.normalize()
 print "Time elapsed:", walltime() - before
 
 print "Projecting to ordinary subspace."
@@ -65,6 +71,12 @@ before = walltime()
 Phis = Phis.hecke(p) - Phis
 print "Time elapsed:", walltime() - before
 
+print "\nNormalizing the symbol again."
+sys.stdout.flush()
+before = walltime()
+Phis.normalize()
+print "Time elapsed:", walltime() - before
+
 print "\nCompute the Hecke eigenvalues:"
 sys.stdout.flush()
 before = walltime()
@@ -83,7 +95,7 @@ for wt in weights:
     for ell in ells:
         print "\na_{0}:".format(ell)
         known = R(a_ells_dict[wt][ell])
-        ours = a_ells[ell](weights_in_w[wt])
+        ours = a_ells[ell].truncate()(weights_in_w[wt])
         if ell == p and unstabilize[wt]:
             ours = ours + p**(wt-1) / ours
         print "Known: {0}".format(known)
