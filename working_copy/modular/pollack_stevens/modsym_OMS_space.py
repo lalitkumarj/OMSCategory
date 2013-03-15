@@ -13,10 +13,15 @@ class ModSym_OMS_factory(UniqueFactory):
         if sign not in (-1,0,1):
             raise ValueError("sign must be -1, 0, 1")
         if isinstance(group, (int, Integer)):
-            group = Gamma0(group)
+            character = None
         if coefficients is None:
             #WHERE TO GET CHARACTER?
             coeffcients = OverconvergentDistributions(weight, p, prec_cap, base, character)
+        if isinstance(group, (int, Integer)):
+            p = coefficients.prime()
+            if group % p != 0:
+                group *= p
+            group = Gamma0(group)
         return (group, coefficients, sign)
     
     def create_object(self, version, key):
