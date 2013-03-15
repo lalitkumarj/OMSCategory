@@ -1,4 +1,5 @@
 from sage.structure.factory import UniqueFactory
+from sage.misc.misc import verbose
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
@@ -66,13 +67,16 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         M_in = _prec_for_solve_diff_eqn(M, p)
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
+        #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
         manin = self.source()
+        gens = manin.gens()
+        gammas = manin.gammas
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
         D = {}
         t = CM(0)
-        for g in manin.gens()[1:]:
+        for g in gens[1:]:
             #print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element(M_in)
 #            print "pre:",D[g]
@@ -88,7 +92,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                     D[g] = 2*D[g] - D[g] * gamg - D[g] * gamg**2
                     t -= D[g]
                 else:
-                    t += D[g] * manin.gammas[g] - D[g]
+                    t += D[g] * gammas[g] - D[g]
         
         ## If k = 0, then t has total measure zero.  However, this is not true when k != 0  
         ## (unlike Prop 5.1 of [PS1] this is not a lift of classical symbol).  
@@ -96,20 +100,22 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         ## here since (mu_1 |_k ([a,b,c,d]-1))(trival char) = chi(a) k a^{k-1} c , 
         ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
 
+        Id = gens[0]
         if k != 0:
-            #TODO: simplify this by having the ManinRelations object compute once and for all a non-torsion generator if it exists (or does Lalit's fix make this all uneccessary?)
-            j = 1
-            g = manin.gens()[j]
-            while (g in manin.reps_with_two_torsion()) or (g in manin.reps_with_three_torsion()) and (j < len(manin.gens())):
-                j += 1
-                try:
-                    g = manin.gens()[j]
-                except:
-                    pass
-            if j == len(manin.gens()):
-                raise ValueError("everything is 2 or 3 torsion!  NOT YET IMPLEMENTED IN THIS CASE")
+            if len(gammas) > 1:
+                #There is a non-torsion generator
+                gam_keys = gammas.keys()
+                gam_keys.remove(Id)
+                g = gam_keys[0]
+                gam = gammas[g]
+            else:
+                verbose("All generators are torsion.")
+                g = gens[1]
+                if g in manin.reps_with_two_torsion():
+                    gam = manin.two_torsion_matrix(g)
+                else:
+                    gam = manin.three_torsion_matrix(g)
 
-            gam = manin.gammas[g]
             a = gam.matrix()[0,0]
             c = gam.matrix()[1,0]
 
@@ -119,14 +125,20 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 chara = 1
             err = -t.moment(0)/(chara*k*a**(k-1)*c)
             v = [R(0)] * M_in
-            v[1] = R(1)
-            mu_1 = err * CM(v)
-            D[g] += mu_1
-#            print "Modifying: ",D[g]
-            t = t + mu_1 * gam - mu_1
+            v[1] = R(err)
+            err = CM(v)  #move multiplication by err to previous line?
+            
+            if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
+                err = err * gam - err
+                D[g] += err
+                t += err
+            else:
+                D[g] += err
+                t += err * gam - err
         
-        Id = manin.gens()[0]
         mu = t.solve_diff_eqn()
+        if mu.precision_relative() < M:
+            raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
 
         return self(D)

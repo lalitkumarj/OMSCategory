@@ -64,17 +64,19 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        R = self.base_ring()
         M_in = _prec_for_solve_diff_eqn_families(M[0], p)
         #print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M[1]])
+        R = CM.base_ring()
         manin = self.source()
+        gens = manin.gens()
+        gammas = manin.gammas
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
         D = {}
         t = CM(0)
-        for g in manin.gens()[1:]:
+        for g in gens[1:]:
             verbose("Looping over generators. At generator %s"%(g))
             #print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element([M_in, M[1]])
@@ -94,7 +96,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     t -= D[g]
                 else:
                     verbose("Generator is non-torsion")
-                    t += D[g] * manin.gammas[g] - D[g]
+                    t += D[g] * gammas[g] - D[g]
         
         ## If k = 0, then t has total measure zero.  However, this is not true when k != 0  
         ## (unlike Prop 5.1 of [PS1] this is not a lift of classical symbol).  
@@ -103,18 +105,21 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
 
         #TODO: simplify this by having the ManinRelations object compute once and for all a non-torsion generator if it exists (or does Lalit's fix make this all uneccessary?)
-        j = 1
-        g = manin.gens()[j]
-        verbose("Try to find non-torsion generator.")
-        while (g in manin.reps_with_two_torsion()) or (g in manin.reps_with_three_torsion()) and (j < len(manin.gens())):
-            j += 1
-            try:
-                g = manin.gens()[j]
-            except:
-                pass
-        if j == len(manin.gens()):
+        Id = gens[0]
+        if len(gammas) > 1:
+            #There is a non-torsion generator
+            gam_keys = gammas.keys()
+            gam_keys.remove(Id)
+            g = gam_keys[0]
+            gam = gammas[g]
+        else:
             verbose("All generators are torsion.")
-        gam = manin.gammas[g]
+            g = gens[1]
+            if g in manin.reps_with_two_torsion():
+                gam = manin.two_torsion_matrix(g)
+            else:
+                gam = manin.three_torsion_matrix(g)
+        
         a = gam.matrix()[0,0]
         c = gam.matrix()[1,0]
         
@@ -144,9 +149,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             D[g] += err
             t += err * gam - err
         
-        Id = manin.gens()[0]
         verbose("Solve difference equation.")
         mu = t.solve_diff_eqn()
+        mu_pr = mu.precisision_relative()
+        if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
+            raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
         return self(D)
 
