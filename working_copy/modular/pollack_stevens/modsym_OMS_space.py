@@ -64,7 +64,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        M_in = _prec_for_solve_diff_eqn(M, p)
+        M_in = _prec_for_solve_diff_eqn(M, p, k)
         verbose("Working with precision %s"%(M_in))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
@@ -102,6 +102,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
 
         Id = gens[0]
+        shift = 0
         if k != 0:
             if len(gammas) > 1:
                 #There is a non-torsion generator
@@ -125,29 +126,44 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             else:
                 chara = 1
             err = -t.moment(0)/(chara*k*a**(k-1)*c)
+            err_val = err.valuation()
+            if err_val < 0:
+                shift -= err_val
+                verbose("err_val: %s, shift: %s, err: %s"%(err_val, shift, err))
+                err = err << shift
+                verbose("New err: %s"%(err))
+                t.ordp += shift
             v = [R(0)] * M_in
-            v[1] = R(1)
-            err = err * CM(v)
+            v[1] = R(err)
+            err = CM(v)
             
             if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
                 err = err * gam - err
-                D[g] += err
                 t += err
             else:
-                D[g] += err
                 t += err * gam - err
 
         verbose("The parent of this dist is %s"%(t.parent()))
         verbose("About to solve diff_eqn with %s"%(t))
         mu = t.solve_diff_eqn()
+        mu_val = mu.valuation()
+        if mu_val < 0:
+            shift -= mu_val
+            mu.ordp -= mu_val
+            if k != 0:
+                err.ordp -= mu_val
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
-
+        for h in gens[1:]:
+            D[h].ordp += shift
+        if k != 0:
+            D[g] += err
+        
         return self(D)
 
 #@cached_method
-def _prec_for_solve_diff_eqn(M, p):
+def _prec_for_solve_diff_eqn(M, p, k):
     r"""
         A helper function for determining the (relative) precision of the input
         to solve_diff_eqn required in order obtain an answer with (relative)
@@ -157,7 +173,9 @@ def _prec_for_solve_diff_eqn(M, p):
         
         .. MATH::
             
-            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3.
+            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3 - v_p(k),
+        
+        where the latter term only appears if ``k`` is not 0.
         
         ::EXAMPLES:
         
@@ -167,12 +185,13 @@ def _prec_for_solve_diff_eqn(M, p):
     """
     # Do we need the weight?
     # A good guess to begin:
+    val_k = ZZ(k).valuation(p) if k != 0 else 0
     if M < 1:
         raise ValueError("Desired precision M(=%s) must be at least 1."%(M))
-    Min = ZZ(3 + M + ceil(ZZ(M).log(p)))
+    Min = ZZ(3 + M + ceil(ZZ(M).log(p)) + val_k)
     # It looks like usually there are no iterations
     # For low M, there can be 1 or 2
-    while M > Min - ceil(Min.log(p)) - 3:
+    while M > Min - ceil(Min.log(p)) - 3 - val_k:
         Min += 1
         #print("An iteration in _prec_solve_diff_eqn")
     return Min
