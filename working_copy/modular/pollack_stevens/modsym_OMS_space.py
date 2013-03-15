@@ -126,7 +126,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             err = -t.moment(0)/(chara*k*a**(k-1)*c)
             v = [R(0)] * M_in
             v[1] = R(err)
-            err = CM(v)  #move multiplication by err to previous line?
+            err = CM(v)
             
             if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
                 err = err * gam - err

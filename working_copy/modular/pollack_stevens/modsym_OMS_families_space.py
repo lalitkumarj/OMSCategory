@@ -98,13 +98,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     verbose("Generator is non-torsion")
                     t += D[g] * gammas[g] - D[g]
         
-        ## If k = 0, then t has total measure zero.  However, this is not true when k != 0  
-        ## (unlike Prop 5.1 of [PS1] this is not a lift of classical symbol).  
-        ## So instead we simply add (const)*mu_1 to some (non-torsion) v[j] to fix this
-        ## here since (mu_1 |_k ([a,b,c,d]-1))(trival char) = chi(a) k a^{k-1} c , 
-        ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
+        ## Fill in this comment?
 
-        #TODO: simplify this by having the ManinRelations object compute once and for all a non-torsion generator if it exists (or does Lalit's fix make this all uneccessary?)
         Id = gens[0]
         if len(gammas) > 1:
             #There is a non-torsion generator
