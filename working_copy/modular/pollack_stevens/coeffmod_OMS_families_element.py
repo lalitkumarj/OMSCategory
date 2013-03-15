@@ -11,6 +11,30 @@ from sage.rings.integer_ring import ZZ
 from sage.functions.other import ceil
 
 class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
+    r"""
+        Fill this in.
+        
+        EXAMPLES::
+        
+            sage: D8 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 8))
+            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8
+            (1 + O(3^4) + O(w^4), 2 + O(3^4) + O(w^4), 3 + O(3^3) + O(w^4), 1 + 3 + O(3^3) + O(w^4), 2 + 3 + O(3^2) + O(w^4), 2*3 + O(3^2) + O(w^4), 1 + O(3) + O(w^4), 2 + O(3) + O(w^4))
+            sage: D4 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 4))
+            sage: mu4 = D4([1,2,3,4,5,6,7,8,9,10]); mu4
+            (1 + O(3^2) + O(w^4), 2 + O(3^2) + O(w^4), O(w^4), 1 + O(3) + O(w^4))
+            sage: D4(mu8)
+            (1 + O(3^2) + O(w^4), 2 + O(3^2) + O(w^4), O(w^4), 1 + O(3) + O(w^4))
+            sage: mu4 == D4(mu8)
+            True
+            sage: D42 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,2], base_coeffs=ZpCA(3, 4))
+            sage: mu42 = D42([1,2,3,4,5,6,7,8,9,10])
+            sage: mu42
+            (1 + O(3^2) + O(w^2), 2 + O(3^2) + O(w^2), O(w^2), 1 + O(3) + O(w^2))
+            sage: D42(mu8)
+            (1 + O(3^2) + O(w^2), 2 + O(3^2) + O(w^2), O(w^2), 1 + O(3) + O(w^2))
+            sage: mu42 == D42(mu8)
+            True
+    """
     # Implementation currently ignores ordp
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=None):
         CoefficientModuleElement_generic.__init__(self, parent)
@@ -22,7 +46,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         if check:
             if isinstance(moments, CoeffMod_OMS_Families_element):
                 ordp = moments.ordp
-                moments = moments._moments.change_ring(parent.base_ring())
+                moments = moments._moments[:parent.precision_cap()]
+                moments = moments.change_ring(parent.base_ring())
             if isinstance(moments, CoeffMod_OMS_element):
                 ordp = moments.ordp
                 moments = self.parent().approx_module(p_prec=len(moments._moments), var_prec=self.parent().precision_cap()[1])(moments._moments)

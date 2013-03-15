@@ -10,6 +10,22 @@ from sage.rings.integer_ring import ZZ
 maxordp = 2 ** 14   #change this to what it is in dist.pyx
 
 class CoeffMod_OMS_element(CoefficientModuleElement_generic):
+    r"""
+        Fill this in.
+        
+        EXAMPLES::
+        
+            sage: D8 = OverconvergentDistributions(0, base=ZpCA(11, 8))
+            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8
+            (1 + O(11^8), 2 + O(11^7), 3 + O(11^6), 4 + O(11^5), 5 + O(11^4), 6 + O(11^3), 7 + O(11^2), 8 + O(11))
+            sage: D4 = OverconvergentDistributions(0, base=ZpCA(11, 4))
+            sage: mu4 = D4([1,2,3,4,5,6,7,8,9,10]); mu4
+            (1 + O(11^4), 2 + O(11^3), 3 + O(11^2), 4 + O(11))
+            sage: D4(mu8)
+            (1 + O(11^4), 2 + O(11^3), 3 + O(11^2), 4 + O(11))
+            sage: mu4 == D4(mu8)
+            True
+    """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
         CoefficientModuleElement_generic.__init__(self, parent)
@@ -17,7 +33,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if check:
             if isinstance(moments, CoeffMod_OMS_element):
                 ordp = moments.ordp
-                moments = moments._moments.change_ring(parent.base_ring())
+                moments = moments._moments[:parent.precision_cap()]
+                moments = moments.change_ring(parent.base_ring())
             elif hasattr(moments, '__len__'):
                 M = min(len(moments), parent.precision_cap())
                 moments = parent.approx_module(M)(moments[:M])
