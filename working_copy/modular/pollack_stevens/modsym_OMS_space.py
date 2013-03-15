@@ -144,7 +144,15 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 t += err * gam - err
 
         verbose("The parent of this dist is %s"%(t.parent()))
-        verbose("About to solve diff_eqn with %s"%(t))
+        verbose("Before adjusting: %s, %s"%(t.ordp, t._moments))
+        #try:
+        #    mu = t.solve_diff_eqn()
+        #except PrecisionError:
+        #    verbose("t"%(t.ordp, t._moments, t.precision_absolute()
+        verbose("Shift before mu = %s"%(shift))
+        if shift > 0:
+            t = t.reduce_precision(t.precision_relative() - shift)
+        verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         mu = t.solve_diff_eqn()
         mu_val = mu.valuation()
         if mu_val < 0:
@@ -155,8 +163,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
-        for h in gens[1:]:
-            D[h].ordp += shift
+        if shift > 0:
+            for h in gens[1:]:
+                D[h].ordp += shift
         if k != 0:
             D[g] += err
         
