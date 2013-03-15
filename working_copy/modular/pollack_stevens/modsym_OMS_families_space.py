@@ -108,7 +108,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         verbose("Try to find non-torsion generator.")
         while (g in manin.reps_with_two_torsion()) or (g in manin.reps_with_three_torsion()) and (j < len(manin.gens())):
             j += 1
-            g = manin.gens()[j]
+            try:
+                g = manin.gens()[j]
+            except:
+                pass
         if j == len(manin.gens()):
             verbose("All generators are torsion.")
         gam = manin.gammas[g]

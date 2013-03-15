@@ -102,7 +102,10 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             g = manin.gens()[j]
             while (g in manin.reps_with_two_torsion()) or (g in manin.reps_with_three_torsion()) and (j < len(manin.gens())):
                 j += 1
-                g = manin.gens()[j]
+                try:
+                    g = manin.gens()[j]
+                except:
+                    pass
             if j == len(manin.gens()):
                 raise ValueError("everything is 2 or 3 torsion!  NOT YET IMPLEMENTED IN THIS CASE")
 
