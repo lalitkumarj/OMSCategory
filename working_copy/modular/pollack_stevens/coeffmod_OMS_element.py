@@ -182,14 +182,14 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         p = self.parent().prime()
         usearg = True
         try:
-            z = self._unscaled_moment(0).is_zero(n)
+            z = self._unscaled_moment(0).is_zero(prec)
         except TypeError:
             z = self._unscaled_moment(0).is_zero()
             use_arg = False
         if not z: return False
-        for a in xrange(1, n):
+        for a in xrange(1, prec):
             if usearg:
-                z = self._unscaled_moment(a).is_zero(n-a)
+                z = self._unscaled_moment(a).is_zero(prec-a)
             else:
                 z = self._unscaled_moment(a).is_zero()
             if not z: return False
