@@ -120,6 +120,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         Id = manin.gens()[0]
         mu = t.solve_diff_eqn()
         D[Id] = -mu
+
         return self(D)
 
 #@cached_method
