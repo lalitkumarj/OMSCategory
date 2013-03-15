@@ -65,6 +65,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         p = self.prime()
         k = self.weight()
         M_in = _prec_for_solve_diff_eqn(M, p)
+        verbose("Working with precision %s"%(M_in))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
         #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
@@ -125,8 +126,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 chara = 1
             err = -t.moment(0)/(chara*k*a**(k-1)*c)
             v = [R(0)] * M_in
-            v[1] = R(err)
-            err = CM(v)
+            v[1] = R(1)
+            err = err * CM(v)
             
             if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
                 err = err * gam - err
@@ -135,7 +136,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             else:
                 D[g] += err
                 t += err * gam - err
-        
+
+        verbose("The parent of this dist is %s"%(t.parent()))
+        verbose("About to solve diff_eqn with %s"%(t))
         mu = t.solve_diff_eqn()
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
