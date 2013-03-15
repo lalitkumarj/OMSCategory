@@ -390,7 +390,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
 #        else:
 #            v = V([R(a) for a in v])
 #        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp-shift, check=False)
-        p = self.parent().prime()        
+        p = self.parent().prime()
         if self.is_zero():
             M = ZZ(self.precision_absolute())
             mu = self.parent()(0)

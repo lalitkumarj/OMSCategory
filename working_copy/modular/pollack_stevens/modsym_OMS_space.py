@@ -179,11 +179,10 @@ def _prec_for_solve_diff_eqn(M, p, k):
         
         ::EXAMPLES:
         
-            sage: [_prec_for_solve_diff_eqn(M, p) for p in [2,3,5] for M in [1,3,10,20]]
-            [7, 10, 18, 28, 6, 8, 16, 26, 5, 8, 15, 25]
-
+            sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
+            sage: [_prec_for_solve_diff_eqn(M, p, k) for p in [2,3,11] for M in [1,3,10,20] for k in [0, 2, 6]]
+            [7, 8, 8, 10, 11, 11, 18, 19, 19, 28, 29, 29, 6, 6, 7, 8, 8, 9, 16, 16, 17, 26, 26, 27, 5, 5, 5, 7, 7, 7, 15, 15, 15, 25, 25, 25]
     """
-    # Do we need the weight?
     # A good guess to begin:
     val_k = ZZ(k).valuation(p) if k != 0 else 0
     if M < 1:
