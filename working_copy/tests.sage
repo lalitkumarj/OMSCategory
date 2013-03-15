@@ -212,6 +212,61 @@ def test_Dist_fam_solve_vs_old_code():
         print nuV_norm, "\n"
         print old_nuV_norm
 
+def test_precision_of_OMS():
+    # Should add examples where prec of base ring > prec of D
+    bad_symbols = []
+    ps = [3,5,7,11]
+    ks = [0,2,5]
+    precs = [4, 10, 20]
+    Ns = [1, 3, 6, 11]
+    for p in ps:
+        print "**** p = {0} ****".format(p)
+        for k in ks:
+            print "******** k = {0} ********".format(k)
+            for N in Ns:
+                print "************ N = {0} ************".format(N)
+                for prec in precs:
+                    print "---- prec = {0} ----".format(prec)
+                    D = OverconvergentDistributions(k, base=ZpCA(p, prec))
+                    M = OverconvergentModularSymbols(N, coefficients=D)
+                    MR = M.source()
+                    Phi = M.random_element()
+                    Phi.normalize()
+                    for g in MR.gens():
+                        mu = Phi._map[g]
+                        verbose("length: {0}".format(len(mu._moments)))
+                        check = _has_appropriate_precision(mu, prec)
+                        #check = _has_appropriate_precision(mu)
+                        verbose("val, mu = %s, %s\n"%(mu.ordp, mu._moments))
+                        if len(check) > 0:
+                            bad_symbols.append([Phi, g])
+                            print "\n>>> Symbol is bad at\n{0}".format(g)
+                            print "        val, mu: ", mu.ordp, mu._moments
+                            for i in check:
+                                print "        _moment[{0}] = {1}".format(i, mu._moments[i])
+    return bad_symbols
+                    
+def _has_appropriate_precision(mu, prec=None):
+    r"""
+        If ``prec`` is given, make sure the absolute precision of the ith moment
+        is `\text{prec}-i`. Note that ``mu`` may still have fewer than ``prec``
+        moments.
+        
+        Not sure if it makes sense to ever have ``prec`` be ``None``...
+    """
+    verbose("val, mu = %s, %s"%(mu.ordp, mu._moments))
+    verbose("length: {0}".format(len(mu._moments)))
+    bad_moms = []
+    if prec is None:
+        prec = len(mu._moments)
+    for i in range(len(mu._moments)):
+        if mu.moment(i).precision_absolute() != prec - i:
+            bad_moms.append(i)
+            verbose("Moment {0} (with prec={1}): {2}".format(i, prec, mu._moments[i]))
+            if mu._moments[i].precision_absolute() < prec - i:
+                verbose("REALLY BAD **********************************************************")
+    return bad_moms
+
 def add_bigohs_dist_fam(nu, p, custom_first_prec=None):
     M = len(nu)
     if custom_first_prec is None:
