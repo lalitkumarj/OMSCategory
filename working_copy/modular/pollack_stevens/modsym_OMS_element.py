@@ -3,6 +3,16 @@ from sage.misc.misc import verbose
 from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
 
 class ModSym_OMS_element(ModularSymbolElement_generic):
+    def is_zero(self):
+        z = True
+        j = 0
+        while z and (j<len(self.values())-1):
+            if (self.values()[j].is_zero()):
+                j += 1
+            else:
+                z = False
+        return z
+                        
     def valuation(self, p=None):
         if p is None:
             p = self.parent().prime()
@@ -124,3 +134,52 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
             elif (qhecke - aq * self).valuation(p) < M[0]:
                 raise ValueError("not a scalar multiple")
         return aq
+
+    def _consistency_check(self):
+        """
+        Check that the map really does satisfy the Manin relations loop (for debugging).
+        The two and three torsion relations are checked and it is checked that the symbol
+        adds up correctly around the fundamental domain
+
+        EXAMPLES::
+
+            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+            sage: E = EllipticCurve('37a1')
+            sage: phi = ps_modsym_from_elliptic_curve(E)
+            sage: phi._consistency_check()
+            This modular symbol satisfies the manin relations
+
+        """
+
+        f = self._map
+        MR = self._map._manin
+        ## Test two torsion relations
+        for g in MR.reps_with_two_torsion():
+            gamg = MR.two_torsion_matrix(g)
+            if not (f[g]*gamg + f[g]).is_zero():
+                raise ValueError("Two torsion relation failed with",g)
+
+        ## Test three torsion relations
+        for g in MR.reps_with_three_torsion():
+            gamg = MR.three_torsion_matrix(g)
+            if not (f[g]*(gamg**2) + f[g]*gamg + f[g]).is_zero():
+                raise ValueError("Three torsion relation failed with",g)
+
+        ## Test that the symbol adds to 0 around the boundary of the fundamental domain
+        t = self.parent().coefficient_module().zero_element()
+        for g in MR.gens()[1:]:
+            if (not g in MR.reps_with_two_torsion()) and (not g in MR.reps_with_three_torsion()):
+                t += f[g] * MR.gammas[g] - f[g]
+            else:
+                if g in MR.reps_with_two_torsion():
+                    t -= f[g] 
+                else:
+                    t -= f[g]
+                    
+        id = MR.gens()[0]
+        if f[id]*MR.gammas[id] - f[id] != -t:
+            print -t
+            print f[id]*MR.gammas[id] - f[id]
+            raise ValueError("Does not add up correctly around loop")
+
+        print "This modular symbol satisfies the manin relations"

@@ -58,10 +58,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        R = self.base_ring()
         M_in = _prec_for_solve_diff_eqn(M, p)
-        #print "M_in", M_in
         CM = self.coefficient_module().change_precision(M_in)
+        R = CM.base_ring()
         manin = self.source()
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 

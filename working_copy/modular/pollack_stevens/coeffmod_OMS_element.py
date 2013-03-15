@@ -16,6 +16,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #TODO: finish this
         if check:
             if isinstance(moments, CoeffMod_OMS_element):
+                ordp = moments.ordp
                 moments = moments._moments.change_ring(parent.base_ring())
             elif hasattr(moments, '__len__'):
                 M = min(len(moments), parent.precision_cap())
@@ -90,7 +91,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         p = self.parent().prime()
         if right.is_zero():
             ans._moments = self.parent().approx_module(0)([])
-            ans.ordp = self.parent().precision_cap()
+            ans.ordp = min(self.parent().precision_cap(),right.valuation(p))
         else:
             v, u = right.val_unit()
             ans._moments = self._moments * u
@@ -129,23 +130,24 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         right = copy(right)
         left.normalize()
         right.normalize()
-        rprec = min(left.precision_relative(), right.precision_relative())
-        p = left.parent().prime()
-        if left.ordp > right.ordp:
-            shift = p ** (left.ordp - right.ordp)
-            for i in range(rprec):
-                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
-                if c: return c
-        elif left.ordp < right.ordp:
-            shift = p ** (right.ordp - left.ordp)
-            for i in range(rprec):
-                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
-                if c: return c
-        else:
-            for i in range(rprec):
-                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
-                if c: return c
-        return 0
+        #        rprec = min(left.precision_relative(), right.precision_relative())
+        #        p = left.parent().prime()
+        #        if left.ordp > right.ordp:
+        #            shift = p ** (left.ordp - right.ordp)
+        #            for i in range(rprec):
+        #                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
+        #                if c: return c
+        #        elif left.ordp < right.ordp:
+        #            shift = p ** (right.ordp - left.ordp)
+        #            for i in range(rprec):
+        #                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
+        #                if c: return c
+        #        else:
+        #            for i in range(rprec):
+        #                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
+        #                if c: return c
+        #        return 0
+        return cmp([left._moments,left.ordp],[right._moments,right.ordp])
     
     def is_zero(self, prec=None):
         #RH: Mostly "copied" from dist.pyx
@@ -163,9 +165,9 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         p = self.parent().prime()
         usearg = True
         try:
-            z = self.moment(0).is_zero(n)
+            z = self._unscaled_moment(0).is_zero(n)
         except TypeError:
-            z = self.moment(0).is_zero()
+            z = self._unscaled_moment(0).is_zero()
             use_arg = False
         if not z: return False
         for a in xrange(1, n):
