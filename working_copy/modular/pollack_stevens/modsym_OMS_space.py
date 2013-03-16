@@ -64,14 +64,34 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        M_in = _prec_for_solve_diff_eqn(M, p, k)
+        manin = self.source()
+        gens = manin.gens()
+        Id = gens[0]
+        gammas = manin.gammas
+        gam_shift = 0
+        if k != 0:
+            if len(gammas) > 1:
+                #There is a non-torsion generator
+                gam_keys = gammas.keys()
+                gam_keys.remove(Id)
+                g0 = gam_keys[0]
+                gam0 = gammas[g0]
+            else:
+                verbose("All generators are torsion.")
+                g0 = gens[1]
+                if g0 in manin.reps_with_two_torsion():
+                    gam0 = manin.two_torsion_matrix(g0)
+                else:
+                    gam0 = manin.three_torsion_matrix(g0)
+            a = gam0.matrix()[0,0]
+            c = gam0.matrix()[1,0]
+            gam_shift = c.valuation(p)
+        
+        M_in = _prec_for_solve_diff_eqn(M, p, k) + gam_shift
         verbose("Working with precision %s"%(M_in))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
         #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
-        manin = self.source()
-        gens = manin.gens()
-        gammas = manin.gammas
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
@@ -101,31 +121,13 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         ## here since (mu_1 |_k ([a,b,c,d]-1))(trival char) = chi(a) k a^{k-1} c , 
         ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
 
-        Id = gens[0]
         shift = 0
         if k != 0:
-            if len(gammas) > 1:
-                #There is a non-torsion generator
-                gam_keys = gammas.keys()
-                gam_keys.remove(Id)
-                g = gam_keys[0]
-                gam = gammas[g]
-            else:
-                verbose("All generators are torsion.")
-                g = gens[1]
-                if g in manin.reps_with_two_torsion():
-                    gam = manin.two_torsion_matrix(g)
-                else:
-                    gam = manin.three_torsion_matrix(g)
-
-            a = gam.matrix()[0,0]
-            c = gam.matrix()[1,0]
-
             if CM._character != None:
                 chara = CM._character(a)
             else:
                 chara = 1
-            err = -t.moment(0)/(chara*k*a**(k-1)*c)
+            err = -t.moment(0)/(chara * k * a**(k-1) * c)
             err_val = err.valuation()
             if err_val < 0:
                 shift -= err_val
@@ -137,11 +139,11 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v[1] = R(err)
             err = CM(v)
             
-            if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
-                err = err * gam - err
+            if g0 in manin.reps_with_two_torsion() or g0 in manin.reps_with_three_torsion():
+                err = err * gam0 - err
                 t += err
             else:
-                t += err * gam - err
+                t += err * gam0 - err
 
         verbose("The parent of this dist is %s"%(t.parent()))
         verbose("Before adjusting: %s, %s"%(t.ordp, t._moments))
@@ -151,7 +153,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #    verbose("t"%(t.ordp, t._moments, t.precision_absolute()
         verbose("Shift before mu = %s"%(shift))
         if shift > 0:
-            t = t.reduce_precision(t.precision_relative() - shift)
+            t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
         verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         mu = t.solve_diff_eqn()
         mu_val = mu.valuation()
@@ -160,6 +162,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             mu.ordp -= mu_val
             if k != 0:
                 err.ordp -= mu_val
+        verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
@@ -167,7 +170,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             for h in gens[1:]:
                 D[h].ordp += shift
         if k != 0:
-            D[g] += err
+            D[g0] += err
         
         return self(D)
 
