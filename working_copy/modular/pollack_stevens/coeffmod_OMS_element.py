@@ -108,7 +108,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         p = self.parent().prime()
         if right.is_zero():
             ans._moments = self.parent().approx_module(0)([])
-            ans.ordp = min(self.parent().precision_cap(),right.valuation(p))
+            ans.ordp = min(self.parent().precision_cap(),right.valuation(p)+self.ordp)
         else:
             v, u = right.val_unit()
             ans._moments = self._moments * u
