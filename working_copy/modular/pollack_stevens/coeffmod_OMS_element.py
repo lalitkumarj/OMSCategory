@@ -142,29 +142,29 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     #            return True
     #    return False
     def __cmp__(left, right):
-        #RH: "copied" from dist.pyx
+            #RH: "copied" from dist.pyx
         left = copy(left)
         right = copy(right)
         left.normalize()
         right.normalize()
-        #        rprec = min(left.precision_relative(), right.precision_relative())
-        #        p = left.parent().prime()
-        #        if left.ordp > right.ordp:
-        #            shift = p ** (left.ordp - right.ordp)
-        #            for i in range(rprec):
-        #                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
-        #                if c: return c
-        #        elif left.ordp < right.ordp:
-        #            shift = p ** (right.ordp - left.ordp)
-        #            for i in range(rprec):
-        #                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
-        #                if c: return c
-        #        else:
-        #            for i in range(rprec):
-        #                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
-        #                if c: return c
-        #        return 0
-        return cmp([left._moments,left.ordp],[right._moments,right.ordp])
+        rprec = min(left.precision_relative(), right.precision_relative())
+        p = left.parent().prime()
+        if left.ordp > right.ordp:
+            shift = p ** (left.ordp - right.ordp)
+            for i in range(rprec):
+                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
+                if c: return c
+        elif left.ordp < right.ordp:
+            shift = p ** (right.ordp - left.ordp)
+            for i in range(rprec):
+                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
+                if c: return c
+        else:
+            for i in range(rprec):
+                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
+                if c: return c
+        return 0
+        #        return cmp([left._moments,left.ordp],[right._moments,right.ordp])
     
     def is_zero(self, prec=None):
         #RH: Mostly "copied" from dist.pyx
