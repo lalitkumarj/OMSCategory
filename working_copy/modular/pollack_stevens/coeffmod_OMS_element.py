@@ -25,6 +25,36 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             (1 + O(11^4), 2 + O(11^3), 3 + O(11^2), 4 + O(11))
             sage: mu4 == D4(mu8)
             True
+            sage: D = OverconvergentDistributions(0,base=ZpCA(3,5))
+            sage: x = D([3,3,3,3]); x._moments
+            (3 + O(3^5), 3 + O(3^5), 3 + O(3^5), 3 + O(3^5))
+            sage: x
+            3 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
+            sage: z = 3 * x; z._moments
+            (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
+            sage: z
+            3^2 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
+            sage: y = D([9,9,9,9]); y._moments
+            (3^2 + O(3^5), 3^2 + O(3^5), 3^2 + O(3^5), 3^2 + O(3^5))
+            sage: y
+            3^2 * (1 + O(3^3), 1 + O(3^2), 1 + O(3))
+            sage: y == z
+            True
+            sage: z == y
+            True
+            sage: a = D([81,81,81,81]); a._moments
+            (3^4 + O(3^5), 3^4 + O(3^5), 3^4 + O(3^5), 3^4 + O(3^5))
+            sage: a
+            3^4 * (1 + O(3))
+            sage: b = 27 * x
+            sage: b._moments
+            (1 + O(3^2), 1 + O(3^2), 1 + O(3^2), 1 + O(3))
+            sage: b
+            3^4 * (1 + O(3^2), 1 + O(3))
+            sage: a == b
+            True
+            sage: b == a
+            True
     """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
@@ -62,10 +92,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             valstr = "%s * "%(self.parent().prime())
         elif self.ordp != 0:
             valstr = "%s^%s * "%(self.parent().prime(), self.ordp)
-        if len(self._moments) == 1:
-            return valstr + repr(self._moments[0])
-        else:
-            return valstr + repr(self._moments)
+        return valstr + repr(self._moments)
     
     def _add_(self, right):
         #RH: "copied" from dist.pyx
@@ -263,23 +290,40 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #RH: "copied" from dist.pyx (caveat: split off from an is_symk statement)
         p = self.parent().prime()
         n = self.precision_relative()
-        return self.ordp + min([n] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        if n == 0:
+            return self.ordp
+        return self.ordp + min([self.parent().precision_cap()] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
         #RH: "copied" from dist.pyx
         V = self._moments.parent()
         R = V.base_ring()
         n = self.precision_relative()
-        p = self.parent().prime()
-        if isinstance(R, pAdicGeneric):
-            self._moments = V([self._moments[i].add_bigoh(n-i) for i in range(n)])
+        self_val = self.valuation()
+        shift = self_val - self.ordp
+        self.ordp = self_val
+        #Factor out powers of uniformizer and check precision
+        m = n
+        adjust_moms = 0
+        if shift > 0:
+            for i in range(n):
+                self._moments[i] = self._moments[i] >> shift
+                adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
+                m -= 1
+        elif shift == 0:
+            for i in range(n):
+                adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
+                m -= 1
         else:
-            self._moments = V([self._moments[i]%(p**(n-i)) for i in range(n)])
-        shift = self.valuation() - self.ordp
-        if shift != 0:
-            V = self.parent().approx_module(n-shift)
-            self.ordp += shift
-            self._moments = V([self._moments[i] // p**shift for i in range(n-shift)])
+            raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
+        #Cut down moments because of precision loss
+        if adjust_moms > 0:
+            n -= adjust_moms
+            V = self.parent().approx_module(n)
+            self._moments = V([self._moments[i].add_bigoh(n - i) for i in range(n)])
+        else:
+            for i in range(n):
+                self._moments[i] = self._moments[i].add_bigoh(n-i)
         return self
         #customized
     
