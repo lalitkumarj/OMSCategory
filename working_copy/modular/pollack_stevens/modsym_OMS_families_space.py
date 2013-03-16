@@ -146,7 +146,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         
         verbose("Solve difference equation.")
         mu = t.solve_diff_eqn()
-        mu_pr = mu.precisision_relative()
+        mu_pr = mu.precision_relative()
         if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu

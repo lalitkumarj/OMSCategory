@@ -46,7 +46,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         if check:
             if isinstance(moments, CoeffMod_OMS_Families_element):
                 ordp = moments.ordp
-                moments = moments._moments[:parent.precision_cap()]
+                moments = moments._moments[:parent.precision_cap()[0]]
                 moments = moments.change_ring(parent.base_ring())
             if isinstance(moments, CoeffMod_OMS_element):
                 ordp = moments.ordp
