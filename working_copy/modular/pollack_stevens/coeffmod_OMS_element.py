@@ -186,6 +186,70 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     #        if self._moments[i].add_bigoh(prec - i) != 0:
     #            return True
     #    return False
+    
+    def _div_(self, right):
+        r"""
+            Divide ``self`` by ``right``.
+            
+            EXAMPLES::
+            
+                
+        """
+        #right = self.parent().base_ring()(right)    #is this necessary? it's probably already been coerced in
+        if right.is_zero():
+            raise ZeroDivisionError("Cannot divide by zero.")
+        v, u = right.val_unit()
+        return CoeffMod_OMS_element((~u) * self._moments, self.parent(), self.ordp - v, check=False)
+    
+    def __lshift__(self, shift):
+        r"""
+            The left shift operator <<. It "multiplies" self by the uniformizer
+            raised to the shift power. In reality it simply adds shift to the
+            valuation of self.
+            
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(3,base=ZpCA(3,5))
+                sage: mu = D([-2,5,3,6,7,11]); mu
+                (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu << 3
+                3^3 * (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu << -2
+                3^-2 * (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu << 0
+                (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: nu = D(0)
+                sage: nu = D(0); nu
+                3^5 * ()
+                sage: nu << 3   #Is this really the desired behaviour?
+                3^8 * ()
+        """
+        ordp = self.ordp + shift
+        return CoeffMod_OMS_element(self._moments, self.parent(), ordp, check=False)
+
+    def __rshift__(self, shift):
+        r"""
+            The right shift operator >>. It "divides" self by the uniformizer
+            raised to the shift power. In reality it simply subtracts shift from
+            the valuation of self.
+            
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(3,base=ZpCA(3,5))
+                sage: mu = D([-2,5,3,6,7,11]); mu
+                (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu >> -3
+                3^3 * (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu >> 2
+                3^-2 * (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu >> 0
+                (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
+                sage: mu << 5 == 0
+                True
+        """
+        ordp = self.ordp - shift
+        return CoeffMod_OMS_element(self._moments, self.parent(), ordp, check=False)
+        
     def __cmp__(left, right):
         r"""
             Compare left (i.e. self) and right, which are both elements of left.parent().
