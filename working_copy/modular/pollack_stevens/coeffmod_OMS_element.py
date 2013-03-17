@@ -27,7 +27,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             True
             sage: D = OverconvergentDistributions(0,base=ZpCA(3,5))
             sage: x = D([3,3,3,3]); x._moments
-            (3 + O(3^5), 3 + O(3^5), 3 + O(3^5), 3 + O(3^5))
+            (1 + O(3^5), 1 + O(3^5), 1 + O(3^5), 1 + O(3^5))
             sage: x
             3 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
             sage: z = 3 * x; z._moments
@@ -35,19 +35,19 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             sage: z
             3^2 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
             sage: y = D([9,9,9,9]); y._moments
-            (3^2 + O(3^5), 3^2 + O(3^5), 3^2 + O(3^5), 3^2 + O(3^5))
+            (1 + O(3^5), 1 + O(3^5), 1 + O(3^5), 1 + O(3^5))
             sage: y
-            3^2 * (1 + O(3^3), 1 + O(3^2), 1 + O(3))
+            3^2 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
             sage: y == z
             True
             sage: z == y
             True
             sage: a = D([81,81,81,81]); a._moments
-            (3^4 + O(3^5), 3^4 + O(3^5), 3^4 + O(3^5), 3^4 + O(3^5))
+            (1 + O(3^5), 1 + O(3^5), 1 + O(3^5), 1 + O(3^5))
             sage: a
-            3^4 * (1 + O(3))
+            3^4 * (1 + O(3^4), 1 + O(3^3), 1 + O(3^2), 1 + O(3))
             sage: b = 27 * x
-            sage: b._moments
+            sage: b._moments    #because in ZpCA with prec=5 27 = 3^3 * (1 + O(3^2))
             (1 + O(3^2), 1 + O(3^2), 1 + O(3^2), 1 + O(3))
             sage: b
             3^4 * (1 + O(3^2), 1 + O(3))
@@ -66,15 +66,32 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 moments = moments._moments[:parent.precision_cap()]
                 moments = moments.change_ring(parent.base_ring())
             elif hasattr(moments, '__len__'):
+                R = parent.base_ring()
+                K = R.fraction_field()
                 M = min(len(moments), parent.precision_cap())
-                moments = parent.approx_module(M)(moments[:M])
-            elif moments == 0:
-                V = self.parent().approx_module(0)
+                V = parent.approx_module(M)
+                VK = V.base_extend(K)
+                moments = VK(moments[:M])
+                if len(moments) == 0 or moments == 0:   #should do something with how "zero" moments is
+                    V = parent.approx_module(0)
+                    moments = V([])
+                    ordp = parent.precision_cap()
+                else:
+                    ordp = min([a.valuation() for a in moments])
+                    for i in range(M):
+                        moments[i] = moments[i] >> ordp
+                    moments = V(moments)
+            elif moments == 0:  #should do something with how "zero" moments is
+                V = parent.approx_module(0)
                 moments = V([])
                 ordp = parent.precision_cap()
             else:
-                moments = parent.approx_module(1)([moments])
-
+                K = parent.base_ring().fraction_field()
+                V = parent.approx_module(1)
+                moments = K(moments)
+                ordp = moments.valuation()
+                moments = V(moments >> ordp)
+        
         self._moments = moments
         #if var_prec is None:
         #    self._var_prec = parent._prec_cap[1]
