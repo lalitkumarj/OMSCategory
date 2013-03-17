@@ -187,28 +187,50 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     #            return True
     #    return False
     def __cmp__(left, right):
-            #RH: "copied" from dist.pyx
+        r"""
+            Compare left (i.e. self) and right, which are both elements of left.parent().
+            
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0,base=Zp(3,5))
+                sage: mu = D([1])
+                sage: nu = D(0)
+                sage: mu == nu
+                False
+                sage: mu = D([3,3,3,3,3,3])
+                sage: nu = D([3,3,3])
+                sage: mu == nu
+                True
+                sage: mu * 3^4 == 0
+                True
+                sage: mu * 3^3 == 0
+                False
+        """
+        #RH: "copied" from dist.pyx, but then changed
         left = copy(left)
         right = copy(right)
         left.normalize()
         right.normalize()
         rprec = min(left.precision_relative(), right.precision_relative())
-        p = left.parent().prime()
-        if left.ordp > right.ordp:
-            shift = p ** (left.ordp - right.ordp)
-            for i in range(rprec):
-                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
-                if c: return c
-        elif left.ordp < right.ordp:
-            shift = p ** (right.ordp - left.ordp)
-            for i in range(rprec):
-                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
-                if c: return c
-        else:
-            for i in range(rprec):
-                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
-                if c: return c
-        return 0
+        c = cmp(left.ordp, right.ordp)
+        if c: return c
+        return cmp(left._moments[:rprec], right._moments[:rprec])
+#        p = left.parent().prime()
+#        if left.ordp > right.ordp:
+#            shift = p ** (left.ordp - right.ordp)
+#            for i in range(rprec):
+#                c = cmp(shift * left._unscaled_moment(i), right._unscaled_moment(i))
+#                if c: return c
+#        elif left.ordp < right.ordp:
+#            shift = p ** (right.ordp - left.ordp)
+#            for i in range(rprec):
+#                c = cmp(left._unscaled_moment(i), shift * right._unscaled_moment(i))
+#                if c: return c
+#        else:
+#            for i in range(rprec):
+#                c = cmp(left._unscaled_moment(i), right._unscaled_moment(i))
+#                if c: return c
+#        return 0
         #        return cmp([left._moments,left.ordp],[right._moments,right.ordp])
     
     def is_zero(self, prec=None):
