@@ -88,7 +88,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             gam_shift = c.valuation(p)
         
         M_in = _prec_for_solve_diff_eqn(M, p, k) + gam_shift
-        verbose("Working with precision %s"%(M_in))
+        verbose("Working with precision %s (M, p, k, gam_shift) = (%s, %s, %s, %s)"%(M_in, M, p, k, gam_shift))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
         #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
@@ -155,14 +155,18 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         if shift > 0:
             t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
         verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
+        t.normalize()
+        verbose("After normalize: About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         mu = t.solve_diff_eqn()
         mu_val = mu.valuation()
+        verbose("mu_val: %s"%(mu_val))
         if mu_val < 0:
             shift -= mu_val
             mu.ordp -= mu_val
             if k != 0:
                 err.ordp -= mu_val
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
+        verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
@@ -171,8 +175,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 D[h].ordp += shift
         if k != 0:
             D[g0] += err
-        
-        return self(D)
+        ret = self(D)
+        verbose("ret.ordp, ret._moments, ret._prec_rel: %s, %s, %s"%(ret._map[Id].ordp, ret._map[Id]._moments, ret._map[Id].precision_relative()))
+        return ret
 
 #@cached_method
 def _prec_for_solve_diff_eqn(M, p, k):

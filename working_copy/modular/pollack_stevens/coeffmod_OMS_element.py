@@ -130,12 +130,13 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         """
         Scalar multiplication self*right.
         """
-        #RH: mostly "copied" from dist.pyx (is_exact_zero...)
-        ans = self.parent()(0)
-        p = self.parent().prime()
+        #RH: mostly "copied" from dist.pyx but then changed
+        ans = CoeffMod_OMS_element(None, self.parent(), None, False)
+        #p = self.parent().prime()
         if right.is_zero():
+            verbose("right is zero: %s"%(right))
             ans._moments = self.parent().approx_module(0)([])
-            ans.ordp = min(self.parent().precision_cap(),right.valuation(p)+self.ordp)
+            ans.ordp = min(self.parent().precision_cap(), right.valuation()+self.ordp)
         else:
             v, u = right.val_unit()
             ans._moments = self._moments * u
@@ -204,7 +205,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         elif prec > aprec:
             return False    #Should this raise a PrecisionError instead
         elif prec < aprec:
-            n -= (aprec - prec)
+            n -= (aprec - prec) #Why is this done?
             prec -= self.ordp
         p = self.parent().prime()
         usearg = True
@@ -216,7 +217,14 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if not z: return False
         for a in xrange(1, prec):
             if usearg:
-                z = self._unscaled_moment(a).is_zero(prec-a)
+                try:
+                    z = self._unscaled_moment(a).is_zero(prec-a)
+                except PrecisionError:
+                    print "self_ordp, self._moments", self.ordp, self._moments
+                    print "n, prec, a, aprec", n, prec, aprec, a
+                    
+                    assert(False)
+                #z = self._unscaled_moment(a).is_zero(prec-a)
             else:
                 z = self._unscaled_moment(a).is_zero()
             if not z: return False
@@ -287,7 +295,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         return ZZ(len(self._moments) + self.ordp)
     
     def valuation(self):
-        #RH: "copied" from dist.pyx (caveat: split off from an is_symk statement)
+        #RH: "copied" from dist.pyx, but then adjusted
         p = self.parent().prime()
         n = self.precision_relative()
         if n == 0:
@@ -295,7 +303,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         return self.ordp + min([self.parent().precision_cap()] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
-        #RH: "copied" from dist.pyx
+        #RH: "copied" from dist.pyx, but then changed (see issue #17)
         V = self._moments.parent()
         R = V.base_ring()
         n = self.precision_relative()
@@ -477,5 +485,5 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
         e = self.ordp - mu.ordp  ## this is the amount the valuation dropped
         f = M.exact_log(p)        ## this is the amount we need it to drop
-        return mu.reduce_precision(mu.precision_relative()-(f-e))
-        
+        mu = mu.reduce_precision(mu.precision_relative()-(f-e))
+        return mu.normalize()
