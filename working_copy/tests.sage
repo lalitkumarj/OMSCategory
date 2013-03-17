@@ -215,6 +215,7 @@ def test_Dist_fam_solve_vs_old_code():
 def test_precision_of_OMS():
     # Should add examples where prec of base ring > prec of D
     bad_symbols = []
+    really_bad_symbols = []
     ps = [3,5,7,11]
     ks = [0,2,5]
     precs = [4, 10, 20]
@@ -234,17 +235,20 @@ def test_precision_of_OMS():
                     Phi.normalize()
                     for g in MR.gens():
                         mu = Phi._map[g]
+                        verbose("\nA new g...")
                         verbose("length: {0}".format(len(mu._moments)))
-                        check = _has_appropriate_precision(mu, prec)
+                        check, really_check = _has_appropriate_precision(mu, prec)
                         #check = _has_appropriate_precision(mu)
                         verbose("val, mu = %s, %s\n"%(mu.ordp, mu._moments))
                         if len(check) > 0:
                             bad_symbols.append([Phi, g])
+                            if len(really_check) >0:
+                                really_bad_symbols.append([Phi, g])
                             print "\n>>> Symbol is bad at\n{0}".format(g)
                             print "        val, mu: ", mu.ordp, mu._moments
                             for i in check:
                                 print "        _moment[{0}] = {1}".format(i, mu._moments[i])
-    return bad_symbols
+    return bad_symbols, really_bad_symbols
                     
 def _has_appropriate_precision(mu, prec=None):
     r"""
@@ -257,15 +261,17 @@ def _has_appropriate_precision(mu, prec=None):
     verbose("val, mu = %s, %s"%(mu.ordp, mu._moments))
     verbose("length: {0}".format(len(mu._moments)))
     bad_moms = []
+    really_bad_moms = []
     if prec is None:
         prec = len(mu._moments)
     for i in range(len(mu._moments)):
         if mu.moment(i).precision_absolute() != prec - i:
             bad_moms.append(i)
             verbose("Moment {0} (with prec={1}): {2}".format(i, prec, mu._moments[i]))
-            if mu._moments[i].precision_absolute() < prec - i:
+            if mu.moment(i).precision_absolute() < prec - i:
+                really_bad_moms.append(i)
                 verbose("REALLY BAD **********************************************************")
-    return bad_moms
+    return bad_moms, really_bad_moms
 
 def add_bigohs_dist_fam(nu, p, custom_first_prec=None):
     M = len(nu)
