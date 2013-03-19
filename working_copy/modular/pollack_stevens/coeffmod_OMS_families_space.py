@@ -32,9 +32,7 @@ def _prec_cap_parser(prec_cap):
         ...
         ValueError: The case prec_cap is None should be dealt with prior to calling this function.
         sage: _prec_cap_parser([5, 0])
-        Traceback (most recent call last):
-        ...
-        ValueError: Precisions should be at least 1.
+        [5, 0]
     """
     if prec_cap is None:
         raise ValueError("The case prec_cap is None should be dealt with prior to calling this function.")
