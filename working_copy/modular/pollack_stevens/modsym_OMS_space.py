@@ -17,7 +17,8 @@ class ModSym_OMS_factory(UniqueFactory):
             character = None
         if coefficients is None:
             #WHERE TO GET CHARACTER?
-            coeffcients = OverconvergentDistributions(weight, p, prec_cap, base, character)
+            #OverconvergentDistributions can handle prec_cap and base being None
+            coefficients = OverconvergentDistributions(weight, p, prec_cap, base, character)
         if isinstance(group, (int, Integer)):
             p = coefficients.prime()
             if group % p != 0:
