@@ -410,7 +410,7 @@ class WeightKAction_OMS(WeightKAction_generic):
         ans = v.parent()(v._moments * A)
         #print "v =", v
         #print "ans = ", v._moments * A
-        ans.ordp = v.ordp   #may be redundant
+        #ans.ordp = v.ordp   #may be redundant
         return ans
 
 class CoefficientModuleElement_generic(ModuleElement):
