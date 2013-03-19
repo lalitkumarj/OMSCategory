@@ -167,6 +167,10 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 err.ordp -= mu_val
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
+        mu = mu.reduce_precision(M)
+        mu.normalize()
+        verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
+        verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
         if mu.precision_relative() < M:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
