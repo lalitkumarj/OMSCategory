@@ -137,20 +137,24 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
 
     def _consistency_check(self):
         """
-        Check that the map really does satisfy the Manin relations loop (for debugging).
-        The two and three torsion relations are checked and it is checked that the symbol
-        adds up correctly around the fundamental domain
+            Check that the map really does satisfy the Manin relations loop (for debugging).
+            The two and three torsion relations are checked and it is checked that the symbol
+            adds up correctly around the fundamental domain
 
-        EXAMPLES::
+            EXAMPLES::
 
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: E = EllipticCurve('37a1')
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi._consistency_check()
-            This modular symbol satisfies the manin relations
-
+                sage: D = OverconvergentDistributions(0, 7, base=Qp(7,5))
+                sage: MS = OverconvergentModularSymbols(14, coefficients=D); MS
+                sage: V = D.approx_module()
+                sage: Phi_dict = {MR.gens()[0]:7 * V((5 + 6*7 + 7^2 + 4*7^3 + 5*7^4 + O(7^5), 6 + 5*7 + 2*7^2 + 3*7^3 + O(7^4), 4 + 5*7 + 7^2 + O(7^3), 2 + 7 + O(7^2), 4 + O(7))), MR.gens()[1]:7 * V((4 + 2*7 + 4*7^2 + 5*7^3 + O(7^5), 5 + 7^2 + 4*7^3 + O(7^4), 1 + 7 + 5*7^2 + O(7^3), 2 + O(7^2), 4 + O(7))), MR.gens()[2]:7 * V((3 + 6*7 + 6*7^2 + 5*7^3 + 7^4 + O(7^5), 6 + 5*7 + 5*7^3 + O(7^4), 3 + 6*7^2 + O(7^3), 6 + 2*7 + O(7^2), O(7))), MR.gens()[3]:7 * V((5 + 3*7 + 4*7^2 + 7^3 + 3*7^4 + O(7^5), 2 + 4*7^2 + 2*7^3 + O(7^4), 1 + 4*7 + 2*7^2 + O(7^3), 6*7 + O(7^2), 6 + O(7))), MR.gens()[4]:7 * V((3 + 2*7^2 + 3*7^3 + 3*7^4 + O(7^5), 5*7 + 4*7^2 + 2*7^3 + O(7^4), 6 + 4*7 + 2*7^2 + O(7^3), 2 + 3*7 + O(7^2), O(7)))}
+                sage: Phi._consistency_check()
+                This modular symbol satisfies the manin relations
         """
-
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: E = EllipticCurve('37a1')
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi._consistency_check()
+#            This modular symbol satisfies the manin relations
         f = self._map
         MR = self._map._manin
         ## Test two torsion relations

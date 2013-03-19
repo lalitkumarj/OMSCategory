@@ -60,6 +60,20 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         return self(self.coefficient_module().an_element())
     
     def random_element(self, M=None):
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0, 7, base=Qp(7,5))
+                sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+                sage: Phi = MS.random_element()
+                sage: Phi._consistency_check()
+                This modular symbol satisfies the manin relations
+                sage: D = OverconvergentDistributions(2, base=ZpCA(5,10))
+                sage: MS = OverconvergentModularSymbols(3, coefficients=D)
+                sage: Phi = MS.random_element()
+                sage: Phi._consistency_check()
+                This modular symbol satisfies the manin relations
+        """
         if M is None:
             M = self.precision_cap()
         #if M == 1?
