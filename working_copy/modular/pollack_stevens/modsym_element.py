@@ -331,7 +331,21 @@ class ModularSymbolElement_generic(ModuleElement):
         return aq
     
     def is_ordinary(self, p=None):
-        raise NotImplementedError
+        has_prime = True
+        try:
+            p = self.parent().prime()
+        except:
+            has_prime == False
+            if p is None:
+                raise ValueError("If self doesn't have a prime, must specify p.")
+        try:
+            ap = self.Tq_eigenvalue(p)  #could take up to precision 1?
+        except ValueError:
+            raise NotImplementedError("is_ordinary currently only implemented for Up eigensymbols.")
+        if has_prime:
+            return ap.valuation() == 0
+        else:
+            return ap.valuation(p) == 0
     
     def reduce_precision(self, M):
         r"""

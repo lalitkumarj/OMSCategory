@@ -89,6 +89,33 @@ class ModularSymbolSpace_generic(Module):
     def level(self):
         return self.source().level()
     
+    def dimension_of_cuspidal_ordinary_subspace(self, p=None):
+        try:
+            p = self.prime()
+        except:
+            if p is None:
+                raise ValueError("If self doesn't have a prime, must specify p.")
+        from sage.modular.modsym.modsym import ModularSymbols
+        from sage.rings.finite_rings.constructor import GF
+        r = self.weight() % (p-1)
+        N = self.level()
+        if N % p != 0:
+                N *= p
+        else:
+            e = N.valuation(p)
+            N.divide_knowing_divisible_by(p ** (e-1))
+        if r == 0:
+            from sage.modular.arithgroup.congroup_gamma0 import Gamma0_constructor as Gamma0
+            M = ModularSymbols(Gamma0(N), 2, 1, GF(p)).cuspidal_subspace()
+        else:
+            from sage.modular.dirichlet import DirichletGroup
+            DG = DirichletGroup(N, GF(p))
+            chi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
+            chi = DG(chi)
+            M = ModularSymbols(chi, 2, 1, GF(p)).cuspidal_subspace()
+        hecke_poly = M.hecke_polynomial(p)
+        x = hecke_poly.parent().gen()
+        return hecke_poly.degree() - hecke_poly.ord(x)
     #def prime(self):
     #    """
     #    
