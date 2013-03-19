@@ -159,8 +159,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         t.normalize()
         verbose("After normalize: About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         mu = t.solve_diff_eqn()
+        verbose("Check difference equation (right after): %s"%(mu * gammas[Id] - mu - t))
         mu_val = mu.valuation()
-        verbose("mu_val: %s"%(mu_val))
+        verbose("mu_val, mu_ordp, mu_moments: %s, %s, %s"%(mu_val, mu.ordp, mu._moments))
         if mu_val < 0:
             shift -= mu_val
             mu.ordp -= mu_val
@@ -181,7 +182,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         if k != 0:
             D[g0] += err
         ret = self(D)
-        verbose("ret.ordp, ret._moments, ret._prec_rel: %s, %s, %s"%(ret._map[Id].ordp, ret._map[Id]._moments, ret._map[Id].precision_relative()))
+        verbose("ret_mu.ordp, ret_mu._moments, ret_mu._prec_rel: %s, %s, %s"%(ret._map[Id].ordp, ret._map[Id]._moments, ret._map[Id].precision_relative()))
+        t.ordp -= mu_val    #only for verbose
+        verbose("Check difference equation (at end): %s"%(mu * gammas[Id] - mu - t.reduce_precision(M).normalize()))
         return ret
 
 #@cached_method

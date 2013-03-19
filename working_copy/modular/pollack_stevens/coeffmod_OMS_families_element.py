@@ -278,6 +278,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return True
     
     def find_scalar(self, other, M = None, check=True):
+        self.normalize()
+        other.normalize()
         n, s_var_prec = self.precision_relative()
         other_pr, other_var_prec = other.precision_relative()
         if n == 0:
@@ -314,6 +316,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         RK = R.change_ring(Rbase.fraction_field())
         if i < other_pr:
             #Hack
+            verbose("val, other._unscaled_moment(%s) = %s, %s"%(i, other.ordp, other._moments[i]))
+            #alpha = _sanitize_alpha(RK(other._unscaled_moment(i)) / RK(a))
             alpha = RK(other._unscaled_moment(i)) / RK(a)
             #alpha, var_prec_loss = _custom_ps_div(other._unscaled_moment(i), a)
             #alpha = R(_add_big_ohs_list(alpha, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
@@ -330,6 +334,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             if check:
 #                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
                 #if other._unscaled_moment(i) != _add_big_ohs_list(alpha * a, [ceil((n - i) * self._cp), var_prec]):
+                verbose("val, self._unscaled_moment(%s) = %s, %s"%(i, self.ordp, other._moments[i]))
+                verbose("val, other._unscaled_moment(%s) = %s, %s"%(i, other.ordp, other._moments[i]))
                 if other._unscaled_moment(i) != alpha * a:
                     raise ValueError("not a scalar multiple")
             v = _padic_val_of_pow_series(a, p)

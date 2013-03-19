@@ -19,6 +19,7 @@ def test_Dist_solve():
             nuD = nu * Delta_mat - nu
             print nuD
             print nu * Delta_mat - nu == mu
+            print "Diff: ", nu * Delta_mat - nu - mu
             print " "
             print "nu: %s\n"%(nu)
 

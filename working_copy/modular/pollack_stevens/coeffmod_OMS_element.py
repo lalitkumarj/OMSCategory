@@ -373,6 +373,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if check:
 #                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
                 if other._unscaled_moment(i) != alpha * a:
+                    verbose("self._unscaled_moment=%s, other._unscaled_ moment=%s"%(a, other._unscaled_moment(i)))
                     raise ValueError("not a scalar multiple")
             v = a.valuation(p)
             if n - i - v > relprec:
@@ -382,7 +383,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 verbose("alpha=%s"%(alpha))
         if relprec < M:
             raise ValueError("result not determined to high enough precision")
-        alpha = alpha * self.parent().prime()**(other.ordp - self.ordp)
+        alpha = alpha << (other.ordp - self.ordp)
         verbose("alpha=%s"%(alpha))
         try:
             return self.parent().base_ring()(alpha)
@@ -416,6 +417,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #Factor out powers of uniformizer and check precision
         m = n
         adjust_moms = 0
+        verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments))
         if shift > 0:
             for i in range(n):
                 self._moments[i] = self._moments[i] >> shift
