@@ -404,9 +404,23 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         n = self.precision_relative()
         if n == 0:
             return self.ordp
-        return self.ordp + min([self.parent().precision_cap()] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        return self.ordp + min([n] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+                sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+        """
         #RH: "copied" from dist.pyx, but then changed (see issue #17)
         V = self._moments.parent()
         R = V.base_ring()
@@ -513,12 +527,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: D10 = D.change_precision(10)
                 sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
                 sage: nu10 = mu10.solve_diff_eqn()
-                sage: set_verbose(2)
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D);
-                sage: MR = MS.source();
+                sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+                sage: MR = MS.source()
                 sage: Id = MR.gens()[0]
                 sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^9 * ()
+                7^8 * ()
                 sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
                 sage: D10 = D.change_precision(10)
                 sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
@@ -527,7 +540,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: MR = MS.source();
                 sage: Id = MR.gens()[0]
                 sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^9 * ()
+                7^8 * ()
         """
         #RH: see tests.sage for randomized verification that this function works correctly
         # assert self._moments[0][0]==0, "not total measure zero"
