@@ -406,11 +406,29 @@ class WeightKAction_OMS(WeightKAction_generic):
             return A
     
     def _call_(self, v, g):
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0,7,base=Qp(7,10))
+                sage: mu = D([1,1,1])
+                sage: mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu = mu / 7
+                sage: mu
+                7^-1 * (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: S0 = D.action().actor()
+                sage: A = S0([1,1,0,1])
+                sage: mu * A
+                7^-1 * (1 + O(7^3), 2 + O(7^2), 4 + O(7))
+                sage: A = S0([1,0,0,1])
+                sage: mu * A
+                7^-1 * (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+        """
         A = self.acting_matrix(g, len(v._moments))
         ans = v.parent()(v._moments * A)
         #print "v =", v
         #print "ans = ", v._moments * A
-        #ans.ordp = v.ordp   #may be redundant
+        ans.ordp += v.ordp   #may be redundant
         return ans
 
 class CoefficientModuleElement_generic(ModuleElement):
