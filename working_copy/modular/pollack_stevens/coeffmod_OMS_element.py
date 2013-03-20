@@ -431,7 +431,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #Factor out powers of uniformizer and check precision
         m = n
         adjust_moms = 0
-        verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments))
+        verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments), level=2)
         if shift > 0:
             for i in range(n):
                 self._moments[i] = self._moments[i] >> shift
@@ -444,7 +444,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         else:
             raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
         #Cut down moments because of precision loss
-        verbose("adjust_mom: %s\n_moms: %s"%(adjust_moms, self._moments))
+        verbose("adjust_mom: %s\n_moms: %s"%(adjust_moms, self._moments), level=2)
         if adjust_moms >= n:
             V = self.parent().approx_module(0)
             self._moments = V([])
