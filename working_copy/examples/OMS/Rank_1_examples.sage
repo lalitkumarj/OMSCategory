@@ -55,8 +55,8 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
         eis_ell = 2
         eis = True
         while eis:
-            if f[eis_ell] == 1 + eis_ell ** (k + 1):
-                eis_ell = eis_ell()
+            if (f[eis_ell] == 1 + eis_ell ** (k + 1)) or ((N*p) % eis_ell == 0):
+                eis_ell = next_prime(eis_ell)
             else:
                 eis = False
                 if verbose:
@@ -84,6 +84,8 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
                 pass
             j += 1
         Phis[Npk] = Phi
+        if verbose:
+            print "Working with an eigensymbol with precision %s and valuation %s"%(Phi.precision_absolute(),Phi.valuation())       
         R = M.base_ring()
         for ell in prime_range(max_ell + 1):
             a_ell_f = R(f[ell], prec)
@@ -110,6 +112,8 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
                         pass
                     j += 1
                 assert(not not_eigen)
+                if verbose:
+                    print "Working with an eigensymbol with precision %s and valuation %s"%(Phi.precision_absolute(),Phi.valuation())
             if k != 0 and ell == p:
                 #un-p-stablize
                 a_ell_Phi = a_ell_Phi + (p ** (k + 1)) / a_ell_Phi
