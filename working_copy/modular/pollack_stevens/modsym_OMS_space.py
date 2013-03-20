@@ -85,22 +85,30 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         gammas = manin.gammas
         gam_shift = 0
         if k != 0:
+            ## We will now a pick a generator to later alter in order to solve the difference equation
             if len(gammas) > 1:
-                #There is a non-torsion generator
+                verbose("There is a non-torsion generator")
                 gam_keys = gammas.keys()
                 gam_keys.remove(Id)
                 g0 = gam_keys[0]
                 gam0 = gammas[g0]
             else:
-                verbose("All generators are torsion.")
+                verbose("All generators are torsion")
                 g0 = gens[1]
                 if g0 in manin.reps_with_two_torsion():
+                    verbose("Using a two torsion generator")
                     gam0 = manin.two_torsion_matrix(g0)
                 else:
+                    verbose("Using a three torsion generator")
                     gam0 = manin.three_torsion_matrix(g0)
             a = gam0.matrix()[0,0]
             c = gam0.matrix()[1,0]
-            gam_shift = c.valuation(p)
+            if g0 in manin.reps_with_three_torsion():
+                aa = (gam0**2).matrix()[0,0]
+                cc = (gam0**2).matrix()[1,0]
+                gam_shift = max(c.valuation(p),cc.valuation(p))
+            else:
+                gam_shift = c.valuation(p)
         
         M_in = _prec_for_solve_diff_eqn(M, p, k) + gam_shift
         verbose("Working with precision %s (M, p, k, gam_shift) = (%s, %s, %s, %s)"%(M_in, M, p, k, gam_shift))
@@ -135,6 +143,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         ## So instead we simply add (const)*mu_1 to some (non-torsion) v[j] to fix this
         ## here since (mu_1 |_k ([a,b,c,d]-1))(trival char) = chi(a) k a^{k-1} c , 
         ## we take the constant to be minus the total measure of t divided by (chi(a) k a^{k-1} c)
+        ## Something a little different is done in the two and three torsion case. 
 
         shift = 0
         if k != 0:
@@ -142,7 +151,10 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 chara = CM._character(a)
             else:
                 chara = 1
-            err = -t.moment(0)/(chara * k * a**(k-1) * c)
+            if not g0 in manin.reps_with_three_torsion():
+                err = -t.moment(0)/(chara * k * a**(k-1) * c)
+            else:
+                err = -t.moment(0)/(chara * k * (a**(k-1) * c + aa**(k-1) * cc))
             err_val = err.valuation()
             if err_val < 0:
                 shift -= err_val
@@ -153,10 +165,14 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v = [R(0)] * M_in
             v[1] = R(err)
             err = CM(v)
-            
-            if g0 in manin.reps_with_two_torsion() or g0 in manin.reps_with_three_torsion():
-                err = err * gam0 - err
-                t += err
+
+            ## In the two and three torsion case, we now adjust err to make it satisfy the torsion Manin relations
+            if g0 in manin.reps_with_two_torsion():
+                err = err - err * gam0
+                t -= err
+            elif g0 in manin.reps_with_three_torsion():
+                err = 2 * err - err * gam0 - err * gam0**2
+                t -= err
             else:
                 t += err * gam0 - err
 
@@ -175,14 +191,14 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         mu = t.solve_diff_eqn()
         verbose("Check difference equation (right after): %s"%(mu * gammas[Id] - mu - t))
         mu_val = mu.valuation()
-        verbose("mu_val, mu_ordp, mu_moments: %s, %s, %s"%(mu_val, mu.ordp, mu._moments))
+        verbose("mu_val, mu_ordp, mu_moments and mu: %s, %s, %s, %s"%(mu_val, mu.ordp, mu._moments, mu))
         if mu_val < 0:
             shift -= mu_val
             mu.ordp -= mu_val
             if k != 0:
                 err.ordp -= mu_val
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
-        verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
+        verbose("mu.ordp, mu._moments and mu: %s, %s, %s"%(mu.ordp, mu._moments, mu))
         mu = mu.reduce_precision(M)
         mu.normalize()
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
