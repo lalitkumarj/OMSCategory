@@ -55,69 +55,68 @@ class ModularSymbolElement_generic(ModuleElement):
     def _add_(self, right):
         """
         Returns self + right
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi + phi
-            Modular symbol of level 11 with values in Sym^0 Q^2
-            sage: (phi + phi).values()
-            [-2/5, 3, -1]
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi + phi
+#            Modular symbol of level 11 with values in Sym^0 Q^2
+#            sage: (phi + phi).values()
+#            [-2/5, 3, -1]
+#        """
         return self.__class__(self._map + right._map, self.parent(), construct=True)
 
     def _lmul_(self, right):
         """
         Returns self * right
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: 2*phi
-            Modular symbol of level 11 with values in Sym^0 Q^2
-            sage: (2*phi).values()
-            [-2/5, 3, -1]
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: 2*phi
+#            Modular symbol of level 11 with values in Sym^0 Q^2
+#            sage: (2*phi).values()
+#            [-2/5, 3, -1]
+#        """
         return self.__class__(self._map * right, self.parent(), construct=True)
 
     def _rmul_(self, right):
         """
         Returns self * right
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi*2
-            Modular symbol of level 11 with values in Sym^0 Q^2
-            sage: (phi*2).values()
-            [-2/5, 3, -1]
         """
+#        EXAMPLES::
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi*2
+#            Modular symbol of level 11 with values in Sym^0 Q^2
+#            sage: (phi*2).values()
+#            [-2/5, 3, -1]
+#        """
         return self.__class__(self._map * right, self.parent(), construct=True)
 
     def _sub_(self, right):
         """
         Returns self - right
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi - phi
-            Modular symbol of level 11 with values in Sym^0 Q^2
-            sage: (phi - phi).values()
-            [0, 0, 0]
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi - phi
+#            Modular symbol of level 11 with values in Sym^0 Q^2
+#            sage: (phi - phi).values()
+#            [0, 0, 0]
+#        """
         return self.__class__(self._map - right._map, self.parent(), construct=True)
     
     def plus_part(self):
@@ -129,16 +128,16 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self + self | [1,0,0,-1]
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
-            True
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
+#            True
+#        """
         S0N = Sigma0(self.parent().level())
         return self + self * S0N(minusproj)
 
@@ -151,16 +150,16 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self - self | [1,0,0,-1]
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: (phi.plus_part()+phi.minus_part()) == phi * 2
-            True
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: (phi.plus_part()+phi.minus_part()) == phi * 2
+#            True
+#        """
         S0N = Sigma0(self.parent().level())
         return self - self * S0N(minusproj)
     
@@ -191,25 +190,25 @@ class ModularSymbolElement_generic(ModuleElement):
           defining the Hecke operator.  That is, it computes
           sum_a self | [1,a,0,ell] + self | [ell,0,0,1],
           the last term occurring only if the level is prime to ell.
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi.hecke(2) == phi * E.ap(2)
-            True
-            sage: phi.hecke(3) == phi * E.ap(3)
-            True
-            sage: phi.hecke(5) == phi * E.ap(5)
-            True
-            sage: phi.hecke(101) == phi * E.ap(101)
-            True
-
-            sage: all([phi.hecke(p, algorithm='naive') == phi * E.ap(p) for p in [2,3,5,101]])
-            True
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E); phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi.hecke(2) == phi * E.ap(2)
+#            True
+#            sage: phi.hecke(3) == phi * E.ap(3)
+#            True
+#            sage: phi.hecke(5) == phi * E.ap(5)
+#            True
+#            sage: phi.hecke(101) == phi * E.ap(101)
+#            True
+#
+#            sage: all([phi.hecke(p, algorithm='naive') == phi * E.ap(p) for p in [2,3,5,101]])
+#            True
+#        """
         return self.__class__(self._map.hecke(ell, algorithm), self.parent(), construct=True)
     
     def valuation(self, p):
@@ -238,26 +237,26 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - True/False
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
-            sage: phi_ord.is_Tq_eigensymbol(2,3,10)
-            True
-            sage: phi_ord.is_Tq_eigensymbol(2,3,100)
-            False
-            sage: phi_ord.is_Tq_eigensymbol(2,3,1000)
-            False
-            sage: phi_ord.is_Tq_eigensymbol(3,3,10)
-            True
-            sage: phi_ord.is_Tq_eigensymbol(3,3,100)
-            False
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,10)
+#            True
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,100)
+#            False
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,1000)
+#            False
+#            sage: phi_ord.is_Tq_eigensymbol(3,3,10)
+#            True
+#            sage: phi_ord.is_Tq_eigensymbol(3,3,100)
+#            False
+#        """
         try:
             aq = self.Tq_eigenvalue(q, p, M)
             return True
@@ -284,25 +283,25 @@ class ModularSymbolElement_generic(ModuleElement):
 
         - Constant `c` such that `self|T_q - c * self` has valuation greater than
           or equal to `M` (if it exists), otherwise raises ValueError
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
-            sage: phi_ord.Tq_eigenvalue(2,3,10) + 2
-            O(3^10)
-
-            sage: phi_ord.Tq_eigenvalue(3,3,10)
-            2 + 3^2 + 2*3^3 + 2*3^4 + 2*3^6 + 3^8 + 2*3^9 + O(3^10)
-            sage: phi_ord.Tq_eigenvalue(3,3,100)
-            Traceback (most recent call last):
-            ...
-            ValueError: not a scalar multiple
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#            sage: phi_ord.Tq_eigenvalue(2,3,10) + 2
+#            O(3^10)
+#
+#            sage: phi_ord.Tq_eigenvalue(3,3,10)
+#            2 + 3^2 + 2*3^3 + 2*3^4 + 2*3^6 + 3^8 + 2*3^9 + O(3^10)
+#            sage: phi_ord.Tq_eigenvalue(3,3,100)
+#            Traceback (most recent call last):
+#            ...
+#            ValueError: not a scalar multiple
+#        """
         qhecke = self.hecke(q)
         gens = self.parent().source().gens()
         if p is None:

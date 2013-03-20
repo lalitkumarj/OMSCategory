@@ -80,11 +80,7 @@ class WeightKAction_generic(Action):
     
     def clear_cache(self):
         r"""
-        
-
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
+            
         """
         self._actmat = {}
         self._maxprecs = {}
@@ -113,10 +109,6 @@ class WeightKAction_generic(Action):
 
             This function caches its results.  To clear the cache use
             :meth:`clear_cache`.
-
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         """
         g = g.matrix()
         if not self._maxprecs.has_key(g):
@@ -162,11 +154,6 @@ class WeightKAction_generic(Action):
 
         - 
 
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
-        """
-        """
         Forms a large M x M matrix say G such that if v is the vector of
         moments of a distribution mu, then v*G is the vector of moments of
         mu|[a,b;c,d]
@@ -220,10 +207,6 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         OUTPUT:
 
         - 
-
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         """
         #tim = verbose("Starting")
         a, b, c, d = self._adjuster(g)
@@ -334,10 +317,6 @@ class WeightKAction_OMS(WeightKAction_generic):
         OUTPUT:
 
         - 
-
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.distributions import Distributions, Symk
         """
         #tim = verbose("Starting")
         a, b, c, d = self._adjuster(g)

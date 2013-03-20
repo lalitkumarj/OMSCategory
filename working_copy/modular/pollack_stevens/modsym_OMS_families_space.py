@@ -154,6 +154,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
 #@cached_method
 def _prec_for_solve_diff_eqn_families(M, p):
+    #UPDATE THIS with valuation of K[0]-1 and K[1]
     r"""
         A helper function for determining the (relative) precision of the input
         to solve_diff_eqn required in order obtain an answer with (relative)
@@ -164,11 +165,6 @@ def _prec_for_solve_diff_eqn_families(M, p):
         .. MATH::
             
             M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3.
-        
-        ::EXAMPLES:
-        
-            sage: [_prec_for_solve_diff_eqn(M, p) for p in [2,3,5] for M in [1,3,10,20]]
-            [7, 10, 18, 28, 6, 8, 16, 26, 5, 8, 15, 25]
 
     """
     # Do we need the weight?

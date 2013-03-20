@@ -191,9 +191,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         r"""
             Divide ``self`` by ``right``.
             
-            EXAMPLES::
-            
-                
         """
         #right = self.parent().base_ring()(right)    #is this necessary? it's probably already been coerced in
         if right.is_zero():

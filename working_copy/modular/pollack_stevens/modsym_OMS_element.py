@@ -43,26 +43,26 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
         OUTPUT:
 
         - True/False
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
-            sage: phi_ord.is_Tq_eigensymbol(2,3,10)
-            True
-            sage: phi_ord.is_Tq_eigensymbol(2,3,100)
-            False
-            sage: phi_ord.is_Tq_eigensymbol(2,3,1000)
-            False
-            sage: phi_ord.is_Tq_eigensymbol(3,3,10)
-            True
-            sage: phi_ord.is_Tq_eigensymbol(3,3,100)
-            False
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,10)
+#            True
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,100)
+#            False
+#            sage: phi_ord.is_Tq_eigensymbol(2,3,1000)
+#            False
+#            sage: phi_ord.is_Tq_eigensymbol(3,3,10)
+#            True
+#            sage: phi_ord.is_Tq_eigensymbol(3,3,100)
+#            False
+#        """
         try:
             aq = self.Tq_eigenvalue(q, p, M)
             return True
@@ -89,25 +89,25 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
 
         - Constant `c` such that `self|T_q - c * self` has valuation greater than
           or equal to `M` (if it exists), otherwise raises ValueError
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
-            sage: phi_ord.Tq_eigenvalue(2,3,10) + 2
-            O(3^10)
-
-            sage: phi_ord.Tq_eigenvalue(3,3,10)
-            2 + 3^2 + 2*3^3 + 2*3^4 + 2*3^6 + 3^8 + 2*3^9 + O(3^10)
-            sage: phi_ord.Tq_eigenvalue(3,3,100)
-            Traceback (most recent call last):
-            ...
-            ValueError: not a scalar multiple
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: phi_ord = phi.p_stabilize(p = 3, ap = E.ap(3), M = 10, ordinary = True)
+#            sage: phi_ord.Tq_eigenvalue(2,3,10) + 2
+#            O(3^10)
+#
+#            sage: phi_ord.Tq_eigenvalue(3,3,10)
+#            2 + 3^2 + 2*3^3 + 2*3^4 + 2*3^6 + 3^8 + 2*3^9 + O(3^10)
+#            sage: phi_ord.Tq_eigenvalue(3,3,100)
+#            Traceback (most recent call last):
+#            ...
+#            ValueError: not a scalar multiple
+#        """
         qhecke = self.hecke(q)
         gens = self.parent().source().gens()
         if p is None:
@@ -144,9 +144,11 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
             EXAMPLES::
 
                 sage: D = OverconvergentDistributions(0, 7, base=Qp(7,5))
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D); MS
+                sage: MS = OverconvergentModularSymbols(14, coefficients=D);
+                sage: MR = MS.source()
                 sage: V = D.approx_module()
                 sage: Phi_dict = {MR.gens()[0]:7 * V((5 + 6*7 + 7^2 + 4*7^3 + 5*7^4 + O(7^5), 6 + 5*7 + 2*7^2 + 3*7^3 + O(7^4), 4 + 5*7 + 7^2 + O(7^3), 2 + 7 + O(7^2), 4 + O(7))), MR.gens()[1]:7 * V((4 + 2*7 + 4*7^2 + 5*7^3 + O(7^5), 5 + 7^2 + 4*7^3 + O(7^4), 1 + 7 + 5*7^2 + O(7^3), 2 + O(7^2), 4 + O(7))), MR.gens()[2]:7 * V((3 + 6*7 + 6*7^2 + 5*7^3 + 7^4 + O(7^5), 6 + 5*7 + 5*7^3 + O(7^4), 3 + 6*7^2 + O(7^3), 6 + 2*7 + O(7^2), O(7))), MR.gens()[3]:7 * V((5 + 3*7 + 4*7^2 + 7^3 + 3*7^4 + O(7^5), 2 + 4*7^2 + 2*7^3 + O(7^4), 1 + 4*7 + 2*7^2 + O(7^3), 6*7 + O(7^2), 6 + O(7))), MR.gens()[4]:7 * V((3 + 2*7^2 + 3*7^3 + 3*7^4 + O(7^5), 5*7 + 4*7^2 + 2*7^3 + O(7^4), 6 + 4*7 + 2*7^2 + O(7^3), 2 + 3*7 + O(7^2), O(7)))}
+                sage: Phi = MS(Phi_dict)
                 sage: Phi._consistency_check()
                 This modular symbol satisfies the manin relations
         """

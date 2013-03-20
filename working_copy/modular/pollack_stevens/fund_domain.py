@@ -40,7 +40,7 @@ from copy import deepcopy
 from sage.misc.cachefunc import cached_method
 from sage.rings.arith import convergents,xgcd,gcd
 
-from sigma0 import Sigma0, Sigma0Element
+from sage.modular.pollack_stevens.sigma0 import Sigma0, Sigma0Element
 
 M2ZSpace = MatrixSpace_ZZ_2x2()
 
@@ -113,14 +113,14 @@ class PSModularSymbolsDomain(SageObject):
         INPUT:
 
             See :class:`PSModularSymbolsDomain`.
-
-        EXAMPLES::
-
-            sage: from sage.modular.pollack_stevens.fund_domain import PSModularSymbolsDomain
-            sage: isinstance(ManinRelations(11), PSModularSymbolsDomain) # indirect doctest
-            True
-
         """
+#        EXAMPLES::
+#
+#            sage: from sage.modular.pollack_stevens.fund_domain import PSModularSymbolsDomain
+#            sage: isinstance(ManinRelations(11), PSModularSymbolsDomain) # indirect doctest
+#            True
+#
+#        """
         self._N = ZZ(N)
         self._reps = reps
 
@@ -580,13 +580,13 @@ class ManinRelations(PSModularSymbolsDomain):
         INPUT:
 
         - ``N`` -- a positive integer, the level of `\Gamma_0(N)` to work with
-
-        EXAMPLES::
-
-            sage: type(ManinRelations(30))
-            <class 'sage.modular.pollack_stevens.fund_domain.ManinRelations'>
-
         """
+#        EXAMPLES::
+#
+#            sage: type(ManinRelations(30))
+#            <class 'sage.modular.pollack_stevens.fund_domain.ManinRelations'>
+#
+#        """
         N = ZZ(N)
         if N <= 0:
             raise ValueError, "N must be a positive integer"
@@ -1444,35 +1444,33 @@ class ManinRelations(PSModularSymbolsDomain):
         OUTPUT:
 
         A list of lists (see above).
-
-        EXAMPLES::
-
-            sage: E = EllipticCurve('11a')
-            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
-            sage: phi = ps_modsym_from_elliptic_curve(E)
-            sage: phi.values()
-            [-1/5, 3/2, -1/2]
-            sage: M = phi.parent().source()
-            sage: M.prep_hecke_on_gen(2, M.gens()[0])
-            {[ 1  0]
-            [-1  1]: [], [1 0]
-            [0 1]: [[1 0]
-            [0 2], [1 1]
-            [0 2], [2 0]
-            [0 1]], [ 1 -1]
-            [-1  2]: [[ 1 -1]
-            [ 0  2]], [ 1  0]
-            [-2  1]: [], [ 0 -1]
-            [ 1  1]: [], [-1 -2]
-            [ 2  3]: [], [ 0 -1]
-            [ 1  3]: [], [-1 -1]
-            [ 2  1]: [], [ 0 -1]
-            [ 1  2]: [], [-2 -1]
-            [ 3  1]: [], [ 1  1]
-            [-1  0]: [], [-1 -1]
-            [ 3  2]: []}
-
         """
+#        EXAMPLES::
+#
+#            sage: E = EllipticCurve('11a')
+#            sage: from sage.modular.pollack_stevens.space import ps_modsym_from_elliptic_curve
+#            sage: phi = ps_modsym_from_elliptic_curve(E)
+#            sage: phi.values()
+#            [-1/5, 3/2, -1/2]
+#            sage: M = phi.parent().source()
+#            sage: M.prep_hecke_on_gen(2, M.gens()[0])
+#            {[ 1  0]
+#            [-1  1]: [], [1 0]
+#            [0 1]: [[1 0]
+#            [0 2], [1 1]
+#            [0 2], [2 0]
+#            [0 1]], [ 1 -1]
+#            [-1  2]: [[ 1 -1]
+#            [ 0  2]], [ 1  0]
+#            [-2  1]: [], [ 0 -1]
+#            [ 1  1]: [], [-1 -2]
+#            [ 2  3]: [], [ 0 -1]
+#            [ 1  3]: [], [-1 -1]
+#            [ 2  1]: [], [ 0 -1]
+#            [ 1  2]: [], [-2 -1]
+#            [ 3  1]: [], [ 1  1]
+#            [-1  0]: [], [-1 -1]
+#            [ 3  2]: []}
         N = self.level()
         SN = Sigma0(N)
 
