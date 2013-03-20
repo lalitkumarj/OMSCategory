@@ -39,6 +39,7 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
         print "Constructing OMSs and verifying they match up."
     Phis = {}
     problems = []
+    not_eigens = []
     count = 0
     for Npk in input_dict[1]:
         if verbose:
@@ -111,7 +112,9 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
                     except ValueError:
                         pass
                     j += 1
-                assert(not not_eigen)
+                if not_eigen:
+                    not_eigens.append([Npk, Phi])
+                    continue
                 if verbose:
                     print "Working with an eigensymbol with precision %s and valuation %s"%(Phi.precision_absolute(),Phi.valuation())
             if k != 0 and ell == p:
@@ -122,7 +125,7 @@ def verify_rank_one(input_dict, max_ell=20, prec=10, verbose=True):
                 print "a_%s: %s ?= %s"%(ell, a_ell_f, a_ell_Phi)
                 print checker, "up to precision", (a_ell_f - a_ell_Phi).valuation()
             if not checker:
-                problems.append(Npk)
+                problems.append([Npk, Phi])
                 if verbose:
                     print "PROBLEM at {0}".format(Npk)
-    return Phis, NFs, problems
+    return Phis, NFs, problems, not_eigens
