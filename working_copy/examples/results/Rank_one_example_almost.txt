@@ -1,0 +1,1722 @@
+Verifying rank one up to precision 10
+Constructing 38 newforms.
+Constructing OMSs and verifying they match up.
+
+Newform #1
+(1, 11, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + O(11^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_3: 10 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 10 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_5: 1 + O(11^10) ?= 1 + O(11^9)
+True up to precision 9
+a_7: 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_11: 1 + O(11^10) ?= 1 + O(11^9)
+True up to precision 9
+a_13: 4 + O(11^10) ?= 4 + O(11^9)
+True up to precision 9
+a_17: 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_19: O(11^10) ?= O(11^9)
+True up to precision 9
+
+Newform #2
+(1, 13, 10)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 13 of Up.
+Iteration 14 of Up.
+Iteration 15 of Up.
+Iteration 16 of Up.
+Iteration 17 of Up.
+Iteration 18 of Up.
+Iteration 19 of Up.
+Iteration 20 of Up.
+Iteration 21 of Up.
+Iteration 22 of Up.
+Iteration 23 of Up.
+Iteration 24 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 8 + 5*13 + 10*13^3 + 5*13^4 + 11*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 2 + 11*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 2 + 11*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_3: 5 + 6*13 + 13^2 + O(13^10) ?= 5 + 6*13 + 13^2 + O(13^8)
+True up to precision 8
+a_5: 7 + 7*13 + 2*13^2 + 2*13^3 + O(13^10) ?= 7 + 7*13 + 2*13^2 + 2*13^3 + O(13^8)
+True up to precision 8
+a_7: 12*13 + 4*13^2 + 5*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12*13 + 4*13^2 + 5*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_11: 5*13 + 4*13^2 + 9*13^3 + 5*13^4 + 13^5 + O(13^10) ?= 5*13 + 4*13^2 + 9*13^3 + 5*13^4 + 13^5 + O(13^8)
+True up to precision 8
+a_13: 8 + 5*13 + 10*13^3 + 5*13^4 + 11*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 8 + 5*13 + 10*13^3 + 5*13^4 + 11*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_17: 4 + 6*13 + 8*13^2 + 2*13^3 + 5*13^4 + 7*13^5 + 11*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 4 + 6*13 + 8*13^2 + 2*13^3 + 5*13^4 + 7*13^5 + 11*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_19: 3 + 4*13 + 9*13^2 + 3*13^3 + 9*13^4 + 2*13^5 + 2*13^6 + O(13^10) ?= 3 + 4*13 + 9*13^2 + 3*13^3 + 9*13^4 + 2*13^5 + 2*13^6 + O(13^8)
+True up to precision 8
+
+Newform #3
+(2, 7, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 1 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_3: 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_5: O(7^10) ?= O(7^9)
+True up to precision 9
+a_7: 1 + O(7^10) ?= 1 + O(7^9)
+True up to precision 9
+a_11: O(7^10) ?= O(7^9)
+True up to precision 9
+a_13: 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_17: 6 + O(7^10) ?= 6 + O(7^9)
+True up to precision 9
+a_19: 2 + O(7^10) ?= 2 + O(7^9)
+True up to precision 9
+
+Newform #4
+(2, 11, 6)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 3 + 9*11^2 + 7*11^7 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 3 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 3 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_3: 1 + 11 + O(11^10) ?= 1 + 11 + O(11^8)
+True up to precision 8
+a_5: 10 + 2*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 10 + 2*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_7: 4 + 4*11 + 8*11^2 + O(11^10) ?= 4 + 4*11 + 8*11^2 + O(11^8)
+True up to precision 8
+a_11: 3 + 9*11^2 + O(11^10) ?= 3 + 9*11^2 + O(11^8)
+True up to precision 8
+a_13: 7 + 4*11 + 11^3 + O(11^10) ?= 7 + 4*11 + 11^3 + O(11^8)
+True up to precision 8
+a_17: 10 + 5*11 + 11^4 + O(11^10) ?= 10 + 5*11 + 11^4 + O(11^8)
+True up to precision 8
+a_19: 1 + 10*11 + 10*11^2 + 2*11^3 + 8*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 1 + 10*11 + 10*11^2 + 2*11^3 + 8*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+
+Newform #5
+(2, 11, 8)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 7 + 10*11 + 8*11^2 + 11^3 + 7*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 5 + 11 + O(11^10) ?= 5 + 11 + O(11^8)
+True up to precision 8
+a_3: 9 + 7*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 7*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_5: 1 + 2*11 + 7*11^2 + O(11^10) ?= 1 + 2*11 + 7*11^2 + O(11^8)
+True up to precision 8
+a_7: 5 + 11 + 3*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 5 + 11 + 3*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_11: 7 + 10*11 + 8*11^2 + 11^3 + 7*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 7 + 10*11 + 8*11^2 + 11^3 + 7*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_13: 4 + 9*11 + 8*11^2 + 11^3 + 11^4 + 11^5 + O(11^10) ?= 4 + 9*11 + 8*11^2 + 11^3 + 11^4 + 11^5 + O(11^8)
+True up to precision 8
+a_17: 3 + 2*11 + 10*11^2 + 5*11^4 + 9*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 3 + 2*11 + 10*11^2 + 5*11^4 + 9*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_19: 10 + 4*11 + 10*11^2 + 5*11^3 + 10*11^4 + 11^5 + O(11^10) ?= 10 + 4*11 + 10*11^2 + 5*11^3 + 10*11^4 + 11^5 + O(11^8)
+True up to precision 8
+
+Newform #6
+(2, 13, 6)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 4 + 2*13 + 8*13^2 + 3*13^7 + 8*13^8 + O(13^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 5 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 5 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_3: 12 + O(13^10) ?= 12 + O(13^9)
+True up to precision 9
+a_5: 11 + 9*13 + 11*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 9*13 + 11*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_7: 2 + 6*13^2 + O(13^10) ?= 2 + 6*13^2 + O(13^9)
+True up to precision 9
+a_11: 6*13 + 6*13^2 + O(13^10) ?= 6*13 + 6*13^2 + O(13^9)
+True up to precision 9
+a_13: 4 + 2*13 + 8*13^2 + O(13^10) ?= 4 + 2*13 + 8*13^2 + O(13^9)
+True up to precision 9
+a_17: 3 + 9*13^2 + 6*13^3 + O(13^10) ?= 3 + 9*13^2 + 6*13^3 + O(13^9)
+True up to precision 9
+a_19: 9 + 8*13 + 10*13^2 + 7*13^3 + 11*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 9 + 8*13 + 10*13^2 + 7*13^3 + 11*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+
+Newform #7
+(2, 13, 8)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 7 + 10*13 + 3*13^3 + 6*13^4 + O(13^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 3 + 13 + O(13^10) ?= 3 + 13 + O(13^9)
+True up to precision 9
+a_3: 13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_5: 12 + 13 + 5*13^2 + O(13^10) ?= 12 + 13 + 5*13^2 + O(13^9)
+True up to precision 9
+a_7: 10 + 4*13 + 7*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 10 + 4*13 + 7*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_11: 12 + 9*13 + 5*13^2 + 11*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12 + 9*13 + 5*13^2 + 11*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_13: 7 + 10*13 + 3*13^3 + 6*13^4 + O(13^10) ?= 7 + 10*13 + 3*13^3 + 6*13^4 + O(13^9)
+True up to precision 9
+a_17: 1 + 7*13 + 3*13^2 + 4*13^3 + 4*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 1 + 7*13 + 3*13^2 + 4*13^3 + 4*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_19: 2*13 + 7*13^2 + 11*13^4 + O(13^10) ?= 2*13 + 7*13^2 + 11*13^4 + O(13^9)
+True up to precision 9
+
+Newform #8
+(3, 5, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + O(5^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_3: 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_5: 1 + O(5^10) ?= 1 + O(5^9)
+True up to precision 9
+a_7: O(5^10) ?= O(5^9)
+True up to precision 9
+a_11: 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_13: 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_17: 2 + O(5^10) ?= 2 + O(5^9)
+True up to precision 9
+a_19: 4 + O(5^10) ?= 4 + O(5^9)
+True up to precision 9
+
+Newform #9
+(3, 7, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_3: 1 + O(7^10) ?= 1 + O(7^8)
+True up to precision 8
+a_5: 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_7: 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 6 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_11: 4 + O(7^10) ?= 4 + O(7^8)
+True up to precision 8
+a_13: 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_17: 1 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 1 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_19: 4 + O(7^10) ?= 4 + O(7^8)
+True up to precision 8
+
+Newform #10
+(3, 7, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 2 + 7 + 6*7^2 + 6*7^3 + 6*7^4 + 2*7^5 + 5*7^6 + 5*7^7 + 6*7^8 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 1 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 1 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_3: 2 + 7 + O(7^10) ?= 2 + 7 + O(7^9)
+True up to precision 9
+a_5: 6 + O(7^10) ?= 6 + O(7^9)
+True up to precision 9
+a_7: 2 + 7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 2 + 7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_11: 3 + 3*7 + 2*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 3*7 + 2*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_13: 1 + 6*7^2 + 7^3 + O(7^10) ?= 1 + 6*7^2 + 7^3 + O(7^9)
+True up to precision 9
+a_17: 4*7^2 + 2*7^3 + O(7^10) ?= 4*7^2 + 2*7^3 + O(7^9)
+True up to precision 9
+a_19: 4 + 4*7 + 2*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 4 + 4*7 + 2*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+
+Newform #11
+(3, 11, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 8 + 3*11 + 6*11^2 + 10*11^3 + 10*11^4 + 3*11^5 + 5*11^6 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 5 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 5 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_3: 9 + O(11^10) ?= 9 + O(11^8)
+True up to precision 8
+a_5: 6 + O(11^10) ?= 6 + O(11^8)
+True up to precision 8
+a_7: 4 + 7*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 4 + 7*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_11: 8 + 3*11 + 6*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 8 + 3*11 + 6*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_13: 3*11 + 5*11^2 + O(11^10) ?= 3*11 + 5*11^2 + O(11^8)
+True up to precision 8
+a_17: 2 + 3*11 + 7*11^2 + O(11^10) ?= 2 + 3*11 + 7*11^2 + O(11^8)
+True up to precision 8
+a_19: 5 + 4*11 + 6*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 5 + 4*11 + 6*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+
+Newform #12
+(3, 11, 6)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 9 + 11 + 3*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 5*11^7 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 6 + O(11^10) ?= 6 + O(11^8)
+True up to precision 8
+a_3: 6 + 8*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 8*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_5: 5 + 2*11 + 3*11^2 + O(11^10) ?= 5 + 2*11 + 3*11^2 + O(11^8)
+True up to precision 8
+a_7: 2 + 5*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 2 + 5*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_11: 9 + 11 + 3*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 11 + 3*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_13: 6 + 9*11 + 11^2 + 7*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 9*11 + 11^2 + 7*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_17: 6 + 6*11 + 3*11^2 + 10*11^3 + 11^4 + O(11^10) ?= 6 + 6*11 + 3*11^2 + 10*11^3 + 11^4 + O(11^8)
+True up to precision 8
+a_19: 4 + 8*11 + 5*11^2 + 4*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 4 + 8*11 + 5*11^2 + 4*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+
+Newform #13
+(3, 13, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + 10*13 + 3*13^2 + 12*13^5 + 9*13^6 + 7*13^7 + O(13^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 7 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 7 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_3: 9 + O(13^10) ?= 9 + O(13^8)
+True up to precision 8
+a_5: 6 + O(13^10) ?= 6 + O(13^8)
+True up to precision 8
+a_7: 12 + 9*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12 + 9*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_11: 8 + 8*13 + 9*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 8 + 8*13 + 9*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_13: 1 + 10*13 + 3*13^2 + O(13^10) ?= 1 + 10*13 + 3*13^2 + O(13^8)
+True up to precision 8
+a_17: 11 + 2*13 + 5*13^2 + O(13^10) ?= 11 + 2*13 + 5*13^2 + O(13^8)
+True up to precision 8
+a_19: 3 + 9*13 + 9*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 3 + 9*13 + 9*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+
+Newform #14
+(3, 13, 6)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 11 + 10*13 + 8*13^2 + 10*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 6*13^7 + 12*13^8 + O(13^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 6 + O(13^10) ?= 6 + O(13^9)
+True up to precision 9
+a_3: 12 + 10*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12 + 10*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_5: 4*13 + 2*13^2 + O(13^10) ?= 4*13 + 2*13^2 + O(13^9)
+True up to precision 9
+a_7: 1 + 8*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 1 + 8*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_11: 1 + 5*13 + 7*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 1 + 5*13 + 7*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_13: 11 + 10*13 + 8*13^2 + 10*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 10*13 + 8*13^2 + 10*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_17: 7 + 12*13 + 11*13^2 + 12*13^3 + O(13^10) ?= 7 + 12*13 + 11*13^2 + 12*13^3 + O(13^9)
+True up to precision 9
+a_19: 12 + 12*13 + 9*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12 + 12*13 + 9*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+
+Newform #15
+(4, 5, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: O(5^10) ?= O(5^9)
+True up to precision 9
+a_3: 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_5: 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_7: 2 + O(5^10) ?= 2 + O(5^9)
+True up to precision 9
+a_11: O(5^10) ?= O(5^9)
+True up to precision 9
+a_13: 2 + O(5^10) ?= 2 + O(5^9)
+True up to precision 9
+a_17: 4 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_19: 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+
+Newform #16
+(4, 7, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 3 + 7 + 5*7^2 + 6*7^3 + 6*7^4 + 7^5 + 6*7^6 + 3*7^7 + O(7^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: O(7^10) ?= O(7^8)
+True up to precision 8
+a_3: 2 + 5*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 2 + 5*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_5: 5 + 7^2 + O(7^10) ?= 5 + 7^2 + O(7^8)
+True up to precision 8
+a_7: 3 + 7 + 5*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 7 + 5*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_11: 1 + 4*7^2 + 7^3 + O(7^10) ?= 1 + 4*7^2 + 7^3 + O(7^8)
+True up to precision 8
+a_13: 2 + 3*7 + 5*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 2 + 3*7 + 5*7^2 + 5*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + O(7^8)
+True up to precision 8
+a_17: 6 + 5*7^2 + 7^3 + O(7^10) ?= 6 + 5*7^2 + 7^3 + O(7^8)
+True up to precision 8
+a_19: 3 + 3*7^2 + 2*7^3 + O(7^10) ?= 3 + 3*7^2 + 2*7^3 + O(7^8)
+True up to precision 8
+
+Newform #17
+(4, 11, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 1 + 5*11 + 4*11^2 + 10*11^5 + 4*11^6 + 11^7 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: O(11^10) ?= O(11^8)
+True up to precision 8
+a_3: 10 + 9*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 10 + 9*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_5: 10 + 4*11 + O(11^10) ?= 10 + 4*11 + O(11^8)
+True up to precision 8
+a_7: 3*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 3*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_11: 1 + 5*11 + 4*11^2 + O(11^10) ?= 1 + 5*11 + 4*11^2 + O(11^8)
+True up to precision 8
+a_13: 6*11 + 7*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6*11 + 7*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_17: 10*11 + 4*11^2 + O(11^10) ?= 10*11 + 4*11^2 + O(11^8)
+True up to precision 8
+a_19: 10*11 + 6*11^2 + O(11^10) ?= 10*11 + 6*11^2 + O(11^8)
+True up to precision 8
+
+Newform #18
+(4, 13, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 11 + 6*13 + 10*13^2 + 12*13^3 + 12*13^4 + 6*13^5 + 11*13^6 + 3*13^7 + O(13^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: O(13^10) ?= O(13^8)
+True up to precision 8
+a_3: 1 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 1 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_5: 2 + 4*13 + O(13^10) ?= 2 + 4*13 + O(13^8)
+True up to precision 8
+a_7: 3 + 6*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 3 + 6*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_11: 7 + 2*13 + 3*13^2 + O(13^10) ?= 7 + 2*13 + 3*13^2 + O(13^8)
+True up to precision 8
+a_13: 11 + 6*13 + 10*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 6*13 + 10*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_17: 9 + 6*13 + 3*13^2 + O(13^10) ?= 9 + 6*13 + 3*13^2 + O(13^8)
+True up to precision 8
+a_19: 4 + 12*13 + 4*13^2 + O(13^10) ?= 4 + 12*13 + 4*13^2 + O(13^8)
+True up to precision 8
+
+Newform #19
+(5, 3, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+Working with an eigensymbol with precision 10 and valuation 0
+a_2: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_3: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_5: 1 + O(3^10) ?= 1 + O(3^10)
+True up to precision 10
+a_7: O(3^10) ?= O(3^10)
+True up to precision 10
+a_11: 2 + 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_13: 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_17: 2 + O(3^10) ?= 2 + O(3^10)
+True up to precision 10
+a_19: 1 + 3 + O(3^10) ?= 1 + 3 + O(3^10)
+True up to precision 10
+
+Newform #20
+(5, 7, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 6 + 7^3 + 7^4 + 7^5 + 2*7^6 + 4*7^7 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_3: 2 + O(7^10) ?= 2 + O(7^9)
+True up to precision 9
+a_5: 2 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 2 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_7: 6 + O(7^10) ?= 6 + O(7^9)
+True up to precision 9
+a_11: 4 + 4*7 + O(7^10) ?= 4 + 4*7 + O(7^9)
+True up to precision 9
+a_13: 4 + 7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 4 + 7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_17: 5 + 3*7 + O(7^10) ?= 5 + 3*7 + O(7^9)
+True up to precision 9
+a_19: 2 + 2*7^2 + O(7^10) ?= 2 + 2*7^2 + O(7^9)
+True up to precision 9
+
+Newform #21
+(5, 7, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 3 + 6*7 + 3*7^2 + 2*7^5 + 5*7^6 + 3*7^7 + 3*7^8 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 2 + O(7^10) ?= 2 + O(7^9)
+True up to precision 9
+a_3: 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_5: 4 + 3*7 + O(7^10) ?= 4 + 3*7 + O(7^9)
+True up to precision 9
+a_7: 3 + 6*7 + 3*7^2 + O(7^10) ?= 3 + 6*7 + 3*7^2 + O(7^9)
+True up to precision 9
+a_11: 6 + 6*7 + 3*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 6 + 6*7 + 3*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_13: 6 + 5*7 + 5*7^2 + O(7^10) ?= 6 + 5*7 + 5*7^2 + O(7^9)
+True up to precision 9
+a_17: 2 + 5*7 + 2*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 2 + 5*7 + 2*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_19: 3 + 4*7 + 3*7^3 + O(7^10) ?= 3 + 4*7 + 3*7^3 + O(7^9)
+True up to precision 9
+
+Newform #22
+(5, 11, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 10 + 2*11 + 11^3 + 3*11^4 + 9*11^5 + 6*11^6 + 4*11^7 + 8*11^8 + O(11^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 7 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 7 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_3: 2 + O(11^10) ?= 2 + O(11^9)
+True up to precision 9
+a_5: 6 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_7: 6 + O(11^10) ?= 6 + O(11^9)
+True up to precision 9
+a_11: 10 + 2*11 + O(11^10) ?= 10 + 2*11 + O(11^9)
+True up to precision 9
+a_13: 6 + 7*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 7*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_17: 4 + 2*11 + O(11^10) ?= 4 + 2*11 + O(11^9)
+True up to precision 9
+a_19: 1 + 9*11 + O(11^10) ?= 1 + 9*11 + O(11^9)
+True up to precision 9
+
+Newform #23
+(5, 11, 4)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 6 + 8*11 + 9*11^2 + 10*11^3 + 10*11^4 + 8*11^5 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 2 + O(11^10) ?= 2 + O(11^8)
+True up to precision 8
+a_3: 7 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 7 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_5: 3 + 2*11 + O(11^10) ?= 3 + 2*11 + O(11^8)
+True up to precision 8
+a_7: 5 + 6*11 + 11^2 + O(11^10) ?= 5 + 6*11 + 11^2 + O(11^8)
+True up to precision 8
+a_11: 6 + 8*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 8*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_13: 4*11 + 2*11^2 + O(11^10) ?= 4*11 + 2*11^2 + O(11^8)
+True up to precision 8
+a_17: 5 + 11 + 8*11^2 + 9*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 5 + 11 + 8*11^2 + 9*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_19: 4 + 8*11 + 8*11^2 + O(11^10) ?= 4 + 8*11 + 8*11^2 + O(11^8)
+True up to precision 8
+
+Newform #24
+(5, 13, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + 10*13 + 12*13^2 + 11*13^3 + 9*13^4 + 3*13^5 + 10*13^6 + 11*13^7 + O(13^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 9 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 9 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_3: 2 + O(13^10) ?= 2 + O(13^8)
+True up to precision 8
+a_5: 8 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 8 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_7: 6 + O(13^10) ?= 6 + O(13^8)
+True up to precision 8
+a_11: 6 + 2*13 + O(13^10) ?= 6 + 2*13 + O(13^8)
+True up to precision 8
+a_13: 1 + 10*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 1 + 10*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_17: 2*13 + O(13^10) ?= 2*13 + O(13^8)
+True up to precision 8
+a_19: 9 + 7*13 + O(13^10) ?= 9 + 7*13 + O(13^8)
+True up to precision 8
+
+Newform #25
+(6, 5, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 7
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 7 (eis=False).
+Up eigenvalue: 1 + 5 + 4*5^3 + 4*5^5 + 4*5^6 + 5^7 + O(5^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_3: 2 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 2 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_5: 1 + 5 + O(5^10) ?= 1 + 5 + O(5^8)
+True up to precision 8
+a_7: 4 + 5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_11: 2 + 2*5 + O(5^10) ?= 2 + 2*5 + O(5^8)
+True up to precision 8
+a_13: 3 + 2*5 + 5^2 + O(5^10) ?= 3 + 2*5 + 5^2 + O(5^8)
+True up to precision 8
+a_17: 4 + 4*5 + 4*5^2 + 3*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 4*5 + 4*5^2 + 3*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_19: 4*5 + O(5^10) ?= 4*5 + O(5^8)
+True up to precision 8
+
+Newform #26
+(6, 7, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 5
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 5 (eis=False).
+Up eigenvalue: 5 + 4*7 + 6*7^2 + 3*7^3 + 6*7^4 + 3*7^5 + 2*7^8 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_3: 4 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 4 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_5: 6 + O(7^10) ?= 6 + O(7^9)
+True up to precision 9
+a_7: 5 + 4*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 4*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_11: 5 + 7 + O(7^10) ?= 5 + 7 + O(7^9)
+True up to precision 9
+a_13: 3 + 5*7 + O(7^10) ?= 3 + 5*7 + O(7^9)
+True up to precision 9
+a_17: 3*7 + 4*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3*7 + 4*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_19: 6 + 2*7 + O(7^10) ?= 6 + 2*7 + O(7^9)
+True up to precision 9
+
+Newform #27
+(6, 11, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 5
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 5 (eis=False).
+Up eigenvalue: 1 + 11 + 10*11^3 + 10*11^5 + 10*11^6 + 11^7 + O(11^8)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_3: 8 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 8 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_5: 6 + O(11^10) ?= 6 + O(11^8)
+True up to precision 8
+a_7: 6 + 9*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 9*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_11: 1 + 11 + O(11^10) ?= 1 + 11 + O(11^8)
+True up to precision 8
+a_13: 5 + 3*11 + O(11^10) ?= 5 + 3*11 + O(11^8)
+True up to precision 8
+a_17: 6 + 10*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 6 + 10*11 + 9*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + O(11^8)
+True up to precision 8
+a_19: 9 + 11 + O(11^10) ?= 9 + 11 + O(11^8)
+True up to precision 8
+
+Newform #28
+(6, 13, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 5
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 5 (eis=False).
+Up eigenvalue: 12 + 2*13 + 13^3 + 3*13^4 + 9*13^5 + 2*13^6 + 13^7 + 5*13^8 + O(13^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_3: 10 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 10 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_5: 6 + O(13^10) ?= 6 + O(13^9)
+True up to precision 9
+a_7: 10 + 11*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 10 + 11*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_11: 12 + O(13^10) ?= 12 + O(13^9)
+True up to precision 9
+a_13: 12 + 2*13 + O(13^10) ?= 12 + 2*13 + O(13^9)
+True up to precision 9
+a_17: 4 + 3*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 4 + 3*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_19: 7 + 13 + O(13^10) ?= 7 + 13 + O(13^9)
+True up to precision 9
+
+Newform #29
+(7, 3, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + O(3^9)
+Working with an eigensymbol with precision 10 and valuation 0
+a_2: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + O(3^9)
+True up to precision 9
+a_3: 1 + O(3^10) ?= 1 + O(3^9)
+True up to precision 9
+a_5: 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + O(3^9)
+True up to precision 9
+a_7: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + O(3^9)
+True up to precision 9
+a_11: 1 + 3 + O(3^10) ?= 1 + 3 + O(3^9)
+True up to precision 9
+a_13: 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + O(3^9)
+True up to precision 9
+a_17: 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + O(3^9)
+True up to precision 9
+a_19: 1 + 3 + O(3^10) ?= 1 + 3 + O(3^9)
+True up to precision 9
+
+Newform #30
+(7, 5, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 1 + 3*5 + 4*5^3 + 2*5^4 + 5^5 + 4*5^6 + 2*5^7 + O(5^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 4 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_3: 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_5: 1 + 3*5 + O(5^10) ?= 1 + 3*5 + O(5^9)
+True up to precision 9
+a_7: 3 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_11: 2 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 2 + 3*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+a_13: 3 + 5^2 + O(5^10) ?= 3 + 5^2 + O(5^9)
+True up to precision 9
+a_17: 4 + 2*5^2 + O(5^10) ?= 4 + 2*5^2 + O(5^9)
+True up to precision 9
+a_19: 3*5 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3*5 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + O(5^9)
+True up to precision 9
+
+Newform #31
+(7, 11, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 3 + 10*11 + 10*11^2 + 6*11^3 + 9*11^4 + 6*11^5 + 8*11^7 + 9*11^8 + O(11^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 10 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 10 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_3: 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_5: 5 + 11 + O(11^10) ?= 5 + 11 + O(11^9)
+True up to precision 9
+a_7: 4 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 4 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_11: 3 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 3 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+a_13: 6 + 2*11 + O(11^10) ?= 6 + 2*11 + O(11^9)
+True up to precision 9
+a_17: 10 + 4*11 + O(11^10) ?= 10 + 4*11 + O(11^9)
+True up to precision 9
+a_19: 11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + O(11^10) ?= 11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + O(11^9)
+True up to precision 9
+
+Newform #32
+(7, 13, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Up eigenvalue: 2 + 2*13 + 6*13^3 + 6*13^5 + 8*13^6 + 9*13^7 + 12*13^8 + O(13^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: 12 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 12 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_3: 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_5: 3 + 13 + O(13^10) ?= 3 + 13 + O(13^9)
+True up to precision 9
+a_7: 6 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 6 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_11: 5 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 5 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+a_13: 2 + 2*13 + O(13^10) ?= 2 + 2*13 + O(13^9)
+True up to precision 9
+a_17: 2 + 4*13 + O(13^10) ?= 2 + 4*13 + O(13^9)
+True up to precision 9
+a_19: 7 + 4*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 7 + 4*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + O(13^9)
+True up to precision 9
+
+Newform #33
+(8, 3, 0)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 5
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 5 (eis=False).
+Up eigenvalue: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+Working with an eigensymbol with precision 10 and valuation 0
+a_2: O(3^10) ?= O(3^10)
+True up to precision 10
+a_3: 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_5: 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_7: O(3^10) ?= O(3^10)
+True up to precision 10
+a_11: 1 + 3 + O(3^10) ?= 1 + 3 + O(3^10)
+True up to precision 10
+a_13: 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+a_17: 2 + O(3^10) ?= 2 + O(3^10)
+True up to precision 10
+a_19: 2 + 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10) ?= 2 + 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)
+True up to precision 10
+
+Newform #34
+(8, 5, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 3 + 4*5 + 4*5^2 + 2*5^3 + 2*5^4 + 2*5^5 + 4*5^6 + 5^7 + O(5^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: O(5^10) ?= O(5^8)
+True up to precision 8
+a_3: 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 1 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_5: 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 3 + 4*5 + 4*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_7: 4 + 4*5 + O(5^10) ?= 4 + 4*5 + O(5^8)
+True up to precision 8
+a_11: 1 + 5 + 3*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + 4*5^8 + 4*5^9 + O(5^10) ?= 1 + 5 + 3*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8)
+True up to precision 8
+a_13: 2 + 4*5 + O(5^10) ?= 2 + 4*5 + O(5^8)
+True up to precision 8
+a_17: 2*5^2 + O(5^10) ?= 2*5^2 + O(5^8)
+True up to precision 8
+a_19: 4 + 3*5 + 5^2 + O(5^10) ?= 4 + 3*5 + 5^2 + O(5^8)
+True up to precision 8
+
+Newform #35
+(8, 7, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 3 + 3*7 + 2*7^3 + 2*7^5 + 7^6 + 3*7^7 + 3*7^8 + O(7^9)
+Working with an eigensymbol with precision 10 and valuation 1
+a_2: O(7^10) ?= O(7^9)
+True up to precision 9
+a_3: 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 3 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_5: 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_7: 3 + 3*7 + O(7^10) ?= 3 + 3*7 + O(7^9)
+True up to precision 9
+a_11: 5 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + O(7^10) ?= 5 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + O(7^9)
+True up to precision 9
+a_13: 1 + 3*7 + O(7^10) ?= 1 + 3*7 + O(7^9)
+True up to precision 9
+a_17: 1 + 7^2 + O(7^10) ?= 1 + 7^2 + O(7^9)
+True up to precision 9
+a_19: 2 + 6*7 + O(7^10) ?= 2 + 6*7 + O(7^9)
+True up to precision 9
+
+Newform #36
+(8, 13, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 3
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 3 (eis=False).
+Up eigenvalue: 9 + 13 + 10*13^3 + 13^4 + 4*13^5 + 4*13^6 + 12*13^7 + O(13^8)
+Working with an eigensymbol with precision 10 and valuation 2
+a_2: O(13^10) ?= O(13^8)
+True up to precision 8
+a_3: 9 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 9 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_5: 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 11 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_7: 11 + 13 + O(13^10) ?= 11 + 13 + O(13^8)
+True up to precision 8
+a_11: 8 + 9*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + O(13^10) ?= 8 + 9*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + O(13^8)
+True up to precision 8
+a_13: 9 + 13 + O(13^10) ?= 9 + 13 + O(13^8)
+True up to precision 8
+a_17: 11 + 3*13 + O(13^10) ?= 11 + 3*13 + O(13^8)
+True up to precision 8
+a_19: 5 + 3*13 + O(13^10) ?= 5 + 3*13 + O(13^8)
+True up to precision 8
+
+Newform #37
+(9, 7, 2)
+Finding non-Eisenstein prime
+Non-Eisenstein prime = 2
+Iteration 1 of Up.
+Iteration 2 of Up.
+Iteration 3 of Up.
+Iteration 4 of Up.
+Iteration 5 of Up.
+Iteration 6 of Up.
+Iteration 7 of Up.
+Iteration 8 of Up.
+Iteration 9 of Up.
+Iteration 10 of Up.
+Iteration 11 of Up.
+Iteration 12 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 13 of Up.
+Iteration 14 of Up.
+Iteration 15 of Up.
+Iteration 16 of Up.
+Iteration 17 of Up.
+Iteration 18 of Up.
+Iteration 19 of Up.
+Iteration 20 of Up.
+Iteration 21 of Up.
+Iteration 22 of Up.
+Iteration 23 of Up.
+Iteration 24 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 25 of Up.
+Iteration 26 of Up.
+Iteration 27 of Up.
+Iteration 28 of Up.
+Iteration 29 of Up.
+Iteration 30 of Up.
+Iteration 31 of Up.
+Iteration 32 of Up.
+Iteration 33 of Up.
+Iteration 34 of Up.
+Iteration 35 of Up.
+Iteration 36 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 37 of Up.
+Iteration 38 of Up.
+Iteration 39 of Up.
+Iteration 40 of Up.
+Iteration 41 of Up.
+Iteration 42 of Up.
+Iteration 43 of Up.
+Iteration 44 of Up.
+Iteration 45 of Up.
+Iteration 46 of Up.
+Iteration 47 of Up.
+Iteration 48 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 49 of Up.
+Iteration 50 of Up.
+Iteration 51 of Up.
+Iteration 52 of Up.
+Iteration 53 of Up.
+Iteration 54 of Up.
+Iteration 55 of Up.
+Iteration 56 of Up.
+Iteration 57 of Up.
+Iteration 58 of Up.
+Iteration 59 of Up.
+Iteration 60 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 61 of Up.
+Iteration 62 of Up.
+Iteration 63 of Up.
+Iteration 64 of Up.
+Iteration 65 of Up.
+Iteration 66 of Up.
+Iteration 67 of Up.
+Iteration 68 of Up.
+Iteration 69 of Up.
+Iteration 70 of Up.
+Iteration 71 of Up.
+Iteration 72 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 73 of Up.
+Iteration 74 of Up.
+Iteration 75 of Up.
+Iteration 76 of Up.
+Iteration 77 of Up.
+Iteration 78 of Up.
+Iteration 79 of Up.
+Iteration 80 of Up.
+Iteration 81 of Up.
+Iteration 82 of Up.
+Iteration 83 of Up.
+Iteration 84 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 85 of Up.
+Iteration 86 of Up.
+Iteration 87 of Up.
+Iteration 88 of Up.
+Iteration 89 of Up.
+Iteration 90 of Up.
+Iteration 91 of Up.
+Iteration 92 of Up.
+Iteration 93 of Up.
+Iteration 94 of Up.
+Iteration 95 of Up.
+Iteration 96 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 97 of Up.
+Iteration 98 of Up.
+Iteration 99 of Up.
+Iteration 100 of Up.
+Iteration 101 of Up.
+Iteration 102 of Up.
+Iteration 103 of Up.
+Iteration 104 of Up.
+Iteration 105 of Up.
+Iteration 106 of Up.
+Iteration 107 of Up.
+Iteration 108 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 109 of Up.
+Iteration 110 of Up.
+Iteration 111 of Up.
+Iteration 112 of Up.
+Iteration 113 of Up.
+Iteration 114 of Up.
+Iteration 115 of Up.
+Iteration 116 of Up.
+Iteration 117 of Up.
+Iteration 118 of Up.
+Iteration 119 of Up.
+Iteration 120 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 121 of Up.
+Iteration 122 of Up.
+Iteration 123 of Up.
+Iteration 124 of Up.
+Iteration 125 of Up.
+Iteration 126 of Up.
+Iteration 127 of Up.
+Iteration 128 of Up.
+Iteration 129 of Up.
+Iteration 130 of Up.
+Iteration 131 of Up.
+Iteration 132 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 133 of Up.
+Iteration 134 of Up.
+Iteration 135 of Up.
+Iteration 136 of Up.
+Iteration 137 of Up.
+Iteration 138 of Up.
+Iteration 139 of Up.
+Iteration 140 of Up.
+Iteration 141 of Up.
+Iteration 142 of Up.
+Iteration 143 of Up.
+Iteration 144 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 145 of Up.
+Iteration 146 of Up.
+Iteration 147 of Up.
+Iteration 148 of Up.
+Iteration 149 of Up.
+Iteration 150 of Up.
+Iteration 151 of Up.
+Iteration 152 of Up.
+Iteration 153 of Up.
+Iteration 154 of Up.
+Iteration 155 of Up.
+Iteration 156 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 157 of Up.
+Iteration 158 of Up.
+Iteration 159 of Up.
+Iteration 160 of Up.
+Iteration 161 of Up.
+Iteration 162 of Up.
+Iteration 163 of Up.
+Iteration 164 of Up.
+Iteration 165 of Up.
+Iteration 166 of Up.
+Iteration 167 of Up.
+Iteration 168 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 169 of Up.
+Iteration 170 of Up.
+Iteration 171 of Up.
+Iteration 172 of Up.
+Iteration 173 of Up.
+Iteration 174 of Up.
+Iteration 175 of Up.
+Iteration 176 of Up.
+Iteration 177 of Up.
+Iteration 178 of Up.
+Iteration 179 of Up.
+Iteration 180 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Working with an eigensymbol with precision 10 and valuation 1
+                 Further iterating Up to get a T2 eigensymbol
+Iteration 181 of Up.
+Iteration 182 of Up.
+Iteration 183 of Up.
+Iteration 184 of Up.
+Iteration 185 of Up.
+Iteration 186 of Up.
+Iteration 187 of Up.
+Iteration 188 of Up.
+Iteration 189 of Up.
+Iteration 190 of Up.
+Iteration 191 of Up.
+Iteration 192 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 193 of Up.
+Iteration 194 of Up.
+Iteration 195 of Up.
+Iteration 196 of Up.
+Iteration 197 of Up.
+Iteration 198 of Up.
+Iteration 199 of Up.
+Iteration 200 of Up.
+Iteration 201 of Up.
+Iteration 202 of Up.
+Iteration 203 of Up.
+Iteration 204 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 205 of Up.
+Iteration 206 of Up.
+Iteration 207 of Up.
+Iteration 208 of Up.
+Iteration 209 of Up.
+Iteration 210 of Up.
+Iteration 211 of Up.
+Iteration 212 of Up.
+Iteration 213 of Up.
+Iteration 214 of Up.
+Iteration 215 of Up.
+Iteration 216 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 217 of Up.
+Iteration 218 of Up.
+Iteration 219 of Up.
+Iteration 220 of Up.
+Iteration 221 of Up.
+Iteration 222 of Up.
+Iteration 223 of Up.
+Iteration 224 of Up.
+Iteration 225 of Up.
+Iteration 226 of Up.
+Iteration 227 of Up.
+Iteration 228 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 229 of Up.
+Iteration 230 of Up.
+Iteration 231 of Up.
+Iteration 232 of Up.
+Iteration 233 of Up.
+Iteration 234 of Up.
+Iteration 235 of Up.
+Iteration 236 of Up.
+Iteration 237 of Up.
+Iteration 238 of Up.
+Iteration 239 of Up.
+Iteration 240 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 241 of Up.
+Iteration 242 of Up.
+Iteration 243 of Up.
+Iteration 244 of Up.
+Iteration 245 of Up.
+Iteration 246 of Up.
+Iteration 247 of Up.
+Iteration 248 of Up.
+Iteration 249 of Up.
+Iteration 250 of Up.
+Iteration 251 of Up.
+Iteration 252 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 253 of Up.
+Iteration 254 of Up.
+Iteration 255 of Up.
+Iteration 256 of Up.
+Iteration 257 of Up.
+Iteration 258 of Up.
+Iteration 259 of Up.
+Iteration 260 of Up.
+Iteration 261 of Up.
+Iteration 262 of Up.
+Iteration 263 of Up.
+Iteration 264 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 265 of Up.
+Iteration 266 of Up.
+Iteration 267 of Up.
+Iteration 268 of Up.
+Iteration 269 of Up.
+Iteration 270 of Up.
+Iteration 271 of Up.
+Iteration 272 of Up.
+Iteration 273 of Up.
+Iteration 274 of Up.
+Iteration 275 of Up.
+Iteration 276 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 277 of Up.
+Iteration 278 of Up.
+Iteration 279 of Up.
+Iteration 280 of Up.
+Iteration 281 of Up.
+Iteration 282 of Up.
+Iteration 283 of Up.
+Iteration 284 of Up.
+Iteration 285 of Up.
+Iteration 286 of Up.
+Iteration 287 of Up.
+Iteration 288 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 289 of Up.
+Iteration 290 of Up.
+Iteration 291 of Up.
+Iteration 292 of Up.
+Iteration 293 of Up.
+Iteration 294 of Up.
+Iteration 295 of Up.
+Iteration 296 of Up.
+Iteration 297 of Up.
+Iteration 298 of Up.
+Iteration 299 of Up.
+Iteration 300 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 301 of Up.
+Iteration 302 of Up.
+Iteration 303 of Up.
+Iteration 304 of Up.
+Iteration 305 of Up.
+Iteration 306 of Up.
+Iteration 307 of Up.
+Iteration 308 of Up.
+Iteration 309 of Up.
+Iteration 310 of Up.
+Iteration 311 of Up.
+Iteration 312 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 313 of Up.
+Iteration 314 of Up.
+Iteration 315 of Up.
+Iteration 316 of Up.
+Iteration 317 of Up.
+Iteration 318 of Up.
+Iteration 319 of Up.
+Iteration 320 of Up.
+Iteration 321 of Up.
+Iteration 322 of Up.
+Iteration 323 of Up.
+Iteration 324 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 325 of Up.
+Iteration 326 of Up.
+Iteration 327 of Up.
+Iteration 328 of Up.
+Iteration 329 of Up.
+Iteration 330 of Up.
+Iteration 331 of Up.
+Iteration 332 of Up.
+Iteration 333 of Up.
+Iteration 334 of Up.
+Iteration 335 of Up.
+Iteration 336 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 337 of Up.
+Iteration 338 of Up.
+Iteration 339 of Up.
+Iteration 340 of Up.
+Iteration 341 of Up.
+Iteration 342 of Up.
+Iteration 343 of Up.
+Iteration 344 of Up.
+Iteration 345 of Up.
+Iteration 346 of Up.
+Iteration 347 of Up.
+Iteration 348 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+Iteration 349 of Up.
+Iteration 350 of Up.
+Iteration 351 of Up.
+Iteration 352 of Up.
+Iteration 353 of Up.
+Iteration 354 of Up.
+Iteration 355 of Up.
+Iteration 356 of Up.
+Iteration 357 of Up.
+Iteration 358 of Up.
+Iteration 359 of Up.
+Iteration 360 of Up.
+Killing Eisenstein component with ell = 2 (eis=False).
+---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+<ipython-input-4-a03824315e5c> in <module>()
+----> 1 ret = verify_rank_one(dims_dict)
+
+/Users/rharron/math/mywork/sage/OMSwithCats/OMSCategory/working_copy/examples/OMS/Rank_1_examples.sagedXS0Ir.py in verify_rank_one(input_dict, max_ell, prec, verbose)
+    118                         pass
+    119                     j += _sage_const_1 
+--> 120                 assert(not not_eigen)
+    121                 if verbose:
+    122                     print "Working with an eigensymbol with precision %s and valuation %s"%(Phi.precision_absolute(),Phi.valuation())
+
+AssertionError: 
