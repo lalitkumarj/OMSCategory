@@ -34,56 +34,80 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             (1 + O(3^2) + O(w^2), 2 + O(3^2) + O(w^2), O(w^2), 1 + O(3) + O(w^2))
             sage: mu42 == D42(mu8)
             True
+            sage: D42(15)
+            3 * (2 + O(3) + O(w^2))
+            sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap = [8 ,4], base_coeffs=ZpCA(11, 4))
+            sage: R = D.base_ring(); K = R.base_extend(R.base_ring().fraction_field())
+            sage: v = [K([1,2,11]) / 11, K([1]), K([11,1,1])]
+            sage: D(v)
+            11^-1 * (1 + O(11^3) + (2 + O(11^3))*w + (11 + O(11^3))*w^2 + O(w^4), 11 + O(11^2) + O(w^4), O(w^4))
+            sage: D(0)
+            11^4 * ()
     """
-    # Implementation currently ignores ordp
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=None):
         CoefficientModuleElement_generic.__init__(self, parent)
         #TODO: finish this
-        p = parent.prime()
-        if var_prec == None:
-            var_prec = parent._prec_cap[1]
-        self._var_prec = var_prec
+        #if var_prec == None:
+        #    var_prec = parent._prec_cap[1]
+        #self._var_prec = var_prec
         if check:
+            # Need to check/construct: moments, ordp, and var_prec
+            par_p_prec, par_v_prec = parent.precision_cap()
+            if var_prec is None:
+                var_prec = par_v_prec
+            else:
+                var_prec = min(var_prec, par_v_prec)
             if isinstance(moments, CoeffMod_OMS_Families_element):
                 ordp = moments.ordp
-                moments = moments._moments[:parent.precision_cap()[0]]
+                var_prec = min(var_prec, moments._var_prec)
+                # Note: imposing var_prec precision ins't done in this method.
+                # You should call normalize if you want that.
+                moments = moments._moments[:par_p_prec]
                 moments = moments.change_ring(parent.base_ring())
             if isinstance(moments, CoeffMod_OMS_element):
+                # Coerce in using constant family
                 ordp = moments.ordp
-                moments = self.parent().approx_module(p_prec=len(moments._moments), var_prec=self.parent().precision_cap()[1])(moments._moments)
+                p_prec = min(moments.precision_relative(), par_p_prec)
+                moments = self.parent().approx_module(p_prec, var_prec)(moments._moments)
             elif hasattr(moments, '__len__'):
                 #Need to modify if uniformiser is not p
                 #Deal with var_prec
-                M = min(len(moments), parent.precision_cap()[0])
-                R = self.parent().base_ring()
-                moments = [R(moments[i]) for i in range(M)]
-                ordp = min(map(lambda x : _padic_val_of_pow_series(x, p=p), moments))
-                if ordp == Infinity:
-                    ordp = parent._prec_cap[0]
-                    moments = parent.approx_module(0)([])
+                R = parent.base_ring()
+                K = R.base_extend(R.base_ring().fraction_field())
+                p_prec = min(len(moments), par_p_prec)
+                #figure out var_prec from moments
+                V = parent.approx_module(p_prec, var_prec)
+                VK = V.base_extend(K)
+                moments = VK(moments[:p_prec])
+                if len(moments) == 0 or moments == 0:   #should do something with how "zero" moments is
+                    V = parent.approx_module(0, var_prec) #var_prec?
+                    moments = V([])
+                    ordp = par_p_prec
                 else:
-                    M = len(moments)
-                    moments = parent.approx_module(M)(moments)
-                    if ordp != 0:
-                        moments *= p ** (-ordp)
-            elif moments == 0:
-                ordp = parent._prec_cap[0]
-                moments = parent.approx_module(parent._prec_cap[0], parent._prec_cap[1])(moments)
+                    ordp = min([_padic_val_of_pow_series(a) for a in moments])
+                    moments = V([_right_shift_coeffs(a, ordp) for a in moments])
+            elif moments == 0:  #should do something with how "zero" moments is
+                V = parent.approx_module(0, var_prec)
+                moments = V([])
+                ordp = par_p_prec
             else:
-                moments = parent.approx_module(1, parent.precision_cap()[1])([moments])
-                ordp = moments[0].valuation()
-                if ordp == Infinity:
-                    ordp = parent._prec_cap[0]
-                    moments = parent.approx_module(0)([])
-                elif ordp != 0:
-                    moments *= p ** (-ordp)
-                
+                R = parent.base_ring()
+                K = R.base_extend(R.base_ring().fraction_field())
+                V = parent.approx_module(1, var_prec)
+                moments = K(moments)
+                ordp = _padic_val_of_pow_series(moments)
+                if ordp != 0:
+                    moments = V([_right_shift_coeffs(moments, ordp)])
+                else:
+                    moments = V([moments])
         self._moments = moments
         #if var_prec is None:
         #    self._var_prec = parent._prec_cap[1]
         #else:
         #    self._var_prec = var_prec
-        self.ordp = ordp   #eventually change this maybe
+        self.ordp = ordp
+        self._var_prec = var_prec
+        p = parent.prime()
         self._cp = (p-2) / (p-1)
     
     #def _relprec(self):
@@ -96,10 +120,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             valstr = "%s * "%(self.parent().prime())
         elif self.ordp != 0:
             valstr = "%s^%s * "%(self.parent().prime(), self.ordp)
-        if len(self._moments) == 1:
-            return valstr + repr(self._moments[0])
-        else:
-            return valstr + repr(self._moments)
+        return valstr + repr(self._moments)
     
     def character(self):
         """
@@ -392,7 +413,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             self._moments[i] = R(f, self._var_prec)
         shift = self.valuation() - self.ordp
         if shift != 0:
-            V = self.parent().approx_module(n-shift)
+            V = self.parent().approx_module(n-shift, self._var_prec)
             self.ordp += shift
             p_to_shift = p**shift
             new_moments = []
@@ -447,7 +468,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         R = self.base_ring().base_ring()
         DD = self.parent()
         D = OverconvergentDistributions(0, base=R, prec_cap=M, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
-        V = D.approx_module(M)
+        V = D.approx_module(M, self._var_prec)
         Elem = D.Element
         v = V([R.zero(), R.one()] + [R.zero()]*(M-2))
         mu = Elem(v, D, ordp=0, check=False)
@@ -466,7 +487,7 @@ def _padic_val_of_pow_series(f, p=None):
     """
     if f == 0:
         return Infinity
-    return min([coeff.valuation(p) for coeff in f if not coeff.is_zero()])
+    return min([coeff.valuation(p) if not coeff.is_zero() else coeff.precision_absolute() for coeff in f])
 
 def _padic_val_unit_of_pow_series(f, p=None):
     r"""
@@ -517,6 +538,42 @@ def _add_big_ohs_list(f, prec_cap):
         flist[i] = flist[i].add_bigoh(p_prec)
     return flist
 
+def _right_shift_coeffs(f, shift):
+    r"""
+        Given a power series ``f``, apply '>> shift' to each of its coefficients,
+        i.e. divide each by shift powers of the uniformizer.
+    """
+    if shift == 0:
+        return f
+    flist = [a >> shift for a in f.padded_list()]
+    # Hack to circumvent a bug in sage's handling of power series/polynomials
+    # over p-adic rings
+    R = f.parent()
+    if R.base_ring().is_field():
+        return R(flist)
+    RP = R._poly_ring()
+    from sage.rings.infinity import infinity
+    absprec = min([infinity] + [a.precision_absolute() for a in flist])
+    from sage.rings.polynomial.polynomial_element import Polynomial_generic_dense
+    fpoly = Polynomial_generic_dense(RP, x=flist, check=False, absprec=absprec)
+    return R.element_class(R, f=fpoly, prec=len(flist), check=False)
+
+def _sanitize_alpha(alpha):
+    RK = alpha.parent()
+    alpha_list = alpha.list()
+    len_alpha = len(alpha_list)
+    #Remove O(p^negative)
+    i = 0
+    while i < len_alpha:
+        try:
+            alpha_list[i].is_zero(1)
+        except PrecisionError:
+            break
+        i += 1
+    if i == len_alpha:
+        return alpha
+    return RK(alpha_list[:i], i)
+    
 #Hack to overcome lack of functionality in dividing power series
 #def _custom_ps_div(num, denom):
 #    #print "\n", num

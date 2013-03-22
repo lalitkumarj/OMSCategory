@@ -22,11 +22,11 @@ def _prec_cap_parser(prec_cap):
     
         sage: from sage.modular.pollack_stevens.coeffmod_OMS_families_space import _prec_cap_parser
         sage: _prec_cap_parser(5)
-        [5, 5]
+        [5, None]
         sage: _prec_cap_parser([20, 10])
         [20, 10]
         sage: _prec_cap_parser([7])
-        [7, 7]
+        [7, None]
         sage: _prec_cap_parser(None)
         Traceback (most recent call last):
         ...
@@ -45,7 +45,7 @@ def _prec_cap_parser(prec_cap):
         prec = ZZ(prec_cap[0])
         if prec < 0:
             ValueError("prec_cap should be at least 0.")
-        return [prec, prec]
+        return [prec, None]
     elif len(prec_cap) > 2:
         raise ValueError("prec_cap should not have length > 2.")
     else:
@@ -206,15 +206,14 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     def approx_module(self, p_prec=None, var_prec=None):
         if p_prec is None:
             p_prec = self._prec_cap[0]
+        elif p_prec < 0 or p_prec > self._prec_cap[0]:
+            raise ValueError("p_prec must be between 0 and %s"%(self._prec_cap[0]))
         if var_prec is None:
             var_prec = self._prec_cap[1]
-        p_prec, var_prec = _prec_cap_parser([p_prec, var_prec])
-        if p_prec > self._prec_cap[0]:
-            raise ValueError("p_prec must be less than or equal to the p-adic precision cap")
-        if var_prec > self._prec_cap[1]:
-            raise ValueError("var_prec must be less than or equal to the %s-adic precision cap"%(self.base_ring().variable_name()))
-        #Should/can we do something about the variable's precision
-        return self.base_ring()**p_prec
+        elif var_prec < 0 or var_prec > self._prec_cap[1]:
+            raise ValueError("var_prec must be between 0 and %s"%(self._prec_cap[1]))
+        # Should/can we do something about the variable's precision?
+        return self.base_ring() ** p_prec
     
     def random_element(self, prec=None):
         if prec == None:
