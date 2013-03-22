@@ -145,7 +145,7 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
                 for g in gens[1:]:
                     if qhecke._map[g] != aq * self._map[g]:
                         raise ValueError("not a scalar multiple")
-            elif (qhecke - aq * self).valuation(p) < M[0]:
+            elif (qhecke - aq * self).valuation() < M[0]:
                 raise ValueError("not a scalar multiple")
         return aq
 

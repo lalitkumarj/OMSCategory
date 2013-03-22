@@ -347,7 +347,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         a = self._unscaled_moment(i)
         verbose("a = %s"%(a))
         p = self.parent().prime()
-        v = a.valuation(p)
+        v = a.valuation()
         while v >= n - i:
             i += 1
             verbose("p moment %s"%i)
@@ -355,7 +355,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 a = self._unscaled_moment(i)
             except IndexError:
                 raise ValueError("self is zero")
-            v = a.valuation(p)
+            v = a.valuation()
         relprec = n - i - v
 #            verbose("p=%s, n-i=%s\nself.moment=%s, other.moment=%s"%(p, n-i, a, other._unscaled_moment(i)),level=2)
 ## RP: This code was crashing because other may have too few moments -- so I added this bound with other's relative precision
@@ -374,7 +374,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 if other._unscaled_moment(i) != alpha * a:
                     verbose("self._unscaled_moment=%s, other._unscaled_ moment=%s"%(a, other._unscaled_moment(i)))
                     raise ValueError("not a scalar multiple")
-            v = a.valuation(p)
+            v = a.valuation()
             if n - i - v > relprec:
                 verbose("Reseting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
                 relprec = n - i - v
@@ -399,11 +399,10 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def valuation(self):
         #RH: "copied" from dist.pyx, but then adjusted
-        p = self.parent().prime()
         n = self.precision_relative()
         if n == 0:
             return self.ordp
-        return self.ordp + min([n] + [self._unscaled_moment(a).valuation(p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        return self.ordp + min([n] + [self._unscaled_moment(a).valuation() for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
         r"""
@@ -615,7 +614,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             scalar = K(self.moment(m)) * (~K(m))
             for j in range(m-1,M-1,2):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
-        ordp = min(a.valuation(p) for a in v)
+        ordp = min(a.valuation() for a in v)
         #Is this correct in ramified extensions of QQp?
         if ordp < 0:
             scalar = K(p) ** (-ordp)
