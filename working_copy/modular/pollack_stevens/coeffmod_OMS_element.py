@@ -115,6 +115,25 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def _add_(self, right):
         #RH: "copied" from dist.pyx
+        # Should check by hand that the following examples do actually return
+        # the correct answer
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(2,base=ZpCA(7,5))
+                sage: mu = D((4 + 5*7 + 4*7^2 + 2*7^3 + O(7^5), 3 + 4*7 + 2*7^3 + O(7^4), 3 + 7 + 5*7^2 + O(7^3), 4 + 5*7 + O(7^2), 1 + O(7)))
+                sage: nu = D((5 + 2*7 + 6*7^2 + 3*7^3 + 3*7^4 + O(7^5), 6*7 + 5*7^2 + 2*7^3 + O(7^4), 4 + 4*7 + O(7^3), 3 + 5*7 + O(7^2), 4 + O(7)))
+                sage: mu + nu
+                (2 + 7 + 4*7^2 + 6*7^3 + 3*7^4 + O(7^5), 3 + 3*7 + 6*7^2 + 4*7^3 + O(7^4), 6*7 + 5*7^2 + O(7^3), 4*7 + O(7^2), 5 + O(7))
+                sage: xi = D((3 + 4*7 + 3*7^4 + O(7^5), 3*7^-1 + 3*7^2 + 3*7^3 + O(7^4), 6 + 6*7 + 7^2 + 4*7^3 + 6*7^4 + O(7^5), 5*7 + 6*7^3 + 4*7^4 + O(7^6), 6*7 + 3*7^3 + 6*7^4 + O(7^6)))
+                sage: mu + xi
+                7^-1 * (3*7^2 + 5*7^3 + 2*7^4 + O(7^5), 3 + 3*7 + 4*7^2 + 3*7^3 + O(7^4), 2*7 + 7^2 + O(7^3), 4*7 + O(7^2), O(7))
+                sage: eta = D((7 + 5*7^2 + 6*7^3 + 4*7^4 + O(7^5), 2*7^3 + 5*7^5 + 4*7^6 + 5*7^7 + O(7^8), 7 + 6*7^2 + 2*7^4 + 3*7^5 + O(7^6), 7^2 + 2*7^3 + O(7^7), 2*7 + 4*7^2 + 4*7^3 + 2*7^4 + 5*7^5 + O(7^6)))
+                sage: eta + nu
+                (5 + 3*7 + 4*7^2 + 3*7^3 + 7^4 + O(7^5), 6*7 + 5*7^2 + 4*7^3 + O(7^4), 4 + 5*7 + 6*7^2 + O(7^3), 3 + 5*7 + O(7^2), 4 + O(7))
+                sage: xi + eta
+                7^-1 * (3*7 + 5*7^2 + 5*7^3 + 6*7^4 + O(7^5), 3 + 3*7^3 + O(7^4), 6*7 + O(7^3), O(7^2), O(7))
+        """
         return self._addsub(right, False)
     
     def _sub_(self, right):
@@ -137,9 +156,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             rmoments = V(rmoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(rmoments)) if rprec > len(rmoments) else []))
         # We multiply by the relative power of p
         if self.ordp > right.ordp:
-            smoments *= self.parent().prime()**(self.ordp - right.ordp)
+            for i in range(rprec):
+                smoments[i] = smoments[i] << (self.ordp - right.ordp)
         elif self.ordp < right.ordp:
-            rmoments *= self.parent().prime()**(right.ordp - self.ordp)
+            for i in range(rprec):
+                rmoments[i] = rmoments[i] << (right.ordp - self.ordp)
         if negate:
             rmoments = -rmoments
         ans._moments = smoments + rmoments
