@@ -222,14 +222,24 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("Check difference equation (at end): %s"%(mu * gammas[Id] - mu - t.reduce_precision(M).normalize()))
         return ret
 
-
     def is_start_of_basis(self,list):
+        r"""
+        Determines if the inputed list of OMS's can be extended to a basis of this space
+
+        INPUT:
+
+        - ``list`` -- a list of OMS's
+
+        OUTPUT:
+
+        - True/False
+        """
         for j in range(len(list)):
             assert list[j].valuation() >= 0, "Symbols must be integral"
 
         R = self.base()
-        ## NEED A COMMAND FOR RELATIVE PRECISION OF OMS
-        M = list[0].values()[0].precision_relative()
+        ## THIS IS NOT GREAT
+        M = list[0].values()[0].moment(0).precision_relative()
         p = self.prime()
         d = len(list)
             
@@ -239,18 +249,18 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         return A.rank() == len(list)
 
 
-    r"""
-    Finds a linear relation between the list of OMSs stored in list.  If LI, returns a list of all 0's.
-    
-    INPUT:
-
-    - ``list`` -- a list of OMSs
-
-    OUTPUT:
-
-    - A vector of p-adic numbers describing the linear relation of the list of OMSs
-    """
     def linear_relation(self,list):
+        r"""
+        Finds a linear relation between the given list of OMSs.  If they are LI, returns a list of all 0's.
+    
+        INPUT:
+
+        - ``list`` -- a list of OMSs
+
+        OUTPUT:
+
+        - A list of p-adic numbers describing the linear relation of the list of OMSs
+        """
         for j in range(len(list)):
             assert list[j].valuation() >= 0, "Symbols must be integral"
 
@@ -301,51 +311,72 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             return v + [R(-1)]
 
     def basis_of_ordinary_subspace(self,d,sign=0):
+        r"""
+        Finds a basis of the ordinary subspace of this space.
+    
+        INPUT:
+
+        - ``d`` -- integer equal to the dimension of the ordinary subspace
+
+        - ``sign`` -- optional variable which if 1 or -1 restricts to the plus or minus subspace
+
+        OUTPUT:
+
+        - A list of OMS's which form the desired basis
+        """
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()
         p = self.prime()
 
         while not done:
-            #            verbose("Forming a random symbol")
-            #            print "Forming a random symbol"
+            verbose("Forming a random symbol")
             Phi = self.random_element()
             if sign == 1:
                 Phi = Phi.plus_part()
             elif sign == -1:
                 Phi = Phi.minus_part()
-                #            verbose("Projecting to ordinary subspace")
-                #            print "Projecting to ordinary subspace"
+                verbose("Projecting to ordinary subspace")
             for a in range(M+2):
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
-            #            print "done"
-            #            verbose("Forming U_p-span of this symbol")
-            #            print "Forming U_p-span of this symbol"
+            verbose("Forming U_p-span of this symbol")
             Phi_span = [Phi]
             LI = self.is_start_of_basis(Phi_span)
             if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
                 basis += [Phi_span[len(Phi_span)-1]]
-                print "basis now has size %s"%(len(basis))
+                verbose("basis now has size %s"%(len(basis)))
             done = (d <= len(basis))
             while LI and (not done):
                 Phi_span += [Phi_span[len(Phi_span)-1].hecke(p)]
                 LI = self.is_start_of_basis(Phi_span)
                 if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
                     basis += [Phi_span[len(Phi_span)-1]]
-                    #                    print "span has size %s"%(len(Phi_span))
                 done = (d <= len(basis))
             
         return basis
                  
 
     def hecke_matrix(self,q,basis):
+        r"""
+        Finds the matrix of T_q wrt to the given basis
+    
+        INPUT:
+
+        - ``q`` -- a prime
+
+        - ``basis`` -- basis of a T_q-stable subspace
+
+        OUTPUT:
+
+        - d x d matrix where d is the length of basis
+        """
         d = len(basis)
         T = []
         for r in range(d):
             h = basis[r].hecke(q)
             row = self.linear_relation(basis + [h])
-            #          assert not vector(row).is_zero, "Failing on %s-th basis element"%(r)
+            ## Probably should put some check here that it really worked.
             row.pop()
             T += [row]
         return Matrix(T).transpose()
