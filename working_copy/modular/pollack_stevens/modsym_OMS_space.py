@@ -1,13 +1,18 @@
 from sage.structure.factory import UniqueFactory
 from sage.misc.misc import verbose
 from sage.misc.cachefunc import cached_method
+from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
+from sage.rings.rational_field import QQ
+from sage.rings.finite_rings.constructor import GF
 from sage.functions.other import ceil
+from sage.matrix.constructor import Matrix
 from sage.modular.arithgroup.all import Gamma0
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
 from sage.modular.pollack_stevens.modsym_OMS_element import ModSym_OMS_element
+from sage.interfaces.gp import gp
 
 class ModSym_OMS_factory(UniqueFactory):
     def create_key(self, group, weight=None, sign=0, p=None, prec_cap=None, base=None, coefficients=None):
@@ -217,6 +222,135 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("Check difference equation (at end): %s"%(mu * gammas[Id] - mu - t.reduce_precision(M).normalize()))
         return ret
 
+
+    def is_start_of_basis(self,list):
+        for j in range(len(list)):
+            assert list[j].valuation() >= 0, "Symbols must be integral"
+
+        R = self.base()
+        ## NEED A COMMAND FOR RELATIVE PRECISION OF OMS
+        M = list[0].values()[0].precision_relative()
+        p = self.prime()
+        d = len(list)
+            
+        list = [list[a].list_of_total_measures() for a in range(len(list))]
+        A = Matrix(GF(p),len(list),len(list[0]),list)
+
+        return A.rank() == len(list)
+
+
+    r"""
+    Finds a linear relation between the list of OMSs stored in list.  If LI, returns a list of all 0's.
+    
+    INPUT:
+
+    - ``list`` -- a list of OMSs
+
+    OUTPUT:
+
+    - A vector of p-adic numbers describing the linear relation of the list of OMSs
+    """
+    def linear_relation(self,list):
+        for j in range(len(list)):
+            assert list[j].valuation() >= 0, "Symbols must be integral"
+
+        R = self.base()
+        ## NEED A COMMAND FOR RELATIVE PRECISION OF OMS
+        M = list[0].values()[0].precision_relative()
+        p = self.prime()
+        d = len(list)
+        V = R**d
+            
+        if d == 1:
+            if list[0].is_zero():
+                return [R(1)]
+            else:
+                return [R(0)]
+        s = '['
+        for c in range(len(list)-1):
+            v = list[c].list_of_total_measures()
+            for r in range(len(v)):
+                s += str(ZZ(v[r]))
+                if r < len(v) - 1:
+                    s += ','
+            if c < len(list) - 2:
+                s += ';'
+        s = s + ']'
+
+        A = gp(s)
+        if len(list) == 2:
+            A = A.Mat()
+
+        s = '['
+        v = list[len(list)-1].list_of_total_measures()
+        for r in range(len(v)):
+            s += str(ZZ(v[r]))
+            if r < len(v) - 1:
+                s += ','
+        s += ']~'
+
+        B = gp(s)
+
+        v = A.mattranspose().matsolvemod(p**M,B)
+
+        if v == 0:
+            return [R(0) for a in range(len(v))]
+        else:
+            ## Move back to SAGE from Pari
+            v = [R(v[a]) for a in range(1,len(v)+1)]
+            return v + [R(-1)]
+
+    def basis_of_ordinary_subspace(self,d,sign=0):
+        basis = []
+        done = (d <= len(basis))
+        M = self.precision_cap()
+        p = self.prime()
+
+        while not done:
+            #            verbose("Forming a random symbol")
+            #            print "Forming a random symbol"
+            Phi = self.random_element()
+            if sign == 1:
+                Phi = Phi.plus_part()
+            elif sign == -1:
+                Phi = Phi.minus_part()
+                #            verbose("Projecting to ordinary subspace")
+                #            print "Projecting to ordinary subspace"
+            for a in range(M+2):
+                Phi = Phi.hecke(p)
+            ## Should really check here that we are ordinary
+            #            print "done"
+            #            verbose("Forming U_p-span of this symbol")
+            #            print "Forming U_p-span of this symbol"
+            Phi_span = [Phi]
+            LI = self.is_start_of_basis(Phi_span)
+            if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
+                basis += [Phi_span[len(Phi_span)-1]]
+                print "basis now has size %s"%(len(basis))
+            done = (d <= len(basis))
+            while LI and (not done):
+                Phi_span += [Phi_span[len(Phi_span)-1].hecke(p)]
+                LI = self.is_start_of_basis(Phi_span)
+                if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
+                    basis += [Phi_span[len(Phi_span)-1]]
+                    #                    print "span has size %s"%(len(Phi_span))
+                done = (d <= len(basis))
+            
+        return basis
+                 
+
+    def hecke_matrix(self,q,basis):
+        d = len(basis)
+        T = []
+        for r in range(d):
+            h = basis[r].hecke(q)
+            row = self.linear_relation(basis + [h])
+            #          assert not vector(row).is_zero, "Failing on %s-th basis element"%(r)
+            row.pop()
+            T += [row]
+        return Matrix(T).transpose()
+            
+    
 #@cached_method
 def _prec_for_solve_diff_eqn(M, p, k):
     r"""

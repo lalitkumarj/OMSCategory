@@ -39,7 +39,13 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
 
         - List of p-adic numberes
         """
-        return [mu.moment(0) for mu in self.values()]
+        ans = []
+        for mu in self.values():
+            if mu.precision_relative() == 0:
+                ans += [mu.parent().base().zero()]
+            else:
+                ans += [mu.moment(0)]
+        return ans
     
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
