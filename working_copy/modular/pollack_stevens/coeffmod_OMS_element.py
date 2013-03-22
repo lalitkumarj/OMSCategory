@@ -7,7 +7,7 @@ from sage.rings.arith import binomial, bernoulli
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.rings.integer_ring import ZZ
 
-maxordp = 2 ** 14   #change this to what it is in dist.pyx
+#maxordp = 2 ** 14   #change this to what it is in dist.pyx
 
 class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     r"""

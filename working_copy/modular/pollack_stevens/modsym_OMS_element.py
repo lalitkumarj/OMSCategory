@@ -39,7 +39,7 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
 
         - List of p-adic numberes
         """
-        return [self.values()[a].moment(0) for a in range(len(self.values()))]
+        return [mu.moment(0) for mu in self.values()]
         
     
     @cached_method
