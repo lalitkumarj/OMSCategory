@@ -18,31 +18,31 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         
             sage: D8 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 8))
             sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8
-            (1 + O(3^4) + O(w^4), 2 + O(3^4) + O(w^4), 3 + O(3^3) + O(w^4), 1 + 3 + O(3^3) + O(w^4), 2 + 3 + O(3^2) + O(w^4), 2*3 + O(3^2) + O(w^4), 1 + O(3) + O(w^4), 2 + O(3) + O(w^4))
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^4)
             sage: D4 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 4))
             sage: mu4 = D4([1,2,3,4,5,6,7,8,9,10]); mu4
-            (1 + O(3^2) + O(w^4), 2 + O(3^2) + O(w^4), O(w^4), 1 + O(3) + O(w^4))
+            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^4)
             sage: D4(mu8)
-            (1 + O(3^2) + O(w^4), 2 + O(3^2) + O(w^4), O(w^4), 1 + O(3) + O(w^4))
+            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^4)
             sage: mu4 == D4(mu8)
             True
             sage: D42 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,2], base_coeffs=ZpCA(3, 4))
             sage: mu42 = D42([1,2,3,4,5,6,7,8,9,10])
             sage: mu42
-            (1 + O(3^2) + O(w^2), 2 + O(3^2) + O(w^2), O(w^2), 1 + O(3) + O(w^2))
+            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^2)
             sage: D42(mu8)
-            (1 + O(3^2) + O(w^2), 2 + O(3^2) + O(w^2), O(w^2), 1 + O(3) + O(w^2))
+            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^2)
             sage: mu42 == D42(mu8)
             True
             sage: D42(15)
-            3 * (2 + O(3) + O(w^2))
+            3 * (2 + O(3)) + O(w^2)
             sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap = [8 ,4], base_coeffs=ZpCA(11, 4))
             sage: R = D.base_ring(); K = R.base_extend(R.base_ring().fraction_field())
             sage: v = [K([1,2,11]) / 11, K([1]), K([11,1,1])]
             sage: D(v)
-            11^-1 * (1 + O(11^3) + (2 + O(11^3))*w + (11 + O(11^3))*w^2 + O(w^4), 11 + O(11^2) + O(w^4), O(w^4))
+            11^-1 * (1 + O(11^3) + (2 + O(11^3))*w + (11 + O(11^3))*w^2, 11 + O(11^2), 0) + O(w^4)
             sage: D(0)
-            11^4 * ()
+            11^4 * () + O(w^4)
     """
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=None):
         CoefficientModuleElement_generic.__init__(self, parent)
@@ -107,20 +107,28 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #    self._var_prec = var_prec
         self.ordp = ordp
         self._var_prec = var_prec
-        p = parent.prime()
-        self._cp = (p-2) / (p-1)
     
     #def _relprec(self):
     #    return len(self._moments)
     def _repr_(self):
         #RH: adapted from coeffmod_OMS_element.py
         self.normalize()
-        valstr = ""
+        valstr = "("
         if self.ordp == 1:
-            valstr = "%s * "%(self.parent().prime())
+            valstr = "%s * "%(self.parent().prime()) + valstr
         elif self.ordp != 0:
-            valstr = "%s^%s * "%(self.parent().prime(), self.ordp)
-        return valstr + repr(self._moments)
+            valstr = "%s^%s * "%(self.parent().prime(), self.ordp) + valstr
+        n = len(self._moments)
+        if n == 0:
+            return valstr + ") + O(w^%s)"%(self._var_prec)
+        for i in range(n):
+            mom_str = repr(self._moments[i])
+            big_oh = mom_str.rfind(" + O(%s"%(self._moments[i].variable()))
+            if big_oh > -1:
+                valstr += mom_str[:big_oh] + ", "
+            else:
+                valstr += "0, "
+        return valstr[:-2] + ") + O(w^%s)"%(self._var_prec)
     
     def character(self):
         """
@@ -291,8 +299,9 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             return False
         num_moments = min(prec[0], s_prec_rel[0]) if prec[0] is not None else s_prec_rel[0]
         var_prec = min(prec[1], s_prec_rel[1]) if prec[1] is not None else s_prec_rel[1]
+        p_precs = self.parent().filtration_precisions(num_moments)
         for i in range(num_moments):
-            selflist = _add_big_ohs_list(self._moments[i], [((num_moments-i)*self._cp).ceil(), var_prec])
+            selflist = _add_big_ohs_list(self._moments[i], [p_precs[i], var_prec])
             for c in selflist:
                 if c != 0:
                     return False
@@ -323,7 +332,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         p = self.parent().prime()
         v = _padic_val_of_pow_series(a, p)
         R = self.parent().base_ring()
-        while v >= ceil((n - i) * self._cp):
+        p_precs = self.parent().filtration_precisions(n)
+        while v >= p_precs[i]:
             i += 1
             verbose("p moment %s"%i)
             try:
@@ -345,7 +355,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
         else:
             #Fix var_prec??
-            alpha = RK([Rbase(0, ceil((n - i) * self._cp))], var_prec)
+            alpha = RK([Rbase(0, p_precs[i])], var_prec)
         verbose("alpha = %s"%(alpha))
         
         while i < other_pr-1:
@@ -396,6 +406,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #RH: adapted from coeffmod_OMS_element.py
         p = self.parent().prime()
         n = self.precision_relative()[0]
+        if n == 0:
+            return self.ordp
         return self.ordp + min([n] + [_padic_val_of_pow_series(self._unscaled_moment(a), p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
@@ -403,28 +415,43 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #Not tested
         V = self._moments.parent()
         R = V.base_ring()
-        n = self.precision_relative()[0]
+        n, v_prec = self.precision_relative()
         p = self.parent().prime()
-        for i in range(n):
-            cutoff = ceil((n-i) * self._cp)
-            f = self._moments[i].list()
-            #f = [f[j].add_bigoh(cutoff) if f[j] != 0 else f[j] for j in range(min(len(f), self._var_prec))]
-            f = [f[j].add_bigoh(cutoff) for j in range(min(len(f), self._var_prec))]
-            self._moments[i] = R(f, self._var_prec)
-        shift = self.valuation() - self.ordp
-        if shift != 0:
-            V = self.parent().approx_module(n-shift, self._var_prec)
-            self.ordp += shift
-            p_to_shift = p**shift
-            new_moments = []
-            for i in range(n-shift):
-                cutoff = ceil((n-shift-i) * self._cp)
-                f = self._moments[i].list()
-                f = [(f[j] // p_to_shift).add_bigoh(cutoff) if f[j] != 0 else f[j] for j in range(min(len(f), self._var_prec))]     #should shift prec in else?
-                new_moments.append(R(f, self._var_prec))
-            self._moments = V(new_moments)
+        self_val = self.valuation()
+        shift = self_val - self.ordp
+        self.ordp = self_val
+        #Factor out powers of uniformizer and check precision
+        p_precs = self.parent().filtration_precisions(n)
+        adjust_moms = 0
+        verbose("n: %s; shift: %s; _mom: %s\np_precs: %s"%(n, shift, self._moments, p_precs), level=2)
+        if shift > 0:
+            for i in range(n):
+                self._moments[i] = _right_shift_coeffs(self._moments[i], shift)
+                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+        elif shift == 0:
+            for i in range(n):
+                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+        else:
+            raise NotImplementedError("Currently only deals with the case where the base coefficients are a ring of integers.")
+        #Cut down moments because of precision loss
+        verbose("adjust_mom: %s\n_moms: %s"%(adjust_moms, self._moments), level=2)
+        if adjust_moms >=n:
+            V = self.parent().approx_module(0)
+            self._moments = V([])
+            self._ordp = adjust_moms
+        elif adjust_moms > 0:
+            n -= adjust_moms    #Is this going to give the correct precision?
+            p_precs = self.parent().filtration_precisions(n)
+            verbose("new p_precs: %s"%(p_precs), level=2)
+            R = self.parent().base_ring()
+            for i in range(n):
+                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
+        else:
+            R = self.parent().base_ring()
+            for i in range(n):
+                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
         return self
-    
+
     def moment(self, n):
         #RH: "copied" from dist.pyx
         r"""
@@ -487,7 +514,7 @@ def _padic_val_of_pow_series(f, p=None):
     """
     if f == 0:
         return Infinity
-    return min([coeff.valuation(p) if not coeff.is_zero() else coeff.precision_absolute() for coeff in f])
+    return min([coeff.valuation() if not coeff.is_zero() else coeff.precision_absolute() for coeff in f])
 
 def _padic_val_unit_of_pow_series(f, p=None):
     r"""
@@ -502,6 +529,16 @@ def _padic_val_unit_of_pow_series(f, p=None):
     v = _padic_val_of_pow_series(f, p)
     u = f.parent()([(coeff / (p ** v)) for coeff in f])
     return (v, u)
+
+def _padic_abs_prec_of_pow_series(f, var_prec=None):
+    r"""
+    """
+    if var_prec is None:
+        var_prec = f.parent().default_prec()
+    flist = f.padded_list()
+    if len(flist) == 0:
+        return Infinity
+    return min([flist[i].precision_absolute() for i in range(min(len(flist), var_prec))])
 
 def _add_big_ohs_list(f, prec_cap):
     #There may be a problem if you pass the list [3, O(p^2)] to the power series ring. It will truncate all big-ohs after last "non-zero" entry
@@ -528,15 +565,13 @@ def _add_big_ohs_list(f, prec_cap):
         sage: R = PowerSeriesRing(Zp(3), 'w')
         sage: f = R([0,-1,2,0,-3])
         sage: _add_big_ohs_list(f, [10,7])
-        [O(3^10), 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10), 2 + O(3^10), O(3^10), 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + 2*3^10 + 2*3^11 + 2*3^12 + 2*3^13 + 2*3^14 + 2*3^15 + 2*3^16 + 2*3^17 + 2*3^18 + 2*3^19 + 2*3^20 + O(3^21), 0, 0]
+        [O(3^10), 2 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10), 2 + O(3^10), O(3^10), 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + 2*3^6 + 2*3^7 + 2*3^8 + 2*3^9 + O(3^10)]
         sage: _add_big_ohs_list(f, [2,4])
         [O(3^2), 2 + 2*3 + O(3^2), 2 + O(3^2), O(3^2)]
     """
     p_prec, var_prec = prec_cap
-    flist = f.padded_list(var_prec)
-    for i in range(0, min(f.degree(), var_prec)):
-        flist[i] = flist[i].add_bigoh(p_prec)
-    return flist
+    flist = f.padded_list()
+    return [flist[i].add_bigoh(p_prec) for i in range(min(len(flist), var_prec))]
 
 def _right_shift_coeffs(f, shift):
     r"""

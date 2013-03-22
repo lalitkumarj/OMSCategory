@@ -157,6 +157,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         self._p = base.base_ring().prime()
         self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
         k = k % (self._p - 1)
+        self._cp = (self._p-2) / (self._p-1)
         CoefficientModule_generic.__init__(self, k, base=base, \
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
@@ -180,6 +181,17 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     
     def prime(self):
         return self._p
+    
+    @cached_method
+    def filtration_precisions(self, M=None):
+        r"""
+            Returns a tuple whose `i`th entry is `\lceil(M-i)(p-2)/(p-1)\rceil`,
+            i.e. the `p`-adic precision of the `i`th moment of an element of this
+            space. If ``M`` is None, uses the precision cap of this space.
+        """
+        if M is None:
+            M = self.precision_cap()[0]
+        return tuple(((M-i) * self._cp).ceil() for i in range(M))
     
     def precision_cap(self):
         return self._prec_cap
