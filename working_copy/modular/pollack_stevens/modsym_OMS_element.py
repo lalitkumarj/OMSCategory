@@ -26,6 +26,21 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
         elif p != self.parent().prime():
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
         return min([val.diagonal_valuation() for val in self._map])
+
+    def list_of_total_measures(self):
+        r"""
+        Returns the list of total measures of the OMS evaluated at each of our generators
+
+        INPUT:
+
+        - None
+        
+        OUTPUT:
+
+        - List of p-adic numberes
+        """
+        return [self.values()[a].moment(0) for a in range(len(self.values()))]
+        
     
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
@@ -189,3 +204,5 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
             raise ValueError("Does not add up correctly around loop")
 
         print "This modular symbol satisfies the manin relations"
+
+            
