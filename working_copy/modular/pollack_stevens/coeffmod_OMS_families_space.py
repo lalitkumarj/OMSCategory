@@ -39,21 +39,19 @@ def _prec_cap_parser(prec_cap):
     if not isinstance(prec_cap, (list, tuple)):
         prec = ZZ(prec_cap)
         if prec < 0:
-            ValueError("prec_cap should be at least 1.")
-        return [prec, prec]
+            ValueError("prec_cap should be at least 0.")
+        return [prec, None]
     elif len(prec_cap) == 1:
         prec = ZZ(prec_cap[0])
         if prec < 0:
-            ValueError("prec_cap should be at least 1.")
+            ValueError("prec_cap should be at least 0.")
         return [prec, prec]
     elif len(prec_cap) > 2:
         raise ValueError("prec_cap should not have length > 2.")
     else:
-        p_prec = ZZ(prec_cap[0])
-        var_prec = ZZ(prec_cap[1])
 #        if p_prec < 1 or var_prec < 1:
 #            raise ValueError("Precisions should be at least 1.")
-        return [p_prec, var_prec]
+        return [ZZ(prec_cap[0]), ZZ(prec_cap[1])]
 
 #def _factor_Dir_char(chi, p):
 #    r"""
@@ -148,7 +146,6 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
                  dettwist=None, action_class = WeightKAction_OMS_fam, \
                  variable_name = 'w'):
         #self._prec_cap = prec_cap
-        
         if base is None:
             if base_coeffs is None:
                 base_coeffs = Zp(p, prec = prec_cap[0])
