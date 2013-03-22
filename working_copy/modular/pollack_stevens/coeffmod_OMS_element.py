@@ -55,6 +55,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             True
             sage: b == a
             True
+            sage: D(15)
+            3 * (2 + O(3))
     """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
@@ -90,7 +92,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 V = parent.approx_module(1)
                 moments = K(moments)
                 ordp = moments.valuation()
-                moments = V(moments >> ordp)
+                moments = V([moments >> ordp])
         
         self._moments = moments
         #if var_prec is None:
