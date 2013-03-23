@@ -148,8 +148,9 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         rprec = aprec - ans.ordp
         V = ans.parent().approx_module(rprec)
         R = V.base_ring()
-        smoments = self._moments
-        rmoments = right._moments
+        verbose(self._moments)
+        smoments = copy(self._moments)
+        rmoments = copy(right._moments)
         if smoments.parent() is not V:
             smoments = V(smoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(smoments)) if rprec > len(smoments) else []))
         if rmoments.parent() is not V:
@@ -163,6 +164,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 rmoments[i] = rmoments[i] << (right.ordp - self.ordp)
         if negate:
             rmoments = -rmoments
+        verbose(self._moments)
         ans._moments = smoments + rmoments
         return ans
     
