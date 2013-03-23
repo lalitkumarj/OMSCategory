@@ -42,7 +42,7 @@ and right action of matrices.
 from sage.rings.arith import convergents
 from sage.misc.misc import verbose
 from sage.matrix.matrix_integer_2x2 import MatrixSpace_ZZ_2x2, Matrix_integer_2x2
-from sage.modular.pollack_stevens.sigma0 import Sigma0
+from sage.modular.pollack_stevens.sigma0 import Sigma0, Sigma0Element
 from sage.modular.pollack_stevens.fund_domain import t00, t10, t01, t11, Id, basic_hecke_matrix, M2Z
 
 def unimod_matrices_to_infty(r, s):
@@ -463,7 +463,8 @@ class ManinMap(object):
 #            sage: (f*2)(M2Z([1,0,0,1]))
 #            (2 + O(11^2), 4 + O(11))
 #        """
-        if isinstance(right, Matrix_integer_2x2):
+        #if isinstance(right, Matrix_integer_2x2):
+        if isinstance(right, Sigma0Element):
             return self._right_action(right)
 
         D = {}

@@ -128,6 +128,21 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self + self | [1,0,0,-1]
+        
+        EXAMPLES::
+            
+            sage: MS = OverconvergentModularSymbols(3, p=5, prec_cap=5, weight=2)
+            sage: Phi = MS.random_element()
+            sage: Phi_p = Phi.plus_part()
+            sage: Phi_m = Phi.minus_part()
+            sage: Phi_p + Phi_m == 2 * Phi
+            True
+            sage: Phi_p.minus_part() == 0
+            True
+            sage: Phi_m.plus_part() == 0
+            True
+            sage: Phi_p.hecke(2) == Phi.hecke(2).plus_part()
+            True
         """
 #        EXAMPLES::
 #
@@ -150,6 +165,21 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self - self | [1,0,0,-1]
+        
+        EXAMPLES::
+            
+            sage: MS = OverconvergentModularSymbols(11, p=3, prec_cap=5, weight=0)
+            sage: Phi = MS.random_element()
+            sage: Phi_p = Phi.plus_part()
+            sage: Phi_m = Phi.minus_part()
+            sage: Phi_p + Phi_m == 2 * Phi
+            True
+            sage: Phi_p.minus_part() == 0
+            True
+            sage: Phi_m.plus_part() == 0
+            True
+            sage: Phi_m.hecke(2) == Phi.hecke(2).minus_part()
+            True
         """
 #        EXAMPLES::
 #
@@ -365,5 +395,3 @@ class ModularSymbolElement_generic(ModuleElement):
     
     #def __call__(self):
     #    pass
-    
-    
