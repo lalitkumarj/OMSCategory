@@ -309,8 +309,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             ## Move back to SAGE from Pari
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
-
-    def basis_of_ordinary_subspace(self,d,sign=0):
+    
+    @cached_method
+    def basis_of_ordinary_subspace(self, d, sign=0):
         r"""
         Finds a basis of the ordinary subspace of this space.
     

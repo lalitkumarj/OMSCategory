@@ -1,3 +1,5 @@
+from sage.misc.misc import verbose
+from sage.misc.cachefunc import cached_method
 from sage.modules.module import Module
 from sage.structure.parent import Parent
 from sage.categories.modsym_space_category import ModularSymbolSpaces
@@ -89,10 +91,11 @@ class ModularSymbolSpace_generic(Module):
     def level(self):
         return self.source().level()
     
+    @cached_method
     def dimension_of_ordinary_subspace(self, p=None, cusp=False):
         """
             If ``cusp`` is ``True``, return dimension of cuspidal ordinary
-            subspace.
+            subspace. This does a weight 2 computation with sage's ModularSymbols.
         """
         try:
             p = self.prime()
@@ -110,7 +113,8 @@ class ModularSymbolSpace_generic(Module):
             N.divide_knowing_divisible_by(p ** (e-1))
         if r == 0:
             from sage.modular.arithgroup.congroup_gamma0 import Gamma0_constructor as Gamma0
-            M = ModularSymbols(Gamma0(N), 2, 1, GF(p))
+            verbose("in dim: %s, %s, %s"%(self.sign(), N, p))
+            M = ModularSymbols(Gamma0(N), 2, self.sign(), GF(p))
             if cusp:
                 M = M.cuspidal_subspace()
         else:
@@ -118,10 +122,11 @@ class ModularSymbolSpace_generic(Module):
             DG = DirichletGroup(N, GF(p))
             chi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
             chi = DG(chi)
-            M = ModularSymbols(chi, 2, 1, GF(p)).cuspidal_subspace()
+            M = ModularSymbols(chi, 2, self._sign, GF(p)).cuspidal_subspace()
             if cusp:
                 M = M.cuspidal_subspace()
         hecke_poly = M.hecke_polynomial(p)
+        verbose("in dim: %s"%(hecke_poly))
         x = hecke_poly.parent().gen()
         return hecke_poly.degree() - hecke_poly.ord(x)
     #def prime(self):
