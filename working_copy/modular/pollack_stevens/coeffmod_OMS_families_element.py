@@ -85,7 +85,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                     ordp = par_p_prec
                 else:
                     ordp = min([_padic_val_of_pow_series(a) for a in moments])
-                    moments = V([_right_shift_coeffs(a, ordp) for a in moments])
+                    moments = V([_shift_coeffs(a, ordp) for a in moments])
             elif moments == 0:  #should do something with how "zero" moments is
                 V = parent.approx_module(0, var_prec)
                 moments = V([])
@@ -97,7 +97,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 moments = K(moments)
                 ordp = _padic_val_of_pow_series(moments)
                 if ordp != 0:
-                    moments = V([_right_shift_coeffs(moments, ordp)])
+                    moments = V([_shift_coeffs(moments, ordp)])
                 else:
                     moments = V([moments])
         self._moments = moments
@@ -149,30 +149,25 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         ans = self.parent()(0)
         saprec = self.precision_absolute()
         raprec = right.precision_absolute()
-        #print "In _addsub"
-        #print saprec, raprec
         aprec = min(saprec[0], raprec[0])
-        #print "aprec", aprec
         ans.ordp = min(self.ordp, right.ordp)
-        #print self.ordp, right.ordp
-        #print "ans.ordp", ans.ordp
         rprec = aprec - ans.ordp
-        #print rprec
-        #print self.parent().precision_cap()
         var_prec = min(saprec[1], raprec[1])
         V = ans.parent().approx_module(rprec, var_prec)
         R = V.base_ring()
-        smoments = self._moments
-        rmoments = right._moments
+        smoments = copy(self._moments)
+        rmoments = copy(right._moments)
         if smoments.parent() is not V:
             smoments = V(smoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(smoments)) if rprec > len(smoments) else []))
         if rmoments.parent() is not V:
             rmoments = V(rmoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(rmoments)) if rprec > len(rmoments) else []))
         # We multiply by the relative power of p
         if self.ordp > right.ordp:
-            smoments *= self.parent().prime()**(self.ordp - right.ordp)
+            for i in range(rprec):
+                smoments[i] = _shift_coeffs(smoments[i], self.ordp - right.ordp, right=False)
         elif self.ordp < right.ordp:
-            rmoments *= self.parent().prime()**(right.ordp - self.ordp)
+            for i in range(rprec):
+                rmoments[i] = _shift_coeffs(rmoments[i], right.ordp - self.ordp, right=False)
         if negate:
             rmoments = -rmoments
         ans._moments = smoments + rmoments
@@ -426,7 +421,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         verbose("n: %s; shift: %s; _mom: %s\np_precs: %s"%(n, shift, self._moments, p_precs), level=2)
         if shift > 0:
             for i in range(n):
-                self._moments[i] = _right_shift_coeffs(self._moments[i], shift)
+                self._moments[i] = _shift_coeffs(self._moments[i], shift)
                 adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
         elif shift == 0:
             for i in range(n):
@@ -573,13 +568,15 @@ def _add_big_ohs_list(f, prec_cap):
     flist = f.padded_list()
     return [flist[i].add_bigoh(p_prec) for i in range(min(len(flist), var_prec))]
 
-def _right_shift_coeffs(f, shift):
+def _shift_coeffs(f, shift, right=True):
     r"""
         Given a power series ``f``, apply '>> shift' to each of its coefficients,
         i.e. divide each by shift powers of the uniformizer.
     """
     if shift == 0:
         return f
+    if not right:
+        shift = -shift
     flist = [a >> shift for a in f.padded_list()]
     # Hack to circumvent a bug in sage's handling of power series/polynomials
     # over p-adic rings
