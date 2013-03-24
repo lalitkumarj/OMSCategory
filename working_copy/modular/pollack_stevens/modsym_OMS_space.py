@@ -243,7 +243,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         R = self.base()
         ## THIS IS NOT GREAT
-        M = list[0].values()[0].moment(0).precision_relative()
+        #M = list[0].values()[0].moment(0).precision_relative()
         p = self.prime()
         d = len(list)
             
