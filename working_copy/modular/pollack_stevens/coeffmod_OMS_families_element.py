@@ -178,13 +178,13 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         """
         Scalar multiplication self*right.
         """
-        ans = self.parent()(0)
+        ans = coeffmod_OMS_families_element(None, self.parent(), None, False, var_prec=self._var_prec)
         if right.is_zero():
             return ans
         p = self.parent().prime()
         if right.is_zero():
-            ans._moments = self.parent().approx_module(0, 0)([])
-            ans.ordp = self.parent().precision_cap()[0]
+            ans._moments = self.parent().approx_module(0, self._var_prec)([])
+            ans.ordp = min(self.parent().precision_cap()[0], right.valuation()+self.ordp)
         else:
             v, u = _padic_val_unit_of_pow_series(right, p)
             ans._moments = self._moments * u
@@ -214,34 +214,33 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         elif rrprec == 0:
             return 1
         rprec = min(lrprec, rrprec)
-        #if lrprec > rprec:
-        #    left.reduce_precision(rprec)
-        #elif rrprec > rprec:
-        #    right.reduce_precision(rprec)
-        #left.normalize()
-        #right.normalize()
-        p = left.parent().prime()
-        if left.ordp > right.ordp:
-            shift = p ** (left.ordp - right.ordp)
-            for i in range(rprec):
-                L = (shift * left._unscaled_moment(i)).padded_list()
-                R = (right._unscaled_moment(i)).padded_list()
-                c = cmp(L, R)
-                if c: return c
-        elif left.ordp < right.ordp:
-            shift = p ** (right.ordp - left.ordp)
-            for i in range(rprec):
-                L = (left._unscaled_moment(i)).padded_list()
-                R = (shift * right._unscaled_moment(i)).padded_list()
-                c = cmp(L, R)
-                if c: return c
-        else:
-            for i in range(rprec):
-                L = (left._unscaled_moment(i)).padded_list()
-                R = (right._unscaled_moment(i)).padded_list()
-                c = cmp(L, R)
-                if c: return c
-        return 0
+        c = cmp(left.ordp, right.ordp)
+        if c: return c
+        #Will this work? Not sure power series compare well (see e.g. trac 9457)
+        return cmp(left._moments[:rprec], right._moments[:rprec])
+#
+#        p = left.parent().prime()
+#        if left.ordp > right.ordp:
+#            shift = p ** (left.ordp - right.ordp)
+#            for i in range(rprec):
+#                L = (shift * left._unscaled_moment(i)).padded_list()
+#                R = (right._unscaled_moment(i)).padded_list()
+#                c = cmp(L, R)
+#                if c: return c
+#        elif left.ordp < right.ordp:
+#            shift = p ** (right.ordp - left.ordp)
+#            for i in range(rprec):
+#                L = (left._unscaled_moment(i)).padded_list()
+#                R = (shift * right._unscaled_moment(i)).padded_list()
+#                c = cmp(L, R)
+#                if c: return c
+#        else:
+#            for i in range(rprec):
+#                L = (left._unscaled_moment(i)).padded_list()
+#                R = (right._unscaled_moment(i)).padded_list()
+#                c = cmp(L, R)
+#                if c: return c
+#        return 0
 
 #        parent_prec = self.parent()._prec_cap
 #        var_prec = min(self._var_prec, parent_prec[1], other._var_prec)
@@ -275,6 +274,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             and self.base_ring().has_coerce_map_from(other.base_ring()):
             return True
         elif isinstance(other, CoeffMod_OMS_element):
+            #ADD THIS?
             #kdiff = other._k - self._k
             #self._character = other._character
             #and self.base_ring().has_coerce_map_from(other.base_ring()):
