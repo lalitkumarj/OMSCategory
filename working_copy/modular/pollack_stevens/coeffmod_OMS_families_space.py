@@ -232,7 +232,11 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
             prec = self._prec_cap
         else:
             prec = _prec_cap_parser(prec)
-        return self(self.approx_module(prec[0], prec[1]).random_element())
+        V = self.approx_module(prec[0], prec[1])
+        R = self.base_ring().base_ring()
+        if R.is_field():
+            V = V.change_ring()(self.base_ring().change_ring(R.integer_ring()))
+        return self(V.random_element())
     
     def clear_cache(self):
         self.approx_module.clear_cache()
