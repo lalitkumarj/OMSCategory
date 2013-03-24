@@ -150,7 +150,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
-        return self(D)
+        ret = self(D)
+        if self.sign() == 1:
+            return ret.plus_part()
+        if self.sign() == -1:
+            return ret.minus_part()
+        return ret
 
 #@cached_method
 def _prec_for_solve_diff_eqn_families(M, p):

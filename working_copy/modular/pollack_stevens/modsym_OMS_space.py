@@ -220,6 +220,10 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("ret_mu.ordp, ret_mu._moments, ret_mu._prec_rel: %s, %s, %s"%(ret._map[Id].ordp, ret._map[Id]._moments, ret._map[Id].precision_relative()))
         t.ordp -= mu_val    #only for verbose
         verbose("Check difference equation (at end): %s"%(mu * gammas[Id] - mu - t.reduce_precision(M).normalize()))
+        if self.sign() == 1:
+            return ret.plus_part()
+        if self.sign() == -1:
+            return ret.minus_part()
         return ret
 
     def is_start_of_basis(self,list):
@@ -358,7 +362,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         return basis
                  
 
-    def hecke_matrix(self,q,basis):
+    def hecke_matrix(self, q, basis):
         r"""
         Finds the matrix of T_q wrt to the given basis
     

@@ -153,6 +153,7 @@ class ModularSymbolElement_generic(ModuleElement):
 #            sage: (phi.plus_part()+phi.minus_part()) == 2 * phi
 #            True
 #        """
+        #if sign != 0 could simply return 2*self or 0 accordingly
         S0N = Sigma0(self.parent().level())
         return self + self * S0N(minusproj)
 
