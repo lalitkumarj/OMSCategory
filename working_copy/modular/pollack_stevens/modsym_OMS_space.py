@@ -314,15 +314,15 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             ## Move back to SAGE from Pari
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
-    
+
     @cached_method
-    def basis_of_ordinary_subspace(self, d, sign=0):
+    def basis_of_ordinary_subspace(self, d=None, sign=0):
         r"""
         Finds a basis of the ordinary subspace of this space.
     
         INPUT:
 
-        - ``d`` -- integer equal to the dimension of the ordinary subspace
+        - ``d`` -- (optional) integer equal to the dimension of the ordinary subspace; otherwise this number is just computed via Hida theory
 
         - ``sign`` -- optional variable which if 1 or -1 restricts to the plus or minus subspace
 
@@ -330,6 +330,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - A list of OMS's which form the desired basis
         """
+        if d == None:
+            d = self.dimension_of_ordinary_subspace(sign=sign)
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()
