@@ -1,0 +1,398 @@
+# This is the output of test_Hecke_matrices_at_p(dims_dict, sign=-1) (in working_copy/examples/OMS/Hecke_matrix_test.sage)
+
+Verifying rank 2 Hecke polynomials at p (up to precision 5) (using symbols of sign -1)
+Constructing 14 spaces of (sage) modular symbols.
+Modular Symbols space of dimension 2 for Gamma_0(22) of weight 2 with sign -1 over 11-adic Field with capped relative precision 20
+Modular Symbols space of dimension 2 for Gamma_0(26) of weight 2 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 37 for Gamma_0(26) of weight 12 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 34 for Gamma_0(33) of weight 10 with sign -1 over 11-adic Field with capped relative precision 20
+Modular Symbols space of dimension 40 for Gamma_0(39) of weight 10 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 2 for Gamma_0(28) of weight 2 with sign -1 over 7-adic Field with capped relative precision 20
+Modular Symbols space of dimension 39 for Gamma_0(44) of weight 8 with sign -1 over 11-adic Field with capped relative precision 20
+Modular Symbols space of dimension 46 for Gamma_0(52) of weight 8 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 60 for Gamma_0(65) of weight 10 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 3 for Gamma_0(33) of weight 2 with sign -1 over 3-adic Field with capped relative precision 20
+Modular Symbols space of dimension 16 for Gamma_0(55) of weight 4 with sign -1 over 5-adic Field with capped relative precision 20
+Modular Symbols space of dimension 22 for Gamma_0(77) of weight 4 with sign -1 over 7-adic Field with capped relative precision 20
+Modular Symbols space of dimension 40 for Gamma_0(143) of weight 4 with sign -1 over 13-adic Field with capped relative precision 20
+Modular Symbols space of dimension 52 for Gamma_0(135) of weight 4 with sign -1 over 5-adic Field with capped relative precision 20
+
+Time for task: 16.4771327972
+
+Constructing bases of OMS spaces and verifying the Hecke polynomials.
+
+Modular symbols space #1
+(2, 11, 0)
+
+Finding basis (of dimension 2).
+
+Time for task: 17.5847070217
+
+
+Basis:
+Modular symbol of level 22 with values in Space of 11-adic distributions with k=0 action and precision cap 5
+Modular symbol of level 22 with values in Space of 11-adic distributions with k=0 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 11:
+/Users/rharron/Programming/sage/local/lib/python2.7/site-packages/sage/rings/polynomial/padics/polynomial_padic_capped_relative_dense.py:1002:
+********************************************************************************
+Check that the Newton polygon below is actually convex.
+This issue is being tracked at http://trac.sagemath.org/sage_trac/ticket/6667.
+********************************************************************************
+(1 + O(11^20))*x^2 + (9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 10*11^9 + 10*11^10 + 10*11^11 + 10*11^12 + 10*11^13 + 10*11^14 + 10*11^15 + 10*11^16 + 10*11^17 + 10*11^18 + 10*11^19 + O(11^20))*x + (1 + O(11^20))
+
+Find OMS Hecke polynomial at 11:
+
+Time for task: 2.83520412445
+
+(1 + O(11^5))*x^2 + (9 + 10*11 + 10*11^2 + 10*11^3 + 10*11^4 + O(11^5))*x + (1 + O(11^5))
+
+Are they equal at 11? True
+
+Total time: 37.2563948631
+
+Modular symbols space #2
+(2, 13, 0)
+
+Finding basis (of dimension 2).
+
+Time for task: 14.3347318172
+
+
+Basis:
+Modular symbol of level 26 with values in Space of 13-adic distributions with k=0 action and precision cap 5
+Modular symbol of level 26 with values in Space of 13-adic distributions with k=0 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^20))*x^2 + (O(13^20))*x + (12 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 12*13^9 + 12*13^10 + 12*13^11 + 12*13^12 + 12*13^13 + 12*13^14 + 12*13^15 + 12*13^16 + 12*13^17 + 12*13^18 + 12*13^19 + O(13^20))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 2.87030696869
+
+(1 + O(13^5))*x^2 + (12 + 12*13 + 12*13^2 + 12*13^3 + 12*13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 54.7345209122
+
+Modular symbols space #3
+(2, 13, 10)
+
+Finding basis (of dimension 2).
+
+Time for task: 109.052305937
+
+
+Basis:
+Modular symbol of level 26 with values in Space of 13-adic distributions with k=10 action and precision cap 5
+Modular symbol of level 26 with values in Space of 13-adic distributions with k=10 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^14))*x^2 + (10 + 13 + 12*13^2 + 5*13^3 + 13^4 + 3*13^5 + 10*13^11 + 6*13^12 + 5*13^13 + O(13^14))*x + (12 + 6*13 + 5*13^2 + 6*13^3 + 10*13^4 + 6*13^5 + 4*13^6 + 2*13^7 + 6*13^8 + 5*13^9 + 2*13^10 + 11*13^11 + 12*13^12 + 12*13^13 + O(13^14))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 3.18335103989
+
+(1 + O(13^5))*x^2 + (10 + 13 + 12*13^2 + 5*13^3 + 13^4 + O(13^5))*x + (12 + 6*13 + 5*13^2 + 6*13^3 + 10*13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 168.500053883
+
+Modular symbols space #4
+(3, 11, 8)
+
+Finding basis (of dimension 2).
+
+Time for task: 126.171432972
+
+
+Basis:
+Modular symbol of level 33 with values in Space of 11-adic distributions with k=8 action and precision cap 5
+Modular symbol of level 33 with values in Space of 11-adic distributions with k=8 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 11:
+(1 + O(11^18))*x^2 + (8 + 11 + 5*11^3 + 9*11^4 + 10*11^5 + 10*11^6 + 10*11^7 + 10*11^8 + 6*11^9 + 3*11^10 + 9*11^11 + 7*11^12 + 10*11^13 + 4*11^14 + 6*11^15 + 5*11^16 + 8*11^17 + O(11^18))*x + (2 + 5*11 + 11^2 + 4*11^3 + 7*11^4 + 6*11^5 + 6*11^6 + 11^7 + 3*11^9 + 3*11^10 + 11^11 + 8*11^12 + 9*11^13 + 11^14 + 11^16 + O(11^18))
+
+Find OMS Hecke polynomial at 11:
+
+Time for task: 2.5855550766
+
+(1 + O(11^5))*x^2 + (8 + 11 + 5*11^3 + 9*11^4 + O(11^5))*x + (2 + 5*11 + 11^2 + 4*11^3 + 7*11^4 + O(11^5))
+
+Are they equal at 11? True
+
+Total time: 298.533730984
+
+Modular symbols space #5
+(3, 13, 8)
+
+Finding basis (of dimension 2).
+
+Time for task: 214.599392176
+
+
+Basis:
+Modular symbol of level 39 with values in Space of 13-adic distributions with k=8 action and precision cap 5
+Modular symbol of level 39 with values in Space of 13-adic distributions with k=8 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^16))*x^2 + (6 + 11*13 + 9*13^2 + 2*13^3 + 4*13^4 + 12*13^9 + 7*13^10 + 3*13^11 + 13^12 + 3*13^13 + 13^14 + 11*13^15 + O(13^16))*x + (6 + 7*13 + 9*13^2 + 3*13^3 + 10*13^4 + 13^5 + 8*13^6 + 2*13^7 + 7*13^8 + 8*13^9 + 10*13^10 + 8*13^11 + 12*13^12 + 11*13^13 + 8*13^15 + O(13^16))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 4.45860695839
+
+(1 + O(13^5))*x^2 + (6 + 11*13 + 9*13^2 + 2*13^3 + 4*13^4 + O(13^5))*x + (6 + 7*13 + 9*13^2 + 3*13^3 + 10*13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 519.863993883
+
+Modular symbols space #6
+(4, 7, 0)
+
+Finding basis (of dimension 2).
+
+Time for task: 40.4877169132
+
+
+Basis:
+Modular symbol of level 28 with values in Space of 7-adic distributions with k=0 action and precision cap 5
+Modular symbol of level 28 with values in Space of 7-adic distributions with k=0 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 7:
+(1 + O(7^20))*x^2 + (5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + 6*7^6 + 6*7^7 + 6*7^8 + 6*7^9 + 6*7^10 + 6*7^11 + 6*7^12 + 6*7^13 + 6*7^14 + 6*7^15 + 6*7^16 + 6*7^17 + 6*7^18 + 6*7^19 + O(7^20))*x + (1 + O(7^20))
+
+Find OMS Hecke polynomial at 7:
+
+Time for task: 1.59481191635
+
+(1 + O(7^5))*x^2 + (5 + 6*7 + 6*7^2 + 6*7^3 + 6*7^4 + O(7^5))*x + (1 + O(7^5))
+
+Are they equal at 7? True
+
+Total time: 562.034732819
+
+Modular symbols space #7
+(4, 11, 6)
+
+Finding basis (of dimension 2).
+
+Time for task: 279.953326941
+
+
+Basis:
+Modular symbol of level 44 with values in Space of 11-adic distributions with k=6 action and precision cap 5
+Modular symbol of level 44 with values in Space of 11-adic distributions with k=6 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 11:
+(1 + O(11^14))*x^2 + (5 + 10*11 + 3*11^2 + 9*11^3 + 10*11^4 + 10*11^5 + 10*11^6 + 7*11^7 + 3*11^8 + 5*11^9 + 3*11^10 + 2*11^11 + 4*11^12 + O(11^14))*x + (9 + 10*11^2 + 4*11^3 + 4*11^4 + 7*11^5 + 9*11^7 + 10*11^8 + 10*11^9 + 10*11^10 + 10*11^11 + 10*11^12 + 10*11^13 + O(11^14))
+
+Find OMS Hecke polynomial at 11:
+
+Time for task: 5.14928197861
+
+(1 + O(11^5))*x^2 + (5 + 10*11 + 3*11^2 + 9*11^3 + 10*11^4 + O(11^5))*x + (9 + 10*11^2 + 4*11^3 + 4*11^4 + O(11^5))
+
+Are they equal at 11? True
+
+Total time: 849.405640841
+
+Modular symbols space #8
+(4, 13, 6)
+
+Finding basis (of dimension 2).
+
+Time for task: 948.520795107
+
+
+Basis:
+Modular symbol of level 52 with values in Space of 13-adic distributions with k=6 action and precision cap 5
+Modular symbol of level 52 with values in Space of 13-adic distributions with k=6 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^14))*x^2 + (5 + 8*13 + 9*13^2 + 11*13^3 + 12*13^4 + 12*13^5 + 12*13^6 + 6*13^7 + 9*13^8 + 5*13^11 + 10*13^12 + 10*13^13 + O(13^14))*x + (3 + 4*13 + 4*13^2 + 11*13^3 + 13^4 + 5*13^5 + 11*13^7 + 12*13^8 + 12*13^9 + 12*13^10 + 12*13^11 + 12*13^12 + 12*13^13 + O(13^14))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 5.84972119331
+
+(1 + O(13^5))*x^2 + (5 + 8*13 + 9*13^2 + 11*13^3 + 12*13^4 + O(13^5))*x + (3 + 4*13 + 4*13^2 + 11*13^3 + 13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 1806.33828497
+
+Modular symbols space #9
+(5, 13, 8)
+
+Finding basis (of dimension 2).
+
+Time for task: 794.146251202
+
+
+Basis:
+Modular symbol of level 65 with values in Space of 13-adic distributions with k=8 action and precision cap 5
+Modular symbol of level 65 with values in Space of 13-adic distributions with k=8 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^16))*x^2 + (4 + 5*13 + 8*13^2 + 12*13^3 + 8*13^4 + 12*13^5 + 12*13^6 + 12*13^7 + 12*13^8 + 11*13^9 + 10*13^10 + 7*13^11 + 10*13^13 + 6*13^14 + 13^15 + O(13^16))*x + (4 + 10*13 + 6*13^2 + 3*13^3 + 5*13^4 + 13^5 + 4*13^6 + 10*13^7 + 13^8 + 11*13^9 + 12*13^10 + 12*13^11 + 12*13^12 + 7*13^13 + 4*13^14 + 10*13^15 + O(13^16))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 6.17816901207
+
+(1 + O(13^5))*x^2 + (4 + 5*13 + 8*13^2 + 12*13^3 + 8*13^4 + O(13^5))*x + (4 + 10*13 + 6*13^2 + 3*13^3 + 5*13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 2613.93827891
+
+Modular symbols space #10
+(11, 3, 0)
+
+Finding basis (of dimension 2).
+
+Time for task: 4.30011987686
+
+
+Basis:
+Modular symbol of level 33 with values in Space of 3-adic distributions with k=0 action and precision cap 5
+Modular symbol of level 33 with values in Space of 3-adic distributions with k=0 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 3:
+(1 + O(3^20))*x^2 + (2 + 2*3 + 3^2 + 2*3^5 + 2*3^7 + 3^8 + 2*3^10 + 2*3^12 + 3^14 + 2*3^16 + 2*3^17 + 3^18 + 3^19 + O(3^20))*x + (1 + 2*3 + 3^2 + 2*3^5 + 2*3^7 + 3^8 + 2*3^10 + 2*3^12 + 3^14 + 2*3^16 + 2*3^17 + 3^18 + 3^19 + O(3^20))
+
+Find OMS Hecke polynomial at 3:
+
+Time for task: 0.708389043808
+
+(1 + O(3^5))*x^2 + (2 + 2*3 + 3^2 + O(3^5))*x + (1 + 2*3 + 3^2 + O(3^5))
+
+Are they equal at 3? True
+
+Total time: 2619.0199039
+
+Modular symbols space #11
+(11, 5, 2)
+
+Finding basis (of dimension 2).
+
+Time for task: 103.749477863
+
+
+Basis:
+Modular symbol of level 55 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 55 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 5:
+(1 + O(5^4))*x^2 + (3 + 4*5 + 4*5^2 + 2*5^3 + O(5^4))*x + (4 + 5 + 2*5^2 + 4*5^3 + O(5^4))
+
+Find OMS Hecke polynomial at 5:
+
+Time for task: 1.70488095284
+
+(1 + O(5^5))*x^2 + (3 + 4*5 + 4*5^2 + 2*5^3 + O(5^5))*x + (4 + 5 + 2*5^2 + 4*5^3 + 3*5^4 + O(5^5))
+
+Are they equal at 5? True
+
+Total time: 2724.65190196
+
+Modular symbols space #12
+(11, 7, 2)
+
+Finding basis (of dimension 2).
+
+Time for task: 64.4592289925
+
+
+Basis:
+Modular symbol of level 77 with values in Space of 7-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 77 with values in Space of 7-adic distributions with k=2 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 7:
+ValueError fail: Increasing precision to 30
+(1 + O(7^9))*x^2 + (1 + 4*7 + 6*7^2 + 7^3 + 3*7^4 + 6*7^5 + 4*7^6 + 3*7^7 + 4*7^8 + O(7^9))*x + (3 + 7^2 + 4*7^3 + 4*7^4 + 3*7^5 + 5*7^6 + 3*7^7 + 6*7^8 + O(7^9))
+
+Find OMS Hecke polynomial at 7:
+
+Time for task: 4.02596902847
+
+(1 + O(7^5))*x^2 + (1 + 4*7 + 6*7^2 + 7^3 + 3*7^4 + O(7^5))*x + (3 + 7^2 + 4*7^3 + 4*7^4 + O(7^5))
+
+Are they equal at 7? True
+
+Total time: 2795.5998168
+
+Modular symbols space #13
+(11, 13, 2)
+
+Finding basis (of dimension 2).
+
+Time for task: 635.566473007
+
+
+Basis:
+Modular symbol of level 143 with values in Space of 13-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 143 with values in Space of 13-adic distributions with k=2 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 13:
+(1 + O(13^20))*x^2 + (11 + 6*13 + 12*13^2 + 7*13^3 + 2*13^4 + 5*13^5 + 10*13^6 + 3*13^8 + 12*13^9 + 10*13^10 + 12*13^11 + 8*13^12 + 8*13^13 + 6*13^14 + 5*13^15 + 13^16 + 12*13^17 + 10*13^18 + 6*13^19 + O(13^20))*x + (10 + 4*13 + 2*13^2 + 12*13^3 + 11*13^4 + 12*13^5 + 7*13^6 + 9*13^7 + 8*13^8 + 5*13^9 + 13^10 + 13^11 + 13^12 + 5*13^13 + 13^14 + 13^16 + 13^17 + 13^18 + 7*13^19 + O(13^20))
+
+Find OMS Hecke polynomial at 13:
+
+Time for task: 14.1547191143
+
+(1 + O(13^5))*x^2 + (11 + 6*13 + 12*13^2 + 7*13^3 + 2*13^4 + O(13^5))*x + (10 + 4*13 + 2*13^2 + 12*13^3 + 11*13^4 + O(13^5))
+
+Are they equal at 13? True
+
+Total time: 3447.31170797
+
+Modular symbols space #14
+(27, 5, 2)
+
+Finding basis (of dimension 4).
+
+Time for task: 1705.41652989
+
+
+Basis:
+Modular symbol of level 135 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 135 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 135 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+Modular symbol of level 135 with values in Space of 5-adic distributions with k=2 action and precision cap 5
+
+Compare Hecke polynomials.
+Find classical Hecke polynomial at 5:
+ValueError fail: Increasing precision to 30
+ValueError fail: Increasing precision to 40
+ValueError fail: Increasing precision to 50
+ValueError fail: Increasing precision to 60
+(1 + O(5^6))*x^4 + (2 + O(5^6))*x^3 + (3 + 2*5 + 3*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + O(5^6))*x^2 + (4 + 4*5 + 5^2 + 4*5^3 + 4*5^4 + 4*5^5 + O(5^6))*x + (2 + 2*5 + 3*5^2 + 4*5^3 + 4*5^4 + 4*5^5 + O(5^6))
+
+Find OMS Hecke polynomial at 5:
+
+Time for task: 10.198704958
+
+(1 + O(5^5))*x^4 + (2 + O(5^5))*x^3 + (3 + 2*5 + 3*5^2 + 4*5^3 + 4*5^4 + O(5^5))*x^2 + (4 + 4*5 + 5^2 + 4*5^3 + 4*5^4 + O(5^5))*x + (2 + 2*5 + 3*5^2 + 4*5^3 + 4*5^4 + O(5^5))
+
+Are they equal at 5? True
+
+Total time: 5196.13461781
