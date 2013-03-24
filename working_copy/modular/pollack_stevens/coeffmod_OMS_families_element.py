@@ -495,7 +495,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         R = self.base_ring().base_ring()
         DD = self.parent()
         D = OverconvergentDistributions(0, base=R, prec_cap=M, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
-        V = D.approx_module(M, self._var_prec)
+        V = D.approx_module(M)
         Elem = D.Element
         v = V([R.zero(), R.one()] + [R.zero()]*(M-2))
         mu = Elem(v, D, ordp=0, check=False)
