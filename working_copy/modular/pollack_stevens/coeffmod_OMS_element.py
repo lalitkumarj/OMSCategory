@@ -321,6 +321,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def is_zero(self, prec=None):
         #RH: Mostly "copied" from dist.pyx
+        self.normalize()
         n = self.precision_relative()
         if n == 0:  #Should compare absolute prec first?
             return True

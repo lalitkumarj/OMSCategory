@@ -220,6 +220,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("ret_mu.ordp, ret_mu._moments, ret_mu._prec_rel: %s, %s, %s"%(ret._map[Id].ordp, ret._map[Id]._moments, ret._map[Id].precision_relative()))
         t.ordp -= mu_val    #only for verbose
         verbose("Check difference equation (at end): %s"%(mu * gammas[Id] - mu - t.reduce_precision(M).normalize()))
+        ## NEED TO BE CAREFUL HERE WITH p=2 AND RANDOMNESS BECAUSE OF THE ISSUE OF PLUS/MINUS AND CHAR 2
         if self.sign() == 1:
             return ret.plus_part()
         if self.sign() == -1:
@@ -313,15 +314,15 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             ## Move back to SAGE from Pari
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
-    
+
     @cached_method
-    def basis_of_ordinary_subspace(self, d, sign=0):
+    def basis_of_ordinary_subspace(self, d=None, sign=0):
         r"""
         Finds a basis of the ordinary subspace of this space.
     
         INPUT:
 
-        - ``d`` -- integer equal to the dimension of the ordinary subspace
+        - ``d`` -- (optional) integer equal to the dimension of the ordinary subspace; otherwise this number is just computed via Hida theory
 
         - ``sign`` -- optional variable which if 1 or -1 restricts to the plus or minus subspace
 
@@ -329,23 +330,32 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - A list of OMS's which form the desired basis
         """
+        if d == None:
+            d = self.dimension_of_ordinary_subspace(sign=sign)
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()
         p = self.prime()
 
         while not done:
+            #            print "basis has size %s"%(len(basis))
             verbose("Forming a random symbol")
+            #            print "-----------------------"
+            #            print "Forming a random symbol"
             Phi = self.random_element()
             if sign == 1:
                 Phi = Phi.plus_part()
             elif sign == -1:
                 Phi = Phi.minus_part()
-                verbose("Projecting to ordinary subspace")
+
+            verbose("Projecting to ordinary subspace")
+            #            print "projecting"
             for a in range(M+2):
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
+
             verbose("Forming U_p-span of this symbol")
+            #            print "Forming U_p-span"
             Phi_span = [Phi]
             LI = self.is_start_of_basis(Phi_span)
             if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
