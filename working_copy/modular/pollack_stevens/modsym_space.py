@@ -122,7 +122,7 @@ class ModularSymbolSpace_generic(Module):
             DG = DirichletGroup(N, GF(p))
             chi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
             chi = DG(chi)
-            M = ModularSymbols(chi, 2, self._sign, GF(p)).cuspidal_subspace()
+            M = ModularSymbols(chi, 2, self._sign, GF(p))
             if cusp:
                 M = M.cuspidal_subspace()
         hecke_poly = M.hecke_polynomial(p)
