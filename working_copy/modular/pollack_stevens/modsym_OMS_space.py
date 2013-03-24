@@ -316,7 +316,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             return v + [R(-1)]
 
     @cached_method
-    def basis_of_ordinary_subspace(self, d=None, sign=0):
+    def basis_of_ordinary_subspace(self, d=None):
         r"""
         Finds a basis of the ordinary subspace of this space.
     
@@ -331,7 +331,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         - A list of OMS's which form the desired basis
         """
         if d == None:
-            d = self.dimension_of_ordinary_subspace(sign=sign)
+            d = self.dimension_of_ordinary_subspace()
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()
@@ -343,10 +343,6 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             #            print "-----------------------"
             #            print "Forming a random symbol"
             Phi = self.random_element()
-            if sign == 1:
-                Phi = Phi.plus_part()
-            elif sign == -1:
-                Phi = Phi.minus_part()
 
             verbose("Projecting to ordinary subspace")
             #            print "projecting"

@@ -92,7 +92,7 @@ class ModularSymbolSpace_generic(Module):
         return self.source().level()
     
     @cached_method
-    def dimension_of_ordinary_subspace(self, p=None, cusp=False, sign=0):
+    def dimension_of_ordinary_subspace(self, p=None, cusp=False):
         """
             If ``cusp`` is ``True``, return dimension of cuspidal ordinary
             subspace. This does a weight 2 computation with sage's ModularSymbols.
@@ -123,7 +123,7 @@ class ModularSymbolSpace_generic(Module):
         if r == 0:
             from sage.modular.arithgroup.congroup_gamma0 import Gamma0_constructor as Gamma0
             verbose("in dim: %s, %s, %s"%(self.sign(), N, p))
-            M = ModularSymbols(Gamma0(N), 2, sign, GF(p))
+            M = ModularSymbols(Gamma0(N), 2, self.sign(), GF(p))
             if cusp:
                 M = M.cuspidal_subspace()
         else:
@@ -131,7 +131,7 @@ class ModularSymbolSpace_generic(Module):
             DG = DirichletGroup(N, GF(p))
             chi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
             chi = DG(chi)
-            M = ModularSymbols(chi, 2, sign, GF(p))
+            M = ModularSymbols(chi, 2, self.sign(), GF(p))
             if cusp:
                 M = M.cuspidal_subspace()
         hecke_poly = M.hecke_polynomial(p)
