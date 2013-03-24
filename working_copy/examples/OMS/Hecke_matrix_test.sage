@@ -1,6 +1,8 @@
 def test_Hecke_matrices_at_p(input_dict, rank=2, prec=5, sign=0, verbose=True):
     if verbose:
-        print "\nVerifying rank %s Hecke polynomials at p (up to precision %s)"%(rank, prec)
+        starttime = walltime()
+        cur_time = starttime
+        print "\nVerifying rank %s Hecke polynomials at p (up to precision %s) (using symbols of sign %s)"%(rank, prec, sign)
         print "Constructing %s spaces of (sage) modular symbols."%(len(input_dict[rank]))
     MFs = {}
     for Npk in input_dict[rank]:
@@ -10,6 +12,7 @@ def test_Hecke_matrices_at_p(input_dict, rank=2, prec=5, sign=0, verbose=True):
             print MF
         MFs[Npk] = MF
     if verbose:
+        print "\nTime for task: %s\n"%(walltime() - cur_time)
         print "Constructing bases of OMS spaces and verifying the Hecke polynomials."
     bases = {}
     polys = {}
@@ -29,28 +32,46 @@ def test_Hecke_matrices_at_p(input_dict, rank=2, prec=5, sign=0, verbose=True):
         d = M.dimension_of_ordinary_subspace()
         if verbose:
             print "\nFinding basis (of dimension %s)."%(d)
+            cur_time = walltime()
         B = M.basis_of_ordinary_subspace(d)
         bases[Npk] = B
         if verbose:
+            print "\nTime for task: %s\n"%(walltime() - cur_time)
             print "\nBasis:"
             for b in B:
                 print b
             print "\nCompare Hecke polynomials."
-        RP = PolynomialRing(M.base_ring().fraction_field(), 'x')
+        RP = PolynomialRing(MFs[Npk].base_ring(), 'x')
         if verbose:
             print "Find classical Hecke polynomial at %s:"%(p)
-        hecke_poly_MF = ordinary_hecke_poly(RP(MFs[Npk].hecke_polynomial(p)))
+        try_again = True
+        while try_again:
+            try:
+                hecke_poly_MF = ordinary_hecke_poly(RP(MFs[Npk].hecke_polynomial(p)), verbose=False)
+                try_again = False
+            except ValueError:  # Happens when factoring when the hecke_polynomial has coefficients with negative aboslute precision
+                cur_prec = MFs[Npk].base_ring().precision_cap()
+                cur_prec += 10
+                if verbose:
+                    print "ValueError fail: Increasing precision to %s"%(cur_prec)
+                MFs[Npk] = MFs[Npk].base_extend(Qp(p, cur_prec))
+                RP = PolynomialRing(MFs[Npk].base_ring(), 'x')
         if verbose:
             print hecke_poly_MF
             print "\nFind OMS Hecke polynomial at %s:"%(p)
+            cur_time = walltime()
         hecke_poly_M = M.hecke_matrix(p, B).charpoly()
         if verbose:
+            print "\nTime for task: %s\n"%(walltime() - cur_time)
             print hecke_poly_M
             print "\nAre they equal at {0}?".format(p), hecke_poly_M == hecke_poly_MF
         polys[Npk] = [hecke_poly_MF, hecke_poly_M]
+        if verbose:
+            print "\nTotal time: %s"%(walltime() - starttime)
     return bases, polys, MFs
     
 def test_Hecke_matrices(input_dict, rank=2, max_ell=20, prec=5, sign=0, verbose=True):
+    # NOTE: this function does not work yet
     if verbose:
         print "\nVerifying rank %s Hecke polynomials up to ell = %s (up to precision %s)"%(rank, max_ell+1, prec)
         print "Constructing %s ordinary spaces of (sage) modular symbols."%(len(input_dict[rank]))
