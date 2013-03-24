@@ -291,13 +291,31 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 True
                 sage: mu * 3^3 == 0
                 False
+            
+            Check that something with no moments is 0.
+            
+                sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+                sage: R = ZpCA(7, 5)
+                sage: D = OverconvergentDistributions(2, base=R)
+                sage: mu = CoeffMod_OMS_element((R**0)([]), D, ordp=6, check=False)
+                sage: mu == 0
+                True
         """
         #RH: "copied" from dist.pyx, but then changed
         left = copy(left)
         right = copy(right)
         left.normalize()
         right.normalize()
-        rprec = min(left.precision_relative(), right.precision_relative())
+        lrprec = left.precision_relative()
+        rrprec = right.precision_relative()
+        if lrprec == 0:
+            if rrprec == 0:
+                return 0
+            else:
+                return -1
+        elif rrprec == 0:
+            return 1
+        rprec = min(lrprec, rrprec)
         c = cmp(left.ordp, right.ordp)
         if c: return c
         return cmp(left._moments[:rprec], right._moments[:rprec])
