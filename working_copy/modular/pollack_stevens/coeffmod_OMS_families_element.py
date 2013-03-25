@@ -433,7 +433,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         if adjust_moms >=n:
             V = self.parent().approx_module(0)
             self._moments = V([])
-            self._ordp = adjust_moms
+            self.ordp = adjust_moms
         elif adjust_moms > 0:
             n -= adjust_moms    #Is this going to give the correct precision?
             p_precs = self.parent().filtration_precisions(n)
@@ -480,12 +480,22 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     def solve_diff_eqn(self):
         #Do something about ordp
         if self.is_zero():
-            return self.parent()(0)
-        if self._moments[0] != 0:
+            M, var_prec = self.precision_absolute()
+            V = self.parent().approx_module(0, var_prec)
+            return CoeffMod_OMS_Families_element(V([]), self.parent(), ordp=(M - ZZ(M).exact_log(p) - 1), check=False, var_prec=var_prec)
+        if self._unscaled_moment(0) != 0:
             raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator.")
-        M = len(self._moments)
+        M = ZZ(len(self._moments))
         if M == 1:
-            return self.parent().zero()
+            return self.parent()(0)
+        if M == 2:
+            if p == 2:
+                raise ValueError("Not enough accuracy to return anything")
+            else:
+                mu = self.parent()()
+                mu.ordp = self.ordp
+                V = self.parent().approx_module(1, var_prec)
+                return CoeffMod_OMS_Families_element(V([self._unscaled_moment(1)]), self.parent(), ordp=self.ordp, check=False, var_prec=var_prec)
         from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
         R = self.base_ring().base_ring()
         DD = self.parent()
@@ -500,6 +510,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             mu._moments[j] = R.one()
             mu._moments[j-1] = R.zero()
             mus += self.moment(j) * mu.solve_diff_eqn().lift(DD)
+        #Should we remove precision like at end of non-family code, or is this taken care of?
         return mus
 
 def _padic_val_of_pow_series(f, p=None):

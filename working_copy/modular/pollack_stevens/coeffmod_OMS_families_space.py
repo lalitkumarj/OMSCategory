@@ -3,7 +3,7 @@ import sage.rings.ring as ring
 from sage.structure.factory import UniqueFactory
 from sage.rings.integer_ring import ZZ
 from sage.rings.power_series_ring import PowerSeriesRing
-from sage.rings.padics.factory import ZpCA
+from sage.rings.padics.factory import ZpCA, Qp
 from sage.misc.cachefunc import cached_method
 
 from sage.modular.pollack_stevens.sigma0 import _default_adjuster
@@ -228,7 +228,10 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         base_coeffs = self.base_ring().base_ring()
         if new_prec[0] > base_coeffs.precision_cap():
             #THERE'S NO WAY TO EXTEND PRECISION ON BASE RING!!! This is a crappy hack:
-            base_coeffs = ZpCA(self.prime(), new_prec[0])
+            if base_coeffs.is_field():
+                base_coeffs = Qp(self.prime(), new_prec[0])
+            else:
+                base_coeffs = ZpCA(self.prime(), new_prec[0])
         return FamiliesOfOverconvergentDistributions(self._k, prec_cap = new_prec, base_coeffs=base_coeffs, character=self._character, adjuster=self._adjuster, act_on_left=self.action().is_left(), dettwist=self._dettwist, variable_name = self.base_ring().variable_name())
         
     @cached_method
