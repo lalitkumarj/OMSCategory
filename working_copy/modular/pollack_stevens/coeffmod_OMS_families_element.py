@@ -267,21 +267,6 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
 #                    return True
 #        return False
     
-    def _coerce_map_from_(self, other):
-        if isinstance(other, CoeffMod_OMS_Families_element) \
-            and other._k  == self._k \
-            and self._character == other._character \
-            and self.base_ring().has_coerce_map_from(other.base_ring()):
-            return True
-        elif isinstance(other, CoeffMod_OMS_element):
-            #ADD THIS?
-            #kdiff = other._k - self._k
-            #self._character = other._character
-            #and self.base_ring().has_coerce_map_from(other.base_ring()):
-            return False
-        else:
-            return False
-    
     def is_zero(self, prec=None):
         s_prec_rel = self.precision_relative()
         if prec is None:

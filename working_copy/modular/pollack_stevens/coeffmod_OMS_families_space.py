@@ -163,6 +163,22 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
                  dettwist=dettwist, action_class=action_class, \
                  element_class=CoeffMod_OMS_Families_element, padic=True)
     
+    def _coerce_map_from_(self, other):
+        if isinstance(other, CoeffMod_OMS_Families_element) \
+            and other._k  == self._k \
+            and self._character == other._character \
+            and self.base_ring().has_coerce_map_from(other.base_ring()):
+            #Should we check data related to action?
+            return True
+        elif isinstance(other, CoeffMod_OMS_element):
+            #ADD THIS?
+            #kdiff = other._k - self._k
+            #self._character = other._character
+            #and self.base_ring().has_coerce_map_from(other.base_ring()):
+            return False
+        else:
+            return False
+    
     def _repr_(self):
         s = "Families of overconvergent distributions on the disc %s " % (self._k)
         if self._character is not None:
