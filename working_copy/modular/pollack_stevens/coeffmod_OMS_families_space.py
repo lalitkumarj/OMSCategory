@@ -9,6 +9,7 @@ from sage.misc.cachefunc import cached_method
 from sage.modular.pollack_stevens.sigma0 import _default_adjuster
 from sage.modular.pollack_stevens.coeffmod_space import CoefficientModule_generic
 from sage.modular.pollack_stevens.coeffmod_element import WeightKAction_OMS_fam
+from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element
 
 def _prec_cap_parser(prec_cap):

@@ -5,6 +5,7 @@
 from copy import copy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
+from sage.rings.padics.precision_error import PrecisionError
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 from sage.rings.integer_ring import ZZ
@@ -268,28 +269,42 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
 #        return False
     
     def is_zero(self, prec=None):
-        s_prec_rel = self.precision_relative()
+        self.normalize()
+        n, v_prec = self.precision_relative()
+        if n == 0:
+            return True
+        aprec, v_aprec = self.precision_absolute()
         if prec is None:
-            prec = s_prec_rel
-        elif not hasattr(moments, '__len__'):
-            prec = [ZZ(prec), None]
-        elif len(prec) > 2:
-            raise TypeError("prec must have length at most 2.")
-        if prec[0] > s_prec_rel[0] or prec[1] > s_prec_rel[1]:
-            return False
-        num_moments = min(prec[0], s_prec_rel[0]) if prec[0] is not None else s_prec_rel[0]
-        var_prec = min(prec[1], s_prec_rel[1]) if prec[1] is not None else s_prec_rel[1]
-        p_precs = self.parent().filtration_precisions(num_moments)
-        for i in range(num_moments):
-            selflist = _add_big_ohs_list(self._moments[i], [p_precs[i], var_prec])
-            for c in selflist:
-                if c != 0:
-                    return False
+            prec = [n, v_prec]
+        elif not hasattr(prec, '__len__'):
+            prec = [ZZ(prec), v_prec]
+        elif prec[0] > aprec or prec[1] > v_aprec:
+            return False    #Should this raise a PrecisionError instead
+        p_precs = self.parent().filtration_precisions(prec)
+        for a in xrange(prec):
+            if not self._unscaled_moment(a)._is_zero_padic_power_series([p_precs[a], prec[1]]):
+                return False
         return True
+        
+#        if prec is None:
+#            prec = s_prec_rel
+#        elif len(prec) > 2:
+#            raise TypeError("prec must have length at most 2.")
+#        if prec[0] > s_prec_rel[0] or prec[1] > s_prec_rel[1]:
+#            return False
+#        num_moments = min(prec[0], s_prec_rel[0]) if prec[0] is not None else s_prec_rel[0]
+#        var_prec = min(prec[1], s_prec_rel[1]) if prec[1] is not None else s_prec_rel[1]
+#        p_precs = self.parent().filtration_precisions(num_moments)
+#        for i in range(num_moments):
+#            selflist = _add_big_ohs_list(self._moments[i], [p_precs[i], var_prec])
+#            for c in selflist:
+#                if c != 0:
+#                    return False
+#        return True
     
     def find_scalar(self, other, M = None, check=True):
-        self.normalize()
-        other.normalize()
+        #self.normalize()
+        #other.normalize()
         n, s_var_prec = self.precision_relative()
         other_pr, other_var_prec = other.precision_relative()
         if n == 0:
@@ -384,11 +399,11 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     
     def valuation(self):
         #RH: adapted from coeffmod_OMS_element.py
-        p = self.parent().prime()
+        #FIX THIS
         n = self.precision_relative()[0]
         if n == 0:
             return self.ordp
-        return self.ordp + min([n] + [_padic_val_of_pow_series(self._unscaled_moment(a), p) for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        return self.ordp + min([n] + [_padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
     def normalize(self):
         #RH: adapted from coeffmod_OMS_element.py
@@ -440,7 +455,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         if self.ordp == 0:
             return self._unscaled_moment(n)
         else:
-            return self.parent().prime()**(self.ordp) * self._unscaled_moment(n)
+            return _shift_coeffs(self._unscaled_moment(n), self.ordp, right=False)
     
     def _unscaled_moment(self, n):
         #RH: "copied" from coeffmod_OMS_element.py
@@ -519,6 +534,47 @@ def _padic_abs_prec_of_pow_series(f, var_prec=None):
     if len(flist) == 0:
         return Infinity
     return min([flist[i].precision_absolute() for i in range(min(len(flist), var_prec))])
+
+def _is_zero_padic_power_series(f, prec):
+    r"""
+    Determines whether f is zero with `w`-adic precision prec[1], and `p`-adic
+    precision prec[0].
+    
+    EXAMPLES::
+    
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _is_zero_padic_power_series
+        sage: R = PowerSeriesRing(Zp(5), 'w')
+        sage: f = R([0,1,3,-2], 6)
+        sage: _is_zero_padic_power_series(f, [5,4])
+        False
+        sage: _is_zero_padic_power_series(f, [5,7])
+        False
+        sage: _is_zero_padic_power_series(f, [25,7])
+        False
+        sage: _is_zero_padic_power_series(f, [25,1])
+        True
+        sage: f2 = R([O(5^2),1,3,-2],6)
+        sage: _is_zero_padic_power_series(f2, [5,1])
+        False
+        sage: _is_zero_padic_power_series(f2, [2,1])
+        True
+        sage: f3 = R(0, 3)
+        sage: _is_zero_padic_power_series(f3, [100, 3])
+        True
+        sage: _is_zero_padic_power_series(f3, [100, 4])
+        False
+
+    """
+    if f.prec() < prec[1]:
+        return False
+    flist = _add_big_ohs_list(f, prec)
+    for c in flist:
+        try:
+            if not c.is_zero(prec[0]):
+                return False
+        except PrecisionError:
+            return False
+    return True
 
 def _add_big_ohs_list(f, prec_cap):
     #There may be a problem if you pass the list [3, O(p^2)] to the power series ring. It will truncate all big-ohs after last "non-zero" entry
