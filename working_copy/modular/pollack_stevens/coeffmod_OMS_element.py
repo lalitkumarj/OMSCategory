@@ -3,6 +3,7 @@
 from copy import copy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.padics.padic_generic import pAdicGeneric
+from sage.rings.padics.precision_error import PrecisionError
 from sage.rings.arith import binomial, bernoulli
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.rings.integer_ring import ZZ
@@ -267,7 +268,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: mu >> 0
                 (1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + O(3^5), 2 + 3 + O(3^4), 3 + O(3^3), 2*3 + O(3^2), 1 + O(3))
                 sage: mu << 5 == 0
-                True
+                False
         """
         ordp = self.ordp - shift
         return CoeffMod_OMS_element(self._moments, self.parent(), ordp, check=False)
@@ -287,7 +288,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: nu = D([3,3,3])
                 sage: mu == nu
                 True
-                sage: mu * 3^4 == 0
+                sage: mu * 3^4 == mu << 4
                 True
                 sage: mu * 3^3 == 0
                 False
