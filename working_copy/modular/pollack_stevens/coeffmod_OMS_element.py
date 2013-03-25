@@ -518,7 +518,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if self.ordp == 0:
             return self._unscaled_moment(n)
         else:
-            return self.parent().prime()**(self.ordp) * self._unscaled_moment(n)
+            return self._unscaled_moment(n) << self.ordp
     
     def _unscaled_moment(self, n):
         #RH: "copied" from dist.pyx
