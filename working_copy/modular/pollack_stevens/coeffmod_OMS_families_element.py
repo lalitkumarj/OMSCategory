@@ -181,13 +181,10 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         """
         ans = coeffmod_OMS_families_element(None, self.parent(), None, False, var_prec=self._var_prec)
         if right.is_zero():
-            return ans
-        p = self.parent().prime()
-        if right.is_zero():
             ans._moments = self.parent().approx_module(0, self._var_prec)([])
             ans.ordp = min(self.parent().precision_cap()[0], right.valuation()+self.ordp)
         else:
-            v, u = _padic_val_unit_of_pow_series(right, p)
+            v, u = _padic_val_unit_of_pow_series(right)
             ans._moments = self._moments * u
             ans.ordp = self.ordp + v
         return ans
