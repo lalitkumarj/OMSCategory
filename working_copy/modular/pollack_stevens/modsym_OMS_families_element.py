@@ -18,6 +18,21 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
         return min([val.diagonal_valuation() for val in self._map])
     
+    def list_of_total_measures(self):
+        r"""
+        Returns the list of total measures of the OMS evaluated at each of our generators
+
+        INPUT:
+
+        - None
+        
+        OUTPUT:
+
+        - List of p-adic numberes
+        """
+        z = mu.parent().base().zero()
+        return [mu.moment(0) if mu.precision_relative() != 0 else z for mu in self.values()]
+    
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
         r"""
