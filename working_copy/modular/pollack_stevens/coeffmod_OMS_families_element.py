@@ -426,11 +426,12 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         else:
             raise NotImplementedError("Currently only deals with the case where the base coefficients are a ring of integers.")
         #Cut down moments because of precision loss
-        verbose("adjust_mom: %s\n_moms: %s"%(adjust_moms, self._moments), level=2)
+        verbose("adjust_mom: %s\nn %s \n_moms: %s"%(adjust_moms, n, self._moments), level=2)
         if adjust_moms >=n:
             V = self.parent().approx_module(0)
             self._moments = V([])
-            self.ordp = adjust_moms
+            #self.ordp = adjust_moms
+            verbose("adjust_mom %s, \nn %s, \nself.ordp %s"%(adjust_moms, n, self.ordp))
         elif adjust_moms > 0:
             n -= adjust_moms    #Is this going to give the correct precision?
             p_precs = self.parent().filtration_precisions(n)

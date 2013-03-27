@@ -485,11 +485,12 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         else:
             raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
         #Cut down moments because of precision loss
-        verbose("adjust_mom: %s\n_moms: %s"%(adjust_moms, self._moments), level=2)
+        verbose("adjust_mom: %s\nn %s\n_moms: %s"%(adjust_moms, n, self._moments), level=2)
         if adjust_moms >= n:
             V = self.parent().approx_module(0)
             self._moments = V([])
-            self._ordp = adjust_moms    #should we take min with parent().precision_cap()?
+            #self.ordp = adjust_moms    #should we take min with parent().precision_cap()?
+            verbose("adjust_mom %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
         elif adjust_moms > 0:
             n -= adjust_moms
             V = self.parent().approx_module(n)
