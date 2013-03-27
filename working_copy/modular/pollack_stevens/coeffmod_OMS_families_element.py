@@ -501,14 +501,13 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         Elem = D.Element
         v = V([R.zero(), R.one()] + [R.zero()]*(M-2))
         mu = Elem(v, D, ordp=0, check=False)
-        #Normalize mu?
         mus = self.moment(1) * mu.solve_diff_eqn().lift(DD)
         for j in range(2, M):
             mu._moments[j] = R.one()
             mu._moments[j-1] = R.zero()
             mus += self.moment(j) * mu.solve_diff_eqn().lift(DD)
         #Should we remove precision like at end of non-family code, or is this taken care of?
-        return mus
+        return mus.normalize()  #Is it necessary to normalize?
 
 def _padic_val_of_pow_series(f, p=None):
     r"""

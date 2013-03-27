@@ -403,6 +403,7 @@ class WeightKAction_OMS(WeightKAction_generic):
                 sage: mu * A
                 7^-1 * (1 + O(7^3), 1 + O(7^2), 1 + O(7))
         """
+        #Could change this to look like corresponding function for families?
         A = self.acting_matrix(g, len(v._moments))
         ans = v.parent()(v._moments * A)
         #print "v =", v
