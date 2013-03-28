@@ -2,11 +2,12 @@
 
 from copy import copy   #Not necessary in cython version
 from sage.misc.misc import verbose
+from sage.rings.infinity import Infinity
+from sage.rings.integer_ring import ZZ
 from sage.rings.padics.padic_generic import pAdicGeneric
 from sage.rings.padics.precision_error import PrecisionError
 from sage.rings.arith import binomial, bernoulli
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
-from sage.rings.integer_ring import ZZ
 
 #maxordp = 2 ** 14   #change this to what it is in dist.pyx
 
@@ -143,13 +144,16 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def _addsub(self, right, negate):
         #RH: "copied" from dist.pyx
+        verbose("\n******** begin _addsub ******** with negate: %s"%(negate), level=2)
+        verbose("s_ordp %s, s_moments %s"%(self.ordp, self._moments), level=2)
+        verbose("r_ordp %s, r_moments %s"%(right.ordp, right._moments), level=2)
         ans = self.parent()(0)
         aprec = min(self.ordp + len(self._moments), right.ordp + len(right._moments))
         ans.ordp = min(self.ordp, right.ordp)
         rprec = aprec - ans.ordp
         V = ans.parent().approx_module(rprec)
         R = V.base_ring()
-        verbose(self._moments)
+        verbose([aprec, ans.ordp, rprec])
         smoments = copy(self._moments)
         rmoments = copy(right._moments)
         if smoments.parent() is not V:
@@ -167,6 +171,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             rmoments = -rmoments
         verbose(self._moments)
         ans._moments = smoments + rmoments
+        verbose("ans_ordp %s, ans_moments %s"%(ans.ordp, ans._moments), level=2)
+        verbose("\n******** end _addsub ********", level=2)
         return ans
     
     def _lmul_(self, right):
@@ -440,12 +446,33 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #RH: "copied" from dist.pyx
         return ZZ(len(self._moments) + self.ordp)
     
-    def valuation(self):
+    def valuation(self, val_vector=False):
         #RH: "copied" from dist.pyx, but then adjusted
+        verbose("\n******** begin valuation ********", level=2)
+        verbose("ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
         n = self.precision_relative()
         if n == 0:
+            if val_vector:
+                return [self.ordp, []]
             return self.ordp
-        return self.ordp + min([n] + [self._unscaled_moment(a).valuation() for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        if val_vector:
+            cur = self._unscaled_moment(0).valuation()
+            min_val = cur# if not cur.is_zero() else Infinity
+            vv = [min_val]
+            for a in range(1, n):
+                cur_mom = self._unscaled_moment(a)
+                cur = cur_mom.valuation() if not cur_mom.is_zero() else a + cur_mom.valuation()
+                if cur < min_val:
+                    min_val = cur
+                vv.append(min_val)
+            ret = self.ordp + min_val#min(n, min_val)
+            verbose("ret %s"%(ret), level=2)
+            verbose("\n******** end valuation ********", level=2)
+            return [ret, vv]
+        ret = self.ordp + min([self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])#min([n] + [self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])
+        verbose("ret %s"%(ret), level=2)
+        verbose("\n******** end valuation ********", level=2)
+        return ret
     
     def normalize(self):
         r"""
@@ -463,42 +490,60 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 7^3 * ()
         """
         #RH: "copied" from dist.pyx, but then changed (see issue #17)
+        verbose("\n******** begin normalize ********", level=2)
+        verbose("input: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
         V = self._moments.parent()
         R = V.base_ring()
         n = self.precision_relative()
-        self_val = self.valuation()
-        shift = self_val - self.ordp
-        self.ordp = self_val
-        #Factor out powers of uniformizer and check precision
-        m = n
-        adjust_moms = 0
-        verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments), level=2)
-        if shift > 0:
-            for i in range(n):
-                self._moments[i] = self._moments[i] >> shift
-                adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
-                m -= 1
-        elif shift == 0:
-            for i in range(n):
-                adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
-                m -= 1
-        else:
-            raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
-        #Cut down moments because of precision loss
-        verbose("adjust_mom: %s\nn %s\n_moms: %s"%(adjust_moms, n, self._moments), level=2)
-        if adjust_moms >= n:
-            V = self.parent().approx_module(0)
-            self._moments = V([])
-            #self.ordp = adjust_moms    #should we take min with parent().precision_cap()?
-            verbose("adjust_mom %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
-        elif adjust_moms > 0:
+        if n == 0:
+            return self
+        self_ordp = self.ordp
+        self_val, val_vector = self.valuation(val_vector=True)
+        while True:
+            shift = self_val - self.ordp
+            self.ordp = self_val
+            #Factor out powers of uniformizer and check precision
+            m = n
+            adjust_moms = 0
+            verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments), level=2)
+            if shift > 0:
+                for i in range(n):
+                    self._moments[i] = self._moments[i] >> shift
+                    adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
+                    m -= 1
+            elif shift == 0:
+                for i in range(n):
+                    adjust_moms = max(adjust_moms, m - self._moments[i].precision_absolute())
+                    m -= 1
+            else:
+                raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
+            #Cut down moments because of precision loss
+            verbose("adjust_moms: %s\nn %s\n_moms: %s"%(adjust_moms, n, self._moments), level=2)
+            if adjust_moms >= n:
+                V = self.parent().approx_module(0)
+                self._moments = V([])
+                #self.ordp = adjust_moms    #should we take min with parent().precision_cap()?
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
+            if adjust_moms == 0:
+                for i in range(n):
+                    self._moments[i] = self._moments[i].add_bigoh(n-i)
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
             n -= adjust_moms
-            V = self.parent().approx_module(n)
-            self._moments = V([self._moments[i].add_bigoh(n - i) for i in range(n)])
-        else:
-            for i in range(n):
-                self._moments[i] = self._moments[i].add_bigoh(n-i)
-        return self
+            val_diff = val_vector[n-1] - shift
+            if val_diff == 0:
+                V = self.parent().approx_module(n)
+                self._moments = V([self._moments[i].add_bigoh(n - i) for i in range(n)])
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
+            self_val = val_vector[n-1] + self_ordp
+            val_vector = [val_vector[i] - shift for i in range(n)]
         #customized
     
     def moment(self, n):
