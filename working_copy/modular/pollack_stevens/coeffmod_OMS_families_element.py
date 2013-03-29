@@ -277,8 +277,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             prec = [ZZ(prec), v_prec]
         elif prec[0] > aprec or prec[1] > v_aprec:
             return False    #Should this raise a PrecisionError instead
-        p_precs = self.parent().filtration_precisions(prec)
-        for a in xrange(prec):
+        p_precs = self.parent().filtration_precisions(prec[0])
+        for a in xrange(prec[0]):
             if not self._unscaled_moment(a)._is_zero_padic_power_series([p_precs[a], prec[1]]):
                 return False
         return True
@@ -394,11 +394,13 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #RH: copied from coeffmod_OMS_element.py
         return [ZZ(len(self._moments) + self.ordp), self._var_prec]
     
-    def valuation(self):
+    def valuation(self, val_vector=False):
         #RH: adapted from coeffmod_OMS_element.py
         #FIX THIS
         n = self.precision_relative()[0]
         if n == 0:
+            if val_vector:
+                return [self.ordp, []]
             return self.ordp
         return self.ordp + min([n] + [_padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(n) if not self._unscaled_moment(a).is_zero()])
     
