@@ -446,7 +446,56 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #RH: "copied" from dist.pyx
         return ZZ(len(self._moments) + self.ordp)
     
-    def valuation(self, val_vector=False):
+    def valuation(self):
+        r"""
+        Returns the `\varpi`-adic valuation of this distribution.
+        
+        .. WARNING::
+
+            This function modifies the distribution in place since it calls
+            :meth:`~sage.modular.pollack_stevens.coeffmod_OMS_element.CoeffMod_OMS_element.normalize`.
+        
+        EXAMPLES::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(5, 5)
+            sage: D = OverconvergentDistributions(2, base=R)
+            sage: v = (R**5)((R(O(5^5)), R(O(5^5)), R(O(5^4)), R(5^2 + O(5^3)), R(4*5 + O(5^2))))
+            sage: mu = CoeffMod_OMS_element(v, D, check=False)
+            sage: mu.valuation()
+            5
+        """
+        return self.normalize().ordp
+    
+    def _valuation(self, val_vector=False):
+        r"""
+        If self is normalized, this gives the same answer as
+        :meth:`~sage.modular.pollack_stevens.coeffmod_OMS_element.CoeffMod_OMS_element.valuation`.
+        Otherwise, it computes what is basically self.ordp plus the minimum of
+        the \varpi`-adic valuations of the moments; however, `O(\varpi^a)` in the
+        `i`th moment is considered to have valuation `a+i`. This is consistent
+        with the identification
+        
+        .. MATH::
+        
+            (\varpi^rD^0)/\text{Fil}^M \cong \varpi^r\left(D^0/\text{Fil}^{M-r}\right).
+        
+        EXAMPLES::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(5, 5)
+            sage: D = OverconvergentDistributions(2, base=R)
+            sage: v = (R**5)((R(O(5^5)), R(O(5^5)), R(O(5^4)), R(5^2 + O(5^3)), R(4*5 + O(5^2))))
+            sage: mu = CoeffMod_OMS_element(v, D, check=False)
+            sage: mu._valuation()
+            1
+            sage: mu._moments
+            (O(5^5), O(5^5), O(5^4), 5^2 + O(5^3), 4*5 + O(5^2))
+            sage: mu.normalize()
+            5^5 * ()
+            sage: mu._valuation()
+            5
+        """
         #RH: "copied" from dist.pyx, but then adjusted
         verbose("\n******** begin valuation ********", level=2)
         verbose("ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
@@ -498,7 +547,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if n == 0:
             return self
         self_ordp = self.ordp
-        self_val, val_vector = self.valuation(val_vector=True)
+        self_val, val_vector = self._valuation(val_vector=True)
         while True:
             shift = self_val - self.ordp
             self.ordp = self_val
@@ -544,6 +593,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 return self
             self_val = val_vector[n-1] + self_ordp
             val_vector = [val_vector[i] - shift for i in range(n)]
+            self_ordp = self.ordp
+            verbose("\nn: %s, self_val: %s, val_vector: %s, self.ordp: %s, self_ordp: %s"%(n, self_val, val_vector, self.ordp, self_ordp))
         #customized
     
     def moment(self, n):
