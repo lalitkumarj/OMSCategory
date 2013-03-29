@@ -628,51 +628,12 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: Id = MR.gens()[0]
                 sage: nu10 * MR.gammas[Id] - nu10 - mu10
                 7^8 * ()
+                sage: R = ZpCA(5, 5); D = OverconvergentDistributions(0,base=R);
+                sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
+                sage: nu.solve_diff_eqn()
+                5 * (1 + 3*5 + O(5^2), O(5))
         """
         #RH: see tests.sage for randomized verification that this function works correctly
-        # assert self._moments[0][0]==0, "not total measure zero"
-        # print "result accurate modulo p^",self.moment(0).valuation(self.p)
-        #v=[0 for j in range(0,i)]+[binomial(j,i)*bernoulli(j-i) for j in range(i,M)]
-#        if self.is_zero():
-#            return self.parent()(0)
-#        if self._unscaled_moment(0) != 0:
-#            raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
-#        M = len(self._moments)
-#        if M == 1:
-#            return self.parent()(0)
-#        if M == 2:
-#            return self.parent()(self.moment(1))
-#        R = self.parent().base_ring()
-#        p = self.parent().prime()
-#        pm = p ** self.ordp
-#        shift = 0
-#        while pm <= M:   #looking in F_k(M-1)
-#            pm *= p
-#            shift += 1
-#        self.ordp += shift
-#        #K = R.fraction_field()
-#        V = self.parent().approx_module(M-1)
-#        bern = [bernoulli(i) for i in range(0,M-1,2)]
-#        #What about p=2
-#        minhalf = ~(-2)    #bernoulli(1)
-#        # bernoulli(1) = -1/2; the only nonzero odd bernoulli number
-#        v = [minhalf * self.moment(m) for m in range(M-1)] #(m choose m-1) * B_1 * mu[m]/m            
-#        for m in range(1,M):
-#            scalar = self.moment(m) / m
-#            for j in range(m-1,M-1,2):
-#                v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
-#        ordp = min(a.valuation(p) for a in v)
-#        #Is this correct in ramified extensions of QQp?
-#        if ordp < 0:
-#            print "This should never happen!"
-#            scalar = K(p) ** (-ordp)
-#            v = V([R(a * scalar) for a in v])
-#        elif ordp > 0:
-#            scalar = p ** ordp
-#            v = V([R(a // scalar) for a in v])
-#        else:
-#            v = V([R(a) for a in v])
-#        return CoeffMod_OMS_element(v, self.parent(), ordp=ordp-shift, check=False)
         p = self.parent().prime()
         if self.is_zero():
             M = ZZ(self.precision_absolute())
@@ -682,7 +643,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if self._unscaled_moment(0) != 0:
             raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
         M = ZZ(len(self._moments))
-        ## RP: This if should never happen -- the distribution must be 0 at this point if M==1
+        ## RP: This should never happen -- the distribution must be 0 at this point if M==1
         if M == 1:
             return self.parent()(0)
         if M == 2:
@@ -694,7 +655,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 return mu
         R = self.parent().base_ring()
         K = R.fraction_field()
-        V = self.parent().approx_module(M-1)
         bern = [bernoulli(i) for i in range(0,M-1,2)]
         minhalf = ~K(-2)    #bernoulli(1)
         # bernoulli(1) = -1/2; the only nonzero odd bernoulli number
@@ -705,16 +665,19 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
         ordp = min(a.valuation() for a in v)
         #Is this correct in ramified extensions of QQp?
-        if ordp < 0:
-            scalar = K(p) ** (-ordp)
-            v = V([R(a * scalar) for a in v])
-        elif ordp > 0:
-            scalar = K(p) ** ordp
-            v = V([R(a // scalar) for a in v])
+        abs_prec = self.precision_absolute()
+        verbose("abs_prec: %s, ordp: %s"%(abs_prec, ordp), level=2)
+        if ordp != 0:
+            new_M = abs_prec - 1 - (abs_prec).exact_log(p) - ordp
+            verbose("new_M: %s"%(new_M))
+            V = self.parent().approx_module(new_M)
+            v = V([R(v[i] >> ordp) for i in range(new_M)])
         else:
-            v = V([R(a) for a in v])
+            new_M = abs_prec - 1 - (abs_prec).exact_log(p)
+            verbose("new_M: %s"%(new_M))
+            V = self.parent().approx_module(new_M)
+            v = V([R(v[i]) for i in range(new_M)])
+        v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly
         mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
-        e = self.ordp - mu.ordp  ## this is the amount the valuation dropped
-        f = M.exact_log(p)        ## this is the amount we need it to drop
-        mu = mu.reduce_precision(mu.precision_relative()-(f-e))
+        verbose("mu.ordp: %s, mu._moments: %s"%(mu.ordp, mu._moments), level=2)
         return mu.normalize()
