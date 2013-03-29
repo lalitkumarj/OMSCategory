@@ -394,15 +394,39 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #RH: copied from coeffmod_OMS_element.py
         return [ZZ(len(self._moments) + self.ordp), self._var_prec]
     
-    def valuation(self, val_vector=False):
-        #RH: adapted from coeffmod_OMS_element.py
-        #FIX THIS
+    def valuation(self):
+        r"""
+        Returns the `\varpi`-adic valuation of this family of distributions.
+        
+        .. WARNING::
+
+            This function modifies the distribution in place since it calls
+            :meth:`~sage.modular.pollack_stevens.coeffmod_OMS_families_element.CoeffMod_OMS_Families_element.normalize`.
+        """
+        return self.normalize().ordp
+    
+    def _valuation(self, val_vector=False):
         n = self.precision_relative()[0]
         if n == 0:
             if val_vector:
                 return [self.ordp, []]
             return self.ordp
-        return self.ordp + min([n] + [_padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(n) if not self._unscaled_moment(a).is_zero()])
+        if val_vector:
+            cur = _padic_val_of_pow_series(self._unscaled_moment(0))
+            min_val = cur# if not cur.is_zero() else Infinity
+            vv = [min_val]
+            for a in range(1, n):
+                cur_mom = self._unscaled_moment(a)
+                cur = _padic_val_of_pow_series(cur_mom) if not cur_mom.is_zero() else a + _padic_val_of_pow_series(cur_mom)
+                if cur < min_val:
+                    min_val = cur
+                vv.append(min_val)
+            ret = self.ordp + min_val#min(n, min_val)
+            #verbose("ret %s"%(ret), level=2)
+            #verbose("\n******** end valuation ********", level=2)
+            return [ret, vv]
+        ret = self.ordp + min([_padic_val_of_pow_series(self._unscaled_moment(a)) if not self._unscaled_moment(a).is_zero() else a + _padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(n)])
+        return ret
     
     def normalize(self):
         #RH: adapted from coeffmod_OMS_element.py
@@ -410,42 +434,93 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         V = self._moments.parent()
         R = V.base_ring()
         n, v_prec = self.precision_relative()
-        p = self.parent().prime()
-        self_val = self.valuation()
-        shift = self_val - self.ordp
-        self.ordp = self_val
-        #Factor out powers of uniformizer and check precision
-        p_precs = self.parent().filtration_precisions(n)
-        adjust_moms = 0
-        verbose("n: %s; shift: %s; _mom: %s\np_precs: %s"%(n, shift, self._moments, p_precs), level=2)
-        if shift > 0:
-            for i in range(n):
-                self._moments[i] = _shift_coeffs(self._moments[i], shift)
-                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
-        elif shift == 0:
-            for i in range(n):
-                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
-        else:
-            raise NotImplementedError("Currently only deals with the case where the base coefficients are a ring of integers.")
-        #Cut down moments because of precision loss
-        verbose("adjust_mom: %s\nn %s \n_moms: %s"%(adjust_moms, n, self._moments), level=2)
-        if adjust_moms >=n:
-            V = self.parent().approx_module(0)
-            self._moments = V([])
-            #self.ordp = adjust_moms
-            verbose("adjust_mom %s, \nn %s, \nself.ordp %s"%(adjust_moms, n, self.ordp))
-        elif adjust_moms > 0:
-            n -= adjust_moms    #Is this going to give the correct precision?
+        if n == 0:
+            return self
+        self_ordp = self.ordp
+        self_val, val_vector = self._valuation(val_vector=True)
+        while True:
+            shift = self_val - self.ordp
+            self.ordp = self_val
+            #Factor out powers of uniformizer and check precision
+            adjust_moms = 0
             p_precs = self.parent().filtration_precisions(n)
-            verbose("new p_precs: %s"%(p_precs), level=2)
-            R = self.parent().base_ring()
-            for i in range(n):
-                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
-        else:
-            R = self.parent().base_ring()
-            for i in range(n):
-                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
-        return self
+            verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments), level=2)
+            if shift > 0:
+                for i in range(n):
+                    self._moments[i] = _shift_coeffs(self._moments[i], shift)
+                    adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+            elif shift == 0:
+                for i in range(n):
+                    adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+            else:
+                raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
+            #Cut down moments because of precision loss
+            verbose("adjust_moms: %s\nn %s\n_moms: %s"%(adjust_moms, n, self._moments), level=2)
+            if adjust_moms >= n:
+                V = self.parent().approx_module(0, self._var_prec)
+                self._moments = V([])
+                #self.ordp = adjust_moms    #should we take min with parent().precision_cap()?
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
+            if adjust_moms == 0:
+                for i in range(n):
+                    self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
+            n -= adjust_moms
+            val_diff = val_vector[n-1] - shift
+            if val_diff == 0:
+                p_precs = self.parent().filtration_precisions(n)
+                V = self.parent().approx_module(n, self._var_prec)
+                self._moments = V([R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec) for i in range(n)])
+                verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
+                verbose("\n******** end normalize ********", level=2)
+                return self
+            self_val = val_vector[n-1] + self_ordp
+            val_vector = [val_vector[i] - shift for i in range(n)]
+            self_ordp = self.ordp
+            verbose("\nn: %s, self_val: %s, val_vector: %s, self.ordp: %s, self_ordp: %s"%(n, self_val, val_vector, self.ordp, self_ordp))
+        
+#        p = self.parent().prime()
+#        self_val = self._valuation()
+#        shift = self_val - self.ordp
+#        self.ordp = self_val
+#        #Factor out powers of uniformizer and check precision
+#        p_precs = self.parent().filtration_precisions(n)
+#        adjust_moms = 0
+#        verbose("n: %s; shift: %s; _mom: %s\np_precs: %s"%(n, shift, self._moments, p_precs), level=2)
+#        if shift > 0:
+#            for i in range(n):
+#                self._moments[i] = _shift_coeffs(self._moments[i], shift)
+#                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+#        elif shift == 0:
+#            for i in range(n):
+#                adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+#        else:
+#            raise NotImplementedError("Currently only deals with the case where the base coefficients are a ring of integers.")
+#        #Cut down moments because of precision loss
+#        verbose("adjust_mom: %s\nn %s \n_moms: %s"%(adjust_moms, n, self._moments), level=2)
+#        if adjust_moms >=n:
+#            V = self.parent().approx_module(0)
+#            self._moments = V([])
+#            #self.ordp = adjust_moms
+#            verbose("adjust_mom %s, \nn %s, \nself.ordp %s"%(adjust_moms, n, self.ordp))
+#        elif adjust_moms > 0:
+#            n -= adjust_moms    #Is this going to give the correct precision?
+#            p_precs = self.parent().filtration_precisions(n)
+#            verbose("new p_precs: %s"%(p_precs), level=2)
+#            R = self.parent().base_ring()
+#            for i in range(n):
+#                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
+#        else:
+#            R = self.parent().base_ring()
+#            for i in range(n):
+#                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
+#        return self
 
     def moment(self, n):
         #RH: "copied" from dist.pyx
@@ -539,7 +614,7 @@ def _padic_abs_prec_of_pow_series(f, var_prec=None):
     r"""
     """
     if var_prec is None:
-        var_prec = f.parent().default_prec()
+        var_prec = f._var_prec
     flist = f.padded_list()
     if len(flist) == 0:
         return Infinity
