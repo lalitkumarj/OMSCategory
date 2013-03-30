@@ -158,7 +158,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         self._p = base.base_ring().prime()
         self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
         k = k % (self._p - 1)
-        self._cp = (self._p-2) / (self._p-1)
+        #self._cp = (self._p-2) / (self._p-1)
         CoefficientModule_generic.__init__(self, k, base=base, \
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
@@ -201,14 +201,59 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     
     @cached_method
     def filtration_precisions(self, M=None):
-        r"""
-            Returns a tuple whose `i`th entry is `\lceil(M-i)(p-2)/(p-1)\rceil`,
-            i.e. the `p`-adic precision of the `i`th moment of an element of this
-            space. If ``M`` is None, uses the precision cap of this space.
-        """
+#        r"""
+#        Returns a tuple whose `i`th entry is `M-\lfloori(p-2)/(p-1)\rfloor`,
+#        the `p`-adic precision of the `i`th moment of an element of this space.
+#        If ``M`` is None, uses the precision cap of this space.
+#        """
         if M is None:
             M = self.precision_cap()[0]
-        return tuple(((M-i) * self._cp).ceil() for i in range(M))
+        elif M < 0:
+            raise ValueError("M(=%s) must be at least 0."%(M))
+        if M == 0:
+            return ()
+        if M == 1:
+            return (1, 1)
+        pm1 = self._p - 1
+        a = M
+        i = 0
+        precs = []
+        while True:
+            precs.append(a)
+            if a == 1:
+                break
+            if i % pm1 != 0:
+                a -= 1
+            i += 1
+        return tuple(precs)
+        #return tuple((M * self._cp).ceil() - (i * self._cp).floor() for i in range(M))
+        #return tuple(((M-i) * self._cp).ceil() for i in range(M))
+    
+    @cached_method
+    def length_of_moments(self, M=None):
+        if M is None:
+            M = self.precision_cap()[0]
+        elif M < 0:
+            raise ValueError("M(=%s) must be at least 0."%(M))
+        if M == 0:
+            return ZZ(0)
+        if M == 1:
+            return ZZ(2)
+        M = ZZ(M)
+        return M + ((M - 1)/(self._p - 2)).ceil()
+    
+    @cached_method
+    def length_reverse_lookup(self, L):
+        r"""
+        Given a number of moments ``L``, return ``M`` such that a precision of
+        ``M`` will have the largest number of moments less than or equal to ``L``.
+        """
+        if L < 0:
+            raise ValueError("L(=%s) must be at least 0."%(L))
+        if L <= 1:
+            return ZZ(0)
+        L = ZZ(L)
+        return ZZ(L - 1) - ((L - 2) / (self._p - 1)).floor()
     
     def precision_cap(self):
         return self._prec_cap
@@ -245,7 +290,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         elif var_prec < 0 or var_prec > self._prec_cap[1]:
             raise ValueError("var_prec must be between 0 and %s"%(self._prec_cap[1]))
         # Should/can we do something about the variable's precision?
-        return self.base_ring() ** p_prec
+        return self.base_ring() ** self.length_of_moments(p_prec)
     
     def random_element(self, prec=None):
         if prec == None:
@@ -256,7 +301,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         R = self.base_ring().base_ring()
         if R.is_field():
             V = V.change_ring()(self.base_ring().change_ring(R.integer_ring()))
-        return self(V.random_element())
+        return self(V.random_element()) #Make this better
     
     def clear_cache(self):
         self.approx_module.clear_cache()

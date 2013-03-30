@@ -18,30 +18,29 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         EXAMPLES::
         
             sage: D8 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 8))
-            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8
-            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^4)
+            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8 #the last moment should be O(3) but power series don't work well
+            (1 + O(3^5), 2 + O(3^5), 3 + O(3^4), 1 + 3 + O(3^4), 2 + 3 + O(3^3), 2*3 + O(3^3), 1 + 2*3 + O(3^2), 2 + 2*3 + O(3^2), 0) + O(w^4)
             sage: D4 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 4))
             sage: mu4 = D4([1,2,3,4,5,6,7,8,9,10]); mu4
-            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^4)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^4)
             sage: D4(mu8)
-            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^4)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^4)
             sage: mu4 == D4(mu8)
             True
             sage: D42 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,2], base_coeffs=ZpCA(3, 4))
-            sage: mu42 = D42([1,2,3,4,5,6,7,8,9,10])
-            sage: mu42
-            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^2)
+            sage: mu42 = D42([1,2,3,4,5,6,7,8,9,10]); mu42 
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^2)
             sage: D42(mu8)
-            (1 + O(3^2), 2 + O(3^2), 0, 1 + O(3)) + O(w^2)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^2)
             sage: mu42 == D42(mu8)
             True
-            sage: D42(15)
-            3 * (2 + O(3)) + O(w^2)
+            sage: D42(15)   #the last moment should be O(3) but power series don't work well
+            3 * (2 + O(3), 0) + O(w^2)
             sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap = [8 ,4], base_coeffs=ZpCA(11, 4))
             sage: R = D.base_ring(); K = R.base_extend(R.base_ring().fraction_field())
             sage: v = [K([1,2,11]) / 11, K([1]), K([11,1,1])]
             sage: D(v)
-            11^-1 * (1 + O(11^3) + (2 + O(11^3))*w + (11 + O(11^3))*w^2, 11 + O(11^2), 0) + O(w^4)
+            11^-1 * (1 + O(11^2) + (2 + O(11^2))*w + (11 + O(11^2))*w^2, 11 + O(11^2), 0) + O(w^4)
             sage: D(0)
             11^4 * () + O(w^4)
     """
@@ -63,28 +62,30 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 var_prec = min(var_prec, moments._var_prec)
                 # Note: imposing var_prec precision ins't done in this method.
                 # You should call normalize if you want that.
-                moments = moments._moments[:par_p_prec]
+                moments = moments._moments[:parent.length_of_moments(par_p_prec)]
                 moments = moments.change_ring(parent.base_ring())
             if isinstance(moments, CoeffMod_OMS_element):
                 # Coerce in using constant family
+                # Need to truncate
                 ordp = moments.ordp
-                p_prec = min(moments.precision_relative(), par_p_prec)
-                moments = self.parent().approx_module(p_prec, var_prec)(moments._moments)
+                r_prec = moments.precision_relative()
+                p_prec = min(parent.length_reverse_lookup(r_prec), par_p_prec)
+                moments = parent.approx_module(p_prec, var_prec)(moments._moments[:parent.length_of_moments(p_prec)])
             elif hasattr(moments, '__len__'):
                 #Need to modify if uniformiser is not p
-                #Deal with var_prec
-                R = parent.base_ring()
-                K = R.base_extend(R.base_ring().fraction_field())
-                p_prec = min(len(moments), par_p_prec)
-                #figure out var_prec from moments
-                V = parent.approx_module(p_prec, var_prec)
-                VK = V.base_extend(K)
-                moments = VK(moments[:p_prec])
+                #Need to deal with var_prec
                 if len(moments) == 0 or moments == 0:   #should do something with how "zero" moments is
                     V = parent.approx_module(0, var_prec) #var_prec?
                     moments = V([])
                     ordp = par_p_prec
                 else:
+                    R = parent.base_ring()
+                    K = R.base_extend(R.base_ring().fraction_field())
+                    p_prec = min(parent.length_reverse_lookup(len(moments)), par_p_prec)
+                    #figure out var_prec from moments
+                    V = parent.approx_module(p_prec, var_prec)
+                    VK = V.base_extend(K)
+                    moments = VK(moments[:parent.length_of_moments(p_prec)])
                     ordp = min([_padic_val_of_pow_series(a) for a in moments])
                     moments = V([_shift_coeffs(a, ordp) for a in moments])
             elif moments == 0:  #should do something with how "zero" moments is
@@ -93,14 +94,15 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 ordp = par_p_prec
             else:
                 R = parent.base_ring()
+                Rbase = R.base_ring()
                 K = R.base_extend(R.base_ring().fraction_field())
                 V = parent.approx_module(1, var_prec)
                 moments = K(moments)
                 ordp = _padic_val_of_pow_series(moments)
                 if ordp != 0:
-                    moments = V([_shift_coeffs(moments, ordp)])
+                    moments = V([_shift_coeffs(moments, ordp), Rbase(0, 1)])
                 else:
-                    moments = V([moments])
+                    moments = V([moments, Rbase(0, 1)])
         self._moments = moments
         #if var_prec is None:
         #    self._var_prec = parent._prec_cap[1]
@@ -158,16 +160,17 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         R = V.base_ring()
         smoments = copy(self._moments)
         rmoments = copy(right._moments)
+        length = self.parent().length_of_moments(rprec)
         if smoments.parent() is not V:
-            smoments = V(smoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(smoments)) if rprec > len(smoments) else []))
+            smoments = V(smoments.list(copy=False)[:length] + ([R(0)] * (length - len(smoments)) if length > len(smoments) else []))
         if rmoments.parent() is not V:
-            rmoments = V(rmoments.list(copy=False)[:rprec] + ([R(0)] * (rprec - len(rmoments)) if rprec > len(rmoments) else []))
+            rmoments = V(rmoments.list(copy=False)[:length] + ([R(0)] * (length - len(rmoments)) if length > len(rmoments) else []))
         # We multiply by the relative power of p
         if self.ordp > right.ordp:
-            for i in range(rprec):
+            for i in range(length):
                 smoments[i] = _shift_coeffs(smoments[i], self.ordp - right.ordp, right=False)
         elif self.ordp < right.ordp:
-            for i in range(rprec):
+            for i in range(length):
                 rmoments[i] = _shift_coeffs(rmoments[i], right.ordp - self.ordp, right=False)
         if negate:
             rmoments = -rmoments
@@ -211,11 +214,11 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 return -1
         elif rrprec == 0:
             return 1
-        rprec = min(lrprec, rrprec)
         c = cmp(left.ordp, right.ordp)
         if c: return c
         #Will this work? Not sure power series compare well (see e.g. trac 9457)
-        return cmp(left._moments[:rprec], right._moments[:rprec])
+        length = left.parent().length_of_moments(min(lrprec, rrprec))
+        return cmp(left._moments[:length], right._moments[:length])
 #
 #        p = left.parent().prime()
 #        if left.ordp > right.ordp:
@@ -278,7 +281,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         elif prec[0] > aprec or prec[1] > v_aprec:
             return False    #Should this raise a PrecisionError instead
         p_precs = self.parent().filtration_precisions(prec[0])
-        for a in xrange(prec[0]):
+        for a in xrange(len(p_precs)):
             if not self._unscaled_moment(a)._is_zero_padic_power_series([p_precs[a], prec[1]]):
                 return False
         return True
@@ -300,6 +303,9 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
 #        return True
     
     def find_scalar(self, other, M = None, check=True):
+        r"""
+            M[0] is the desired p-adic precision.
+        """
         #self.normalize()
         #other.normalize()
         n, s_var_prec = self.precision_relative()
@@ -333,11 +339,12 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             except IndexError:
                 raise ValueError("self is zero")
             v = _padic_val_of_pow_series(a, p)
-        relprec = n - i - v
+        relprec = p_precs[i] - v
         var_prec = min(s_var_prec, other_var_prec)  #should this depend on w-adic valuation?
         Rbase = R.base_ring()
         RK = R.change_ring(Rbase.fraction_field())
-        if i < other_pr:
+        other_length = self.parent().length_of_moments(other_pr)
+        if i < other_length:
             #Hack
             verbose("val, other._unscaled_moment(%s) = %s, %s"%(i, other.ordp, other._moments[i]))
             #alpha = _sanitize_alpha(RK(other._unscaled_moment(i)) / RK(a))
@@ -350,7 +357,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             alpha = RK([Rbase(0, p_precs[i])], var_prec)
         verbose("alpha = %s"%(alpha))
         
-        while i < other_pr-1:
+        while i < other_length-1:
             i += 1
             verbose("comparing p moment %s"%i)
             a = self._unscaled_moment(i)
@@ -362,15 +369,15 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 if other._unscaled_moment(i) != alpha * a:
                     raise ValueError("not a scalar multiple")
             v = _padic_val_of_pow_series(a, p)
-            if n - i - v > relprec:
-                verbose("Resetting alpha: relprec=%s, n-i=%s, v=%s"%(relprec, n-i, v))
-                relprec = n - i - v
+            if p_precs[i] - v > relprec:
+                verbose("Resetting alpha: relprec=%s, i=%s, p_precs[i]=%s, v=%s"%(relprec, i,p_precs[i], v))
+                relprec = p_precs[i] - v
                 #Should we alter var_prec, too?
                 #Hack
                 alpha = RK(other._unscaled_moment(i)) / RK(a)
                 #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
                 verbose("alpha=%s"%(alpha))
-        if relprec < M[0]:
+        if relprec < M[0]:  #May need to change this
             raise ValueError("result not determined to high enough precision")
         #if var_prec < M[1]:
         
@@ -387,12 +394,10 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return alpha
     
     def precision_relative(self):
-        #RH: copied from coeffmod_OMS_element.py
-        return [ZZ(len(self._moments)), self._var_prec]
+        return [self.parent().length_reverse_lookup(len(self._moments)), self._var_prec]
     
     def precision_absolute(self):
-        #RH: copied from coeffmod_OMS_element.py
-        return [ZZ(len(self._moments) + self.ordp), self._var_prec]
+        return [ZZ(self.parent().length_reverse_lookup(len(self._moments)) + self.ordp), self._var_prec]
     
     def valuation(self):
         r"""
@@ -411,13 +416,14 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             if val_vector:
                 return [self.ordp, []]
             return self.ordp
+        length = self.parent().length_of_moments(n)
         if val_vector:
             cur = _padic_val_of_pow_series(self._unscaled_moment(0))
             min_val = cur# if not cur.is_zero() else Infinity
             vv = [min_val]
-            for a in range(1, n):
+            for a in range(1, length):
                 cur_mom = self._unscaled_moment(a)
-                cur = _padic_val_of_pow_series(cur_mom) if not cur_mom.is_zero() else a + _padic_val_of_pow_series(cur_mom)
+                cur = _padic_val_of_pow_series(cur_mom) if not cur_mom.is_zero() else a + _padic_val_of_pow_series(cur_mom) #Is this last part right with our filtration?
                 if cur < min_val:
                     min_val = cur
                 vv.append(min_val)
@@ -425,7 +431,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             #verbose("ret %s"%(ret), level=2)
             #verbose("\n******** end valuation ********", level=2)
             return [ret, vv]
-        ret = self.ordp + min([_padic_val_of_pow_series(self._unscaled_moment(a)) if not self._unscaled_moment(a).is_zero() else a + _padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(n)])
+        ret = self.ordp + min([_padic_val_of_pow_series(self._unscaled_moment(a)) if not self._unscaled_moment(a).is_zero() else a + _padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(length)])    #Is this last part right with our filtration?
         return ret
     
     def normalize(self):
@@ -444,13 +450,14 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             #Factor out powers of uniformizer and check precision
             adjust_moms = 0
             p_precs = self.parent().filtration_precisions(n)
+            length = len(p_precs)
             verbose("n: %s; shift: %s; _mom: %s"%(n, shift, self._moments), level=2)
             if shift > 0:
-                for i in range(n):
+                for i in range(length):
                     self._moments[i] = _shift_coeffs(self._moments[i], shift)
                     adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
             elif shift == 0:
-                for i in range(n):
+                for i in range(length):
                     adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
             else:
                 raise NotImplementedError("Currently only deals with the case where the base ring is a ring of integers.")
@@ -465,23 +472,25 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 verbose("\n******** end normalize ********", level=2)
                 return self
             if adjust_moms == 0:
-                for i in range(n):
+                for i in range(length):
                     self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec)
                 verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
                 verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
                 verbose("\n******** end normalize ********", level=2)
                 return self
             n -= adjust_moms
-            val_diff = val_vector[n-1] - shift
+            p_precs = self.parent().filtration_precisions(n)
+            length = len(p_precs)
+            val_diff = val_vector[length-1] - shift
             if val_diff == 0:
-                p_precs = self.parent().filtration_precisions(n)
+                #p_precs = self.parent().filtration_precisions(n)
                 V = self.parent().approx_module(n, self._var_prec)
-                self._moments = V([R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec) for i in range(n)])
+                self._moments = V([R(_add_big_ohs_list(self._moments[i], [p_precs[i], v_prec]), v_prec) for i in range(length)])
                 verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
                 verbose("\n******** end normalize ********", level=2)
                 return self
-            self_val = val_vector[n-1] + self_ordp
-            val_vector = [val_vector[i] - shift for i in range(n)]
+            self_val = val_vector[length-1] + self_ordp
+            val_vector = [val_vector[i] - shift for i in range(length)]
             self_ordp = self.ordp
             verbose("\nn: %s, self_val: %s, val_vector: %s, self.ordp: %s, self_ordp: %s"%(n, self_val, val_vector, self.ordp, self_ordp))
         
@@ -547,8 +556,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             p_prec = new_prec
             var_prec = rprec[1]
         if p_prec > rprec[0] or var_prec > rprec[1]:
-            raise ValuError("Precisions specified must be less than current precisions.")
-        moments = self._moments[:p_prec]
+            raise ValueError("Precisions specified must be less than current precisions.")
+        moments = self._moments[:self.parent().length_of_moments(p_prec)]
         ordp = self.ordp
         return CoeffMod_OMS_Families_element(moments, self.parent(), ordp=ordp, check=False, var_prec=var_prec)
     
@@ -561,8 +570,6 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         if self._unscaled_moment(0) != 0:
             raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator.")
         M = ZZ(len(self._moments))
-        if M == 1:
-            return self.parent()(0)
         if M == 2:
             if p == 2:
                 raise ValueError("Not enough accuracy to return anything")
@@ -570,7 +577,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 mu = self.parent()()
                 mu.ordp = self.ordp
                 V = self.parent().approx_module(1, var_prec)
-                return CoeffMod_OMS_Families_element(V([self._unscaled_moment(1)]), self.parent(), ordp=self.ordp, check=False, var_prec=var_prec)
+                return CoeffMod_OMS_Families_element(V([self._unscaled_moment(1), V.base_ring().base_ring()(0, 1)]), self.parent(), ordp=self.ordp, check=False, var_prec=var_prec)
         from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
         R = self.base_ring().base_ring()
         DD = self.parent()
