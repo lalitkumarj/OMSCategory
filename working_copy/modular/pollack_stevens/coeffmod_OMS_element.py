@@ -153,7 +153,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         rprec = aprec - ans.ordp
         V = ans.parent().approx_module(rprec)
         R = V.base_ring()
-        verbose([aprec, ans.ordp, rprec])
+        verbose([aprec, ans.ordp, rprec], level=2)
         smoments = copy(self._moments)
         rmoments = copy(right._moments)
         if smoments.parent() is not V:
@@ -169,7 +169,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 rmoments[i] = rmoments[i] << (right.ordp - self.ordp)
         if negate:
             rmoments = -rmoments
-        verbose(self._moments)
+        verbose(self._moments, level=2)
         ans._moments = smoments + rmoments
         verbose("ans_ordp %s, ans_moments %s"%(ans.ordp, ans._moments), level=2)
         verbose("\n******** end _addsub ********", level=2)
@@ -183,7 +183,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         ans = CoeffMod_OMS_element(None, self.parent(), None, False)
         #p = self.parent().prime()
         if right.is_zero():
-            verbose("right is zero: %s"%(right))
+            verbose("right is zero: %s"%(right), level=2)
             ans._moments = self.parent().approx_module(0)([])
             ans.ordp = min(self.parent().precision_cap(), right.valuation()+self.ordp)
         else:
@@ -572,14 +572,14 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 V = self.parent().approx_module(0)
                 self._moments = V([])
                 #self.ordp = adjust_moms    #should we take min with parent().precision_cap()?
-                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp), level=2) 
                 verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
                 verbose("\n******** end normalize ********", level=2)
                 return self
             if adjust_moms == 0:
                 for i in range(n):
                     self._moments[i] = self._moments[i].add_bigoh(n-i)
-                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp)) 
+                verbose("adjust_moms %s, n %s, self.ordp %s"%(adjust_moms, n, self.ordp), level=2) 
                 verbose("output: ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
                 verbose("\n******** end normalize ********", level=2)
                 return self
@@ -594,7 +594,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             self_val = val_vector[n-1] + self_ordp
             val_vector = [val_vector[i] - shift for i in range(n)]
             self_ordp = self.ordp
-            verbose("\nn: %s, self_val: %s, val_vector: %s, self.ordp: %s, self_ordp: %s"%(n, self_val, val_vector, self.ordp, self_ordp))
+            verbose("\nn: %s, self_val: %s, val_vector: %s, self.ordp: %s, self_ordp: %s"%(n, self_val, val_vector, self.ordp, self_ordp), level=2)
         #customized
     
     def moment(self, n):
@@ -720,12 +720,12 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         verbose("abs_prec: %s, ordp: %s"%(abs_prec, ordp), level=2)
         if ordp != 0:
             new_M = abs_prec - 1 - (abs_prec).exact_log(p) - ordp
-            verbose("new_M: %s"%(new_M))
+            verbose("new_M: %s"%(new_M), level=2)
             V = self.parent().approx_module(new_M)
             v = V([R(v[i] >> ordp) for i in range(new_M)])
         else:
             new_M = abs_prec - 1 - (abs_prec).exact_log(p)
-            verbose("new_M: %s"%(new_M))
+            verbose("new_M: %s"%(new_M), level=2)
             V = self.parent().approx_module(new_M)
             v = V([R(v[i]) for i in range(new_M)])
         v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly

@@ -16,6 +16,9 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
         elif p != self.parent().prime():
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
         return min([val.diagonal_valuation() for val in self._map])
+    
+    def precision_relative(self):
+        return min([mu.precision_relative() for mu in self.values()])
 
     def list_of_total_measures(self):
         r"""
@@ -29,7 +32,7 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
 
         - List of p-adic numberes
         """
-        z = mu.parent().base().zero()
+        z = self.parent().base().zero()
         return [mu.moment(0) if mu.precision_relative() != 0 else z for mu in self.values()]
     
     @cached_method
