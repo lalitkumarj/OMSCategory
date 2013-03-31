@@ -227,7 +227,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             return ret.minus_part()
         return ret
 
-    def is_start_of_basis(self,list):
+    def is_start_of_basis(self, list):
         r"""
         Determines if the inputed list of OMS's can be extended to a basis of this space
 
@@ -239,82 +239,92 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - True/False
         """
-        for j in range(len(list)):
-            assert list[j].valuation() >= 0, "Symbols must be integral"
-
+        for Phi in list:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
         R = self.base()
-        ## THIS IS NOT GREAT
-        #M = list[0].values()[0].moment(0).precision_relative()
-        p = self.prime()
+        list = [Phi.list_of_total_measures() for Phi in list]
         d = len(list)
-            
-        list = [list[a].list_of_total_measures() for a in range(len(list))]
-        A = Matrix(GF(p),len(list),len(list[0]),list)
-
-        return A.rank() == len(list)
-
-
-    def linear_relation(self,list):
+        A = Matrix(R.residue_field(), d, len(list[0]), list)
+        return A.rank() == d
+    
+    def linear_relation(self, List):
         r"""
         Finds a linear relation between the given list of OMSs.  If they are LI, returns a list of all 0's.
     
         INPUT:
 
-        - ``list`` -- a list of OMSs
+        - ``List`` -- a list of OMSs
 
         OUTPUT:
 
         - A list of p-adic numbers describing the linear relation of the list of OMSs
         """
-        for j in range(len(list)):
-            assert list[j].valuation() >= 0, "Symbols must be integral"
-
+        for Phi in List:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
+        
         R = self.base()
         ## NEED A COMMAND FOR RELATIVE PRECISION OF OMS
-        M = list[0].values()[0].precision_relative()
+        M = List[0].precision_relative()
         p = self.prime()
-        d = len(list)
+        d = len(List)
         V = R**d
-            
+        
         if d == 1:
-            if list[0].is_zero():
+            if List[0].is_zero():
                 return [R(1)]
             else:
                 return [R(0)]
+        # Would be better to use the library as follows. Unfortunately, matsolvemod
+        # is not included in the gen class!!
+        #from sage.libs.pari.gen import pari
+        #cols = [List[c].list_of_total_measures() for c in range(len(List) - 1)]
+        #A = pari(Matrix(ZZ, len(cols[0]), d - 1, lambda i, j : cols[j][i].lift()))
+        #aug_col = pari([ZZ(a) for a in List[-1].list_of_total_measures()]).Col()
+        #v = A.matsolvemod(p ** M, aug_col)
+        
         s = '['
-        for c in range(len(list)-1):
-            v = list[c].list_of_total_measures()
+        for c in range(d-1):
+            v = List[c].list_of_total_measures()
             for r in range(len(v)):
                 s += str(ZZ(v[r]))
                 if r < len(v) - 1:
                     s += ','
-            if c < len(list) - 2:
+            if c < d - 2:
                 s += ';'
         s = s + ']'
-
+        
+        verbose("s = %s"%(s))
+        
         A = gp(s)
-        if len(list) == 2:
+        verbose("A = %s"%(A))
+        if len(List) == 2:
             A = A.Mat()
-
+        
         s = '['
-        v = list[len(list)-1].list_of_total_measures()
+        v = List[d-1].list_of_total_measures()
         for r in range(len(v)):
             s += str(ZZ(v[r]))
             if r < len(v) - 1:
                 s += ','
         s += ']~'
-
+        
+        verbose("s = %s"%(s))
+        
         B = gp(s)
-
+        
+        verbose("B = %s"%(B))
+        
         v = A.mattranspose().matsolvemod(p**M,B)
-
+        
+        verbose("v = %s"%(v))
+        
         if v == 0:
             return [R(0) for a in range(len(v))]
         else:
             ## Move back to SAGE from Pari
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
-
+    
     @cached_method
     def basis_of_ordinary_subspace(self, d=None):
         r"""
@@ -330,7 +340,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - A list of OMS's which form the desired basis
         """
-        if d == None:
+        if d is None:
             d = self.dimension_of_ordinary_subspace()
         basis = []
         done = (d <= len(basis))
@@ -346,7 +356,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
             verbose("Projecting to ordinary subspace")
             #            print "projecting"
-            for a in range(M+2):
+            for a in range(M + 2):
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
 
@@ -354,20 +364,18 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             #            print "Forming U_p-span"
             Phi_span = [Phi]
             LI = self.is_start_of_basis(Phi_span)
-            if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
-                basis += [Phi_span[len(Phi_span)-1]]
+            if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
+                basis += [Phi_span[-1]]
                 verbose("basis now has size %s"%(len(basis)))
             done = (d <= len(basis))
             while LI and (not done):
-                Phi_span += [Phi_span[len(Phi_span)-1].hecke(p)]
+                Phi_span += [Phi_span[-1].hecke(p)]
                 LI = self.is_start_of_basis(Phi_span)
-                if self.is_start_of_basis(basis + [Phi_span[len(Phi_span)-1]]) and LI:
-                    basis += [Phi_span[len(Phi_span)-1]]
+                if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
+                    basis += [Phi_span[-1]]
                 done = (d <= len(basis))
-            
         return basis
-                 
-
+    
     def hecke_matrix(self, q, basis):
         r"""
         Finds the matrix of T_q wrt to the given basis
@@ -382,17 +390,16 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - d x d matrix where d is the length of basis
         """
-        d = len(basis)
+        #d = len(basis)
         T = []
-        for r in range(d):
-            h = basis[r].hecke(q)
+        for Phi in basis:
+            h = Phi.hecke(q)
             row = self.linear_relation(basis + [h])
             ## Probably should put some check here that it really worked.
             row.pop()
-            T += [row]
+            T.append(row)
         return Matrix(T).transpose()
-            
-    
+
 #@cached_method
 def _prec_for_solve_diff_eqn(M, p, k):
     r"""
