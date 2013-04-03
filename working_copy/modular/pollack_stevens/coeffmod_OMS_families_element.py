@@ -442,9 +442,16 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         n, v_prec = self.precision_relative()
         if n == 0:
             return self
+        self_aprec = self.precision_absolute()[0] 
         self_ordp = self.ordp
         self_val, val_vector = self._valuation(val_vector=True)
         while True:
+            ## RP -- just added these lines to stop crashing, but doesn't quite work -- takes more than once to fully normalize to 0.
+            if self_val == Infinity:
+                V = self.parent().approx_module(0,self._var_prec)
+                self._moments = V(0)
+                self.ordp = self_aprec
+                return self
             shift = self_val - self.ordp
             self.ordp = self_val
             #Factor out powers of uniformizer and check precision
