@@ -280,7 +280,7 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         AF, A = self.get_action_matrices(g, len(v._moments))
         w = (v._moments * AF) * A
         Elem = v.parent().Element
-        return Elem(w, v.parent(), ordp=v.ordp, check=False)
+        return Elem(w, v.parent(), ordp=v.ordp, var_prec=v._var_prec,check=False)
 
 #This class should eventually be moved into its own file
 class WeightKAction_OMS(WeightKAction_generic):
