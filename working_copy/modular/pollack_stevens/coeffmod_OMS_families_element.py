@@ -182,7 +182,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         """
         Scalar multiplication self*right.
         """
-        ans = coeffmod_OMS_families_element(None, self.parent(), None, False, var_prec=self._var_prec)
+        ans = CoeffMod_OMS_Families_element(None, self.parent(), None, False, var_prec=self._var_prec)
         if right.is_zero():
             ans._moments = self.parent().approx_module(0, self._var_prec)([])
             ans.ordp = min(self.parent().precision_cap()[0], right.valuation()+self.ordp)
@@ -619,7 +619,7 @@ def _padic_val_unit_of_pow_series(f, p=None):
     if f == 0:
         return (Infinity, self.parent()(0,0))
     if p is None:
-        p = self.parent().base_ring().prime()
+        p = f.parent().base_ring().prime()
     v = _padic_val_of_pow_series(f, p)
     u = f.parent()([(coeff / (p ** v)) for coeff in f])
     return (v, u)
