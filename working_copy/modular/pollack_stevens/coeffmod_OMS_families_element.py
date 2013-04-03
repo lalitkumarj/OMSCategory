@@ -448,8 +448,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         while True:
             ## RP -- just added these lines to stop crashing, but doesn't quite work -- takes more than once to fully normalize to 0.
             if self_val == Infinity:
-                V = self.parent().approx_module(0,self._var_prec)
-                self._moments = V(0)
+                V = self.parent().approx_module(0, self._var_prec)
+                self._moments = V([])
                 self.ordp = self_aprec
                 return self
             shift = self_val - self.ordp
