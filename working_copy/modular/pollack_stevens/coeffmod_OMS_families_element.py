@@ -9,6 +9,7 @@ from sage.rings.padics.precision_error import PrecisionError
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 from sage.rings.integer_ring import ZZ
+from sage.rings.padics.factory import Qp
 from sage.functions.other import ceil
 
 class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
@@ -588,8 +589,11 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 V = self.parent().approx_module(1, var_prec)
                 return CoeffMod_OMS_Families_element(V([self._unscaled_moment(1), V.base_ring().base_ring()(0, 1)]), self.parent(), ordp=self.ordp, check=False, var_prec=var_prec)
         from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
-        R = self.base_ring().base_ring()
         DD = self.parent()
+        ## Hack fix here -- the problem is that because we are using fixed weight distributions
+        ## with the regular filtration, one needs more precision than the base ring has.
+        R = Qp(DD.prime(),M)
+        #R = self.base_ring().base_ring()
         D = OverconvergentDistributions(0, base=R, prec_cap=M, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
         V = D.approx_module(M)
         Elem = D.Element
@@ -716,6 +720,9 @@ def _shift_coeffs(f, shift, right=True):
         i.e. divide each by shift powers of the uniformizer.
     """
     if shift == 0:
+        return f
+    # RP: Function w/o this fix seems to be failing when f = 0 and returning O(w^0) 
+    if f == 0:
         return f
     if not right:
         shift = -shift

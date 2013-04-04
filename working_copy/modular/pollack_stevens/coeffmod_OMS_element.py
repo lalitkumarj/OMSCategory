@@ -643,11 +643,14 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         if DD is None:
             DD = self.parent().lift()
             return DD(self)
-        length = min(ZZ(len(self._moments)), DD.precision_cap()[0])
-        VV = DD.approx_module(length)
-        V = self.parent().approx_module(length)
-        new_moments = VV(self._moments[:length])
-        return DD.Element(new_moments, DD, ordp=self.ordp, check=False)
+        length = min(ZZ(len(self._moments)), DD.length_of_moments())
+        prec = DD.length_reverse_lookup(length)
+        actual_length = DD.length_of_moments(prec)
+        ## actual_length might be one smaller than length because families of distributions can't achieve every possible length
+        VV = DD.approx_module(prec)
+        #V = self.parent().approx_module(length)
+        new_moments = VV(self._moments[:actual_length])
+        return DD.Element(new_moments, DD, ordp=self.ordp, check=False, var_prec=DD.precision_cap()[1])
     
     def solve_diff_eqn(self):
         r"""
