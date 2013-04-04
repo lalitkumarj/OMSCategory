@@ -604,6 +604,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             mu._moments[j] = R.one()
             mu._moments[j-1] = R.zero()
             mus += self.moment(j) * mu.solve_diff_eqn().lift(DD)
+        prec = DD.length_reverse_lookup(M)
+        mus = mus.reduce_precision(prec-1)
         #Should we remove precision like at end of non-family code, or is this taken care of?
         return mus.normalize()  #Is it necessary to normalize?
 
