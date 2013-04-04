@@ -273,6 +273,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         n, v_prec = self.precision_relative()
         if n == 0:
             return True
+        else:
+            return False
         aprec, v_aprec = self.precision_absolute()
         if prec is None:
             prec = [n, v_prec]
