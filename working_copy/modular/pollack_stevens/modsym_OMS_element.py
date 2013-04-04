@@ -30,7 +30,7 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
         
         OUTPUT:
 
-        - List of p-adic numberes
+        - List of p-adic numbers
         """
         z = self.parent().base().zero()
         return [mu.moment(0) if mu.precision_relative() != 0 else z for mu in self.values()]

@@ -20,7 +20,7 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
     
     def list_of_total_measures(self):
         r"""
-        Returns the list of total measures of the OMS evaluated at each of our generators
+        Returns the list of total measures of the OMS families evaluated at each of our generators.
 
         INPUT:
 
@@ -28,10 +28,30 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
         
         OUTPUT:
 
-        - List of p-adic numberes
+        - List of p-adic numbers
         """
-        z = mu.parent().base().zero()
-        return [mu.moment(0) if mu.precision_relative() != 0 else z for mu in self.values()]
+        z = self.parent().base().zero()
+        p = self.parent().prime()
+        return [mu.moment(0) if mu.precision_relative()[0] != 0 else z for mu in self.values()]
+
+    def list_of_total_measures_at_fixed_weight(self,k=None):
+        r"""
+        Returns the list of total measures of the OMS specialized to weight k and evaluated at each of our generators.
+        If no weight is given, just use the weight from the disc the family lives on.
+
+        INPUT:
+
+        - k -- (optional) integer
+        
+        OUTPUT:
+
+        - List of p-adic numbers
+        """
+        if k == None:
+            k = self.weight()
+        z = self.parent().base().zero()
+        p = self.parent().prime()
+        return [mu.moment(0).polynomial().substitute(w=((1+p)**k-1)/p) if mu.precision_relative()[0] != 0 else z for mu in self.values()]
     
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
