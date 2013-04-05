@@ -592,6 +592,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         DD = self.parent()
         ## Hack fix here -- the problem is that because we are using fixed weight distributions
         ## with the regular filtration, one needs more precision than the base ring has.
+        ## RH: We can take something smaller than M
         R = Qp(DD.prime(),M)
         #R = self.base_ring().base_ring()
         D = OverconvergentDistributions(0, base=R, prec_cap=M, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
