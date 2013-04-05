@@ -204,7 +204,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         p = self.prime()
 
         while not done:
-            print "basis has size %s"%(len(basis))
+            print "basis has size %s. seeking size %s"%(len(basis),d)
             verbose("Forming a random symbol")
             print "-----------------------"
             print "Forming a random symbol"
