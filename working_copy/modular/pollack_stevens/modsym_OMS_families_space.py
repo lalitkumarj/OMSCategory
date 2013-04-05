@@ -67,7 +67,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        M_in = _prec_for_solve_diff_eqn_families(M[0], p)
+        M_in = _prec_for_solve_diff_eqn_families(M[0], p) 
         #print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M[1]])
         R = CM.base_ring()
@@ -204,7 +204,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         p = self.prime()
 
         while not done:
-            print "basis has size %s. seeking size %s"%(len(basis),d)
+            print "basis has size %s out of predicted %s"%(len(basis),d)
             verbose("Forming a random symbol")
             print "-----------------------"
             print "Forming a random symbol"
@@ -213,7 +213,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             verbose("Projecting to ordinary subspace")
             print "projecting"
             for a in range(M + 2):
-                print a
+                print "%s out of %s"%(a,M+1)
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
 
@@ -264,8 +264,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if c == []:
             return []
         for j in range(1,var_prec):
-            #print "Working at coefficient %s"%(j)
-            print j
+            print "Working at coefficient %s"%(j)
             v = [0 for k in range(len(vs[0]))]
             for i in range(len(vs)):
                 for a in range(j):
@@ -273,7 +272,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                         v[r] += c[i].padded_list()[a] * vs[i][r].padded_list()[j-a]
             c_coef = find_linear_relation(vs_coef + [v],p,M)
             #print "Found relation %s",%(c_coef)
-            print c_coef
             temp = [c_coef[r]/c_coef[len(c_coef)-1] for r in range(len(c_coef)-1)]
             c_coef = temp
             for r in range(len(c)):
@@ -299,11 +297,14 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         """
         #d = len(basis)
         T = []
+        r = 1
         for Phi in basis:
+            print "At %s-th basis element"%(r)
+            r = r + 1
             h = Phi.hecke(q)
             row = self.linear_relation(basis + [h])
+            row = [-row[a]/row[len(row)-1] for a in range(len(row)-1)]
             ## Probably should put some check here that it really worked.
-            row.pop()
             T.append(row)
         return Matrix(T).transpose()
 
@@ -356,7 +357,6 @@ def find_linear_relation(vs, p, M):
 
     - A list of p-adic numbers describing the linear relation of the vs
     """
-    print "In find_liner_relation"
     d = len(vs)
     R = Qp(p,M)
     V = R**d
@@ -377,6 +377,16 @@ def find_linear_relation(vs, p, M):
         #A = pari(Matrix(ZZ, len(cols[0]), d - 1, lambda i, j : cols[j][i].lift()))
         #aug_col = pari([ZZ(a) for a in List[-1].list_of_total_measures()]).Col()
         #v = A.matsolvemod(p ** M, aug_col)
+
+        ## Stupid hack here to deal with the fact that I can't get
+        ## matsolvemod to work if B=0
+    z = True
+    for r in range(len(vs[d-1])):
+        if vs[d-1][r] != 0:
+            z = False
+
+    if z:
+        return [R(0) for a in range(len(vs)-1)] + [1]
         
     s = '['
     for c in range(d-1):
@@ -420,3 +430,4 @@ def find_linear_relation(vs, p, M):
             ## Move back to SAGE from Pari
         v = [R(v[a]) for a in range(1,len(v)+1)]
         return v + [R(-1)]
+
