@@ -428,12 +428,14 @@ class ModularSymbolElement_generic(ModuleElement):
         for g in MR.reps_with_two_torsion():
             gamg = MR.two_torsion_matrix(g)
             if not (f[g]*gamg + f[g]).is_zero():
+                print f[g]*gamg + f[g]
                 raise ValueError("Two torsion relation failed with",g)
 
         ## Test three torsion relations
         for g in MR.reps_with_three_torsion():
             gamg = MR.three_torsion_matrix(g)
             if not (f[g]*(gamg**2) + f[g]*gamg + f[g]).is_zero():
+                print f[g]*(gamg**2) + f[g]*gamg + f[g]
                 raise ValueError("Three torsion relation failed with",g)
 
         ## Test that the symbol adds to 0 around the boundary of the fundamental domain

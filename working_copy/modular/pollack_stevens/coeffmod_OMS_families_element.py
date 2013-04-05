@@ -608,7 +608,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         prec = DD.length_reverse_lookup(M)
         mus = mus.reduce_precision(prec-1)
         #Should we remove precision like at end of non-family code, or is this taken care of?
-        return mus.normalize()  #Is it necessary to normalize?
+        return mus  #Is it necessary to normalize?
 
 def _padic_val_of_pow_series(f, p=None):
     r"""

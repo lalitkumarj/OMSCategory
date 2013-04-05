@@ -67,9 +67,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        M_in = _prec_for_solve_diff_eqn_families(M[0], p) 
-        #print "M_in", M_in, "var_prec", M[1]
+        ## RP: _prec_for_solve_diff_eqn_families isn't working right (gave 21 for M = 5, p = 3)
+        #M_in = _prec_for_solve_diff_eqn_families(M[0], p)
+        M_in = M[0] + ceil(ZZ(M[0]).log(p)) + 1
+        print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M[1]])
+        print CM
         R = CM.base_ring()
         manin = self.source()
         gens = manin.gens()
@@ -81,9 +84,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         t = CM(0)
         for g in gens[1:]:
             verbose("Looping over generators. At generator %s"%(g))
-            #print "CM._prec_cap", CM.precision_cap()
+            print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element([M_in, M[1]])
-#            print "pre:",D[g]
+            print "pre:",D[g]
+            print "new t",t
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
                     raise ValueError("Level 1 not implemented")
@@ -127,18 +131,21 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         else:
             chara = 1
         from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
-        R = self.base_ring()
+        R = CM.base_ring()
         verbose("Compute automorphy factor.")
         K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R)  #Maybe modify aut... to only return 2 first coeffs?
+        print "aut"
+        print K
         if k != 0:
             err = -t.moment(0) / (K[0] - 1)
-            v = [err] + [R(0)] * (M_in - 1)
+            v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
             err = CM(v)
         else:
             err = -t.moment(0) / (K[1])
-            v = [R(0), err] + [R(0)] * (M_in - 2)
+            v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
-        
+
+        print "err:",err
         if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
             err = err * gam - err
             D[g] += err
@@ -148,8 +155,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t += err * gam - err
         
         verbose("Solve difference equation.")
+        print "input to diff eqn"
+        print t
         mu = t.solve_diff_eqn()
+        print "output to diff eqn"
+        print mu
         mu_pr = mu.precision_relative()
+        print mu_pr
         # RP: commented out these lines as precision isn't set up to work properly yet
         #        if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
         #            raise ValueError("Insufficient precision after solving the difference equation.")
