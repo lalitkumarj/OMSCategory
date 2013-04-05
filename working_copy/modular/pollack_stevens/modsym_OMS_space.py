@@ -5,6 +5,7 @@ from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
+from sage.rings.padics.factory import Qp
 from sage.rings.finite_rings.constructor import GF
 from sage.functions.other import ceil
 from sage.matrix.constructor import Matrix
@@ -432,3 +433,4 @@ def _prec_for_solve_diff_eqn(M, p, k):
         Min += 1
         #print("An iteration in _prec_solve_diff_eqn")
     return Min
+
