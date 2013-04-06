@@ -220,10 +220,10 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         precs = []
         while True:
             precs.append(a)
-            if a == 1:
-                break
             if i % pm1 != 0:
                 a -= 1
+            if a == 0:
+                break
             i += 1
         return tuple(precs)
         #return tuple((M * self._cp).ceil() - (i * self._cp).floor() for i in range(M))
@@ -240,7 +240,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         if M == 1:
             return ZZ(2)
         M = ZZ(M)
-        return M + ((M - 1)/(self._p - 2)).ceil()
+        return M + (M/(self._p - 2)).ceil()
     
     @cached_method
     def length_reverse_lookup(self, L):
@@ -253,7 +253,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         if L <= 1:
             return ZZ(0)
         L = ZZ(L)
-        return ZZ(L - 1) - ((L - 2) / (self._p - 1)).floor()
+        return ZZ(L - 1) - ((L - 1) / (self._p - 1)).floor()
     
     def precision_cap(self):
         return self._prec_cap
