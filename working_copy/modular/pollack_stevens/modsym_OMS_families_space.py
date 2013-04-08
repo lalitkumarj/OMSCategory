@@ -67,9 +67,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        ## RP: _prec_for_solve_diff_eqn_families isn't working right (gave 21 for M = 5, p = 3)
-        #M_in = _prec_for_solve_diff_eqn_families(M[0], p)
-        M_in = M[0] + ceil(ZZ(M[0]).log(p)) + 1
+        # RP: _prec_for_solve... isn't working right
+        # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
+        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p)))
         print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M[1]])
         print CM
@@ -87,7 +87,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element([M_in, M[1]])
             print "pre:",D[g]
-            print "new t",t
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
                     raise ValueError("Level 1 not implemented")
@@ -155,8 +154,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t += err * gam - err
         
         verbose("Solve difference equation.")
-        print "input to diff eqn"
-        print t
         mu = t.solve_diff_eqn()
         print "output to diff eqn"
         print mu

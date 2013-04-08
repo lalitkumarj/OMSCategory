@@ -349,20 +349,21 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         p = self.prime()
 
         while not done:
-            #            print "basis has size %s"%(len(basis))
+            print "basis has size %s out of %s"%(len(basis),d)
             verbose("Forming a random symbol")
-            #            print "-----------------------"
-            #            print "Forming a random symbol"
+            print "-----------------------"
+            print "Forming a random symbol"
             Phi = self.random_element()
 
             verbose("Projecting to ordinary subspace")
-            #            print "projecting"
+            print "projecting"
             for a in range(M + 2):
+                print a
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
 
             verbose("Forming U_p-span of this symbol")
-            #            print "Forming U_p-span"
+            print "Forming U_p-span"
             Phi_span = [Phi]
             LI = self.is_start_of_basis(Phi_span)
             if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
