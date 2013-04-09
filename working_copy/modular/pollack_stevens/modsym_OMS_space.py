@@ -4,11 +4,13 @@ from sage.misc.cachefunc import cached_method
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
+from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.rational_field import QQ
 from sage.rings.padics.factory import Qp
 from sage.rings.finite_rings.constructor import GF
 from sage.functions.other import ceil
 from sage.matrix.constructor import Matrix
+from sage.modules.free_module_element import vector
 from sage.modular.arithgroup.all import Gamma0
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
@@ -228,7 +230,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             return ret.minus_part()
         return ret
 
-    def is_start_of_basis(self, list):
+    def is_start_of_basis(self, List):
         r"""
         Determines if the inputed list of OMS's can be extended to a basis of this space
 
@@ -240,12 +242,38 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - True/False
         """
-        for Phi in list:
+        for Phi in List:
             assert Phi.valuation() >= 0, "Symbols must be integral"
         R = self.base()
-        list = [Phi.list_of_total_measures() for Phi in list]
-        d = len(list)
-        A = Matrix(R.residue_field(), d, len(list[0]), list)
+        List = [Phi.list_of_total_measures() for Phi in List]
+        d = len(List)
+        A = Matrix(R.residue_field(), d, len(List[0]), List)
+        return A.rank() == d
+    
+    def is_start_of_basis_new(self, List):
+        r"""
+        Determines if the inputed list of OMS's can be extended to a basis of this space
+
+        INPUT:
+
+        - ``list`` -- a list of OMS's
+
+        OUTPUT:
+
+        - True/False
+        """
+        for Phi in List:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
+        d = len(List)
+        if d == 1:
+            L = List[0].list_of_total_measures()
+            for mu in L:
+                if not mu.is_zero():
+                    return True
+            return False
+        R = self.base()
+        List = [Phi.list_of_total_measures() for Phi in List]
+        A = Matrix(R.residue_field(), d, len(List[0]), List)
         return A.rank() == d
     
     def linear_relation(self, List):
@@ -326,6 +354,30 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
     
+    def linear_relation_new(self, List, Psi):
+        # ~40% increase in speed for Npk = 2, 11, 0 sign = 0
+        for Phi in List:
+            assert Phi.valuation() >= 0
+        assert Psi.valuation() >=0
+        R = self.base()
+        d = len(List)
+        if d == 0:
+            if Psi.is_zero():
+                return [None, R(1)]
+            else:
+                return [None, 0]
+        M = Psi.precision_absolute()
+        p = self.prime()
+        V = R**d
+        pM = p**M
+        A = Matrix(Zmod(pM), [Phi.list_of_total_measures() for Phi in List])
+        b = vector(Zmod(pM), Psi.list_of_total_measures())
+        try:
+            x = A.solve_left(b)
+            return [V(x), R(-1)]
+        except:
+            return [V(0), 0]
+    
     @cached_method
     def basis_of_ordinary_subspace(self, d=None):
         r"""
@@ -347,7 +399,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         done = (d <= len(basis))
         M = self.precision_cap()
         p = self.prime()
-
+        
         while not done:
             #            print "basis has size %s"%(len(basis))
             verbose("Forming a random symbol")
@@ -377,6 +429,57 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 done = (d <= len(basis))
         return basis
     
+    @cached_method
+    def basis_of_ordinary_subspace_new(self, d=None):
+        r"""
+        Finds a basis of the ordinary subspace of this space.
+    
+        INPUT:
+
+        - ``d`` -- (optional) integer equal to the dimension of the ordinary subspace; otherwise this number is just computed via Hida theory
+
+        - ``sign`` -- optional variable which if 1 or -1 restricts to the plus or minus subspace
+
+        OUTPUT:
+
+        - A list of OMS's which form the desired basis
+        """
+        if d is None:
+            d = self.dimension_of_ordinary_subspace()
+        basis = []
+        done = (d <= len(basis))
+        M = self.precision_cap()
+        p = self.prime()
+        while not done:
+            #            print "basis has size %s"%(len(basis))
+            verbose("Forming a random symbol")
+            #            print "-----------------------"
+            #            print "Forming a random symbol"
+            Phi = self.random_element()
+
+            verbose("Projecting to ordinary subspace")
+            #            print "projecting"
+            for a in range(M + 2):
+                Phi = Phi.hecke(p)
+            ## Should really check here that we are ordinary
+
+            verbose("Forming U_p-span of this symbol")
+            #            print "Forming U_p-span"
+            Phi_span = [Phi]
+            if not self.is_start_of_basis_new(Phi_span):
+                continue
+            while not done:
+                if self.is_start_of_basis_new(basis + [Phi_span[-1]]):
+                    basis.append(Phi_span[-1])
+                    verbose("basis now has size %s"%(len(basis)))
+                    done = (d <= len(basis))
+                else:
+                    break
+                if done:
+                    break
+                Phi_span.append(Phi_span[-1].hecke(p))
+        return basis
+    
     def hecke_matrix(self, q, basis):
         r"""
         Finds the matrix of T_q wrt to the given basis
@@ -398,6 +501,31 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             row = self.linear_relation(basis + [h])
             ## Probably should put some check here that it really worked.
             row.pop()
+            T.append(row)
+        return Matrix(T).transpose()
+    
+    def hecke_matrix_new(self, q, basis):
+        r"""
+        Finds the matrix of T_q wrt to the given basis
+    
+        INPUT:
+
+        - ``q`` -- a prime
+
+        - ``basis`` -- basis of a T_q-stable subspace
+
+        OUTPUT:
+
+        - d x d matrix where d is the length of basis
+        """
+        #d = len(basis)
+        T = []
+        for Phi in basis:
+            Phi_q = Phi.hecke(q)
+            row, check = self.linear_relation_new(basis, Phi_q)
+            ## Probably should put some check here that it really worked.
+            if check is 0:
+                raise ValueError("Phi.hecke(q) is not in the span of basis.")
             T.append(row)
         return Matrix(T).transpose()
 
