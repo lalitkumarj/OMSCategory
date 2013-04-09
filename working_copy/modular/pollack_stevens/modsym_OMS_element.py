@@ -17,6 +17,9 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
         return min([val.diagonal_valuation() for val in self._map])
     
+    def precision_absolute(self):
+        return min([mu.precision_absolute() for mu in self.values()])
+    
     def precision_relative(self):
         return min([mu.precision_relative() for mu in self.values()])
 
