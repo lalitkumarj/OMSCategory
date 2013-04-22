@@ -37,7 +37,8 @@ class ModSym_OMS_factory(UniqueFactory):
     def create_object(self, version, key):
         return ModSym_OMS_space(*key)
 
-OverconvergentModularSymbols = ModSym_OMS_factory('ModSym_OMS_space')
+#OverconvergentModularSymbols = ModSym_OMS_factory('sage.modular.pollack_stevens.modsym_OMS_space.OverconvergentModularSymbols')
+OverconvergentModularSymbols = ModSym_OMS_factory('OverconvergentModularSymbols')
 
 class ModSym_OMS_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):

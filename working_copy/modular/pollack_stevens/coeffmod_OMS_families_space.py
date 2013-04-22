@@ -127,7 +127,7 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
         return CoeffMod_OMS_Families_space(k, p=p, base=base, character=character, \
                  adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
-FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
+FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('FamiliesOfOverconvergentDistributions')
 
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     r"""

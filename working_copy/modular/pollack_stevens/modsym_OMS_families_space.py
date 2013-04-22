@@ -31,7 +31,7 @@ class ModSym_OMS_Families_factory(UniqueFactory):
     def create_object(self, version, key):
         return ModSym_OMS_Families_space(*key)
 
-FamiliesOfOMS = ModSym_OMS_Families_factory('ModSym_OMS_Families_space')
+FamiliesOfOMS = ModSym_OMS_Families_factory('FamiliesOfOMS')
 
 class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):
