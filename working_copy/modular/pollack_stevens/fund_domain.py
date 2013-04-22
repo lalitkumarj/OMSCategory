@@ -39,6 +39,7 @@ from sage.modules.free_module_element import zero_vector
 from copy import deepcopy
 from sage.misc.cachefunc import cached_method
 from sage.rings.arith import convergents,xgcd,gcd
+from sage.structure.unique_representation import UniqueRepresentation
 
 from sage.modular.pollack_stevens.sigma0 import Sigma0, Sigma0Element
 
@@ -114,13 +115,6 @@ class PSModularSymbolsDomain(SageObject):
 
             See :class:`PSModularSymbolsDomain`.
         """
-#        EXAMPLES::
-#
-#            sage: from sage.modular.pollack_stevens.fund_domain import PSModularSymbolsDomain
-#            sage: isinstance(ManinRelations(11), PSModularSymbolsDomain) # indirect doctest
-#            True
-#
-#        """
         self._N = ZZ(N)
         self._reps = reps
 
@@ -536,7 +530,7 @@ class PSModularSymbolsDomain(SageObject):
         """
         return self._P
 
-class ManinRelations(PSModularSymbolsDomain):
+class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
     r"""
     This class gives a description of `Div^0(P^1(\QQ))` as a
     `\ZZ[\Gamma_0(N)]`-module.
@@ -549,7 +543,7 @@ class ManinRelations(PSModularSymbolsDomain):
 
         sage: ManinRelations(1)
         Manin Relations of level 1
-        sage: ManinRelations(11)
+        sage: MR = ManinRelations(11); MR
         Manin Relations of level 11
 
     Large values of ``N`` are not supported::
@@ -561,8 +555,10 @@ class ManinRelations(PSModularSymbolsDomain):
 
     TESTS:
 
-    ``N`` has to be a positive integer::
+        sage: TestSuite(MR).run()
 
+    ``N`` has to be a positive integer::
+    
         sage: ManinRelations(0)
         Traceback (most recent call last):
         ...
