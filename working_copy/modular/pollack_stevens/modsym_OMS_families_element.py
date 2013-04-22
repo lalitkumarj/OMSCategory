@@ -4,6 +4,14 @@ from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_gen
 #from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _padic_val_of_pow_series
 
 class ModSym_OMS_Families_element(ModularSymbolElement_generic):
+    """
+    TESTS::
+    
+        sage: D = FamiliesOfOverconvergentDistributions(0, prec_cap=[5,3], base_coeffs=ZpCA(11))
+        sage: MS = FamiliesOfOMS(11, coefficients=D)
+        sage: Phi = MS.random_element()
+        sage: TestSuite(Phi).run()
+    """
     def valuation(self, p=None):
         if p is None:
             p = self.parent().prime()

@@ -2,7 +2,15 @@ from sage.misc.cachefunc import cached_method
 from sage.misc.misc import verbose
 from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
 
-class ModSym_OMS_element(ModularSymbolElement_generic):                        
+class ModSym_OMS_element(ModularSymbolElement_generic):
+    """
+    TESTS::
+    
+        sage: D = OverconvergentDistributions(2, 5, 5)
+        sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+        sage: Phi = MS.random_element()
+        sage: TestSuite(Phi).run()
+    """
     def valuation(self, p=None):
         if p is None:
             p = self.parent().prime()

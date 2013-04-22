@@ -59,6 +59,10 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             True
             sage: D(15)
             3 * (2 + O(3))
+    
+    TEST::
+    
+        sage: TestSuite(mu8).run()
     """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
@@ -102,6 +106,18 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #else:
         #    self._var_prec = var_prec
         self.ordp = ordp
+    
+    #def __reduce__(self):
+#        """
+#        TESTS::
+#        
+#            sage: D = OverconvergentDistributions(4, 3, 10)
+#            sage: mu = D.random_element()
+#            sage: loads(dumps(mu)) == mu
+#            True
+#        """
+#        from sage.modular.pollack_stevens.coeffmod_OMS_element import create__CoeffMod_OMS_element
+#        return (create__CoeffMod_OMS_element, (self._moments, self.parent(), self.ordp))
     
     #def _relprec(self):
     #    return len(self._moments)
@@ -735,3 +751,9 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
         verbose("mu.ordp: %s, mu._moments: %s"%(mu.ordp, mu._moments), level=2)
         return mu.normalize()
+
+#def create__CoeffMod_OMS_element(moments, parent, ordp):
+#    """
+#    Used for unpickling.
+#    """
+#    return CoeffMod_OMS_element(moments, parent, ordp=ordp, check=False)

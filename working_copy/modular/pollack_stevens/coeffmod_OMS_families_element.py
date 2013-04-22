@@ -44,6 +44,10 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             11^-1 * (1 + O(11^2) + (2 + O(11^2))*w + (11 + O(11^2))*w^2, 11 + O(11^2), 0) + O(w^4)
             sage: D(0)
             11^4 * () + O(w^4)
+    
+    TEST::
+    
+        sage: TestSuite(mu4).run()
     """
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=None):
         CoefficientModuleElement_generic.__init__(self, parent)
@@ -111,6 +115,18 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #    self._var_prec = var_prec
         self.ordp = ordp
         self._var_prec = var_prec
+    
+    #def __reduce__(self):
+#        """
+#        TESTS::
+#        
+#            sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap=[8,5], base_coeffs=ZpCA(3))
+#            sage: mu = D.random_element()
+#            sage: loads(dumps(mu)) == mu
+#            True
+#        """
+#        from sage.modular.pollack_stevens.coeffmod_OMS_families_element import create__CoeffMod_OMS_Families_element
+#        return (create__CoeffMod_OMS_Families_element, (self._moments, self.parent(), self.ordp, self._var_prec))
     
     #def _relprec(self):
     #    return len(self._moments)
@@ -795,3 +811,9 @@ def _sanitize_alpha(alpha):
 #    val_diff = num_val - denom_val
 #    alpha, new_prec = _custom_ps_div(num >> val_diff, denom >> val_diff)
 #    return [alpha << val_diff, new_prec - val_diff]
+
+#def create__CoeffMod_OMS_Families_element(moments, parent, ordp, var_prec):
+#    """
+#    Used for unpickling.
+#    """
+#    return CoeffMod_OMS_Families_element(moments, parent, ordp=ordp, check=False, var_prec=var_prec)

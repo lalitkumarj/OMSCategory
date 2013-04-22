@@ -25,6 +25,10 @@ class ModularSymbolElement_generic(ModuleElement):
         else:
             self._map = ManinMap(parent._coefficients, parent._source, map_data)
     
+    def __reduce__(self):
+        from sage.modular.pollack_stevens.modsym_element import create__ModSym_element
+        return (create__ModSym_element, (self._map, self.parent()))
+    
     def _repr_(self):
         return "Modular symbol of level %s with values in %s"%(self.parent().level(), self.parent().coefficient_module())
     
@@ -457,3 +461,9 @@ class ModularSymbolElement_generic(ModuleElement):
     
     def __call__(self, a):
         return self._map(a)
+
+def create__ModSym_element(map_data, parent):
+    """
+    Used for unpickling.
+    """
+    return parent.Element(map_data, parent, construct=True)
