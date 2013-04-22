@@ -19,20 +19,20 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         EXAMPLES::
         
             sage: D8 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 8))
-            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8 #the last moment should be O(3) but power series don't work well
-            (1 + O(3^5), 2 + O(3^5), 3 + O(3^4), 1 + 3 + O(3^4), 2 + 3 + O(3^3), 2*3 + O(3^3), 1 + 2*3 + O(3^2), 2 + 2*3 + O(3^2), 0) + O(w^4)
+            sage: mu8 = D8([1,2,3,4,5,6,7,8,9,10]); mu8 #the before last moment should be O(3) but power series don't work well
+            (1 + O(3^5), 2 + O(3^5), 3 + O(3^4), 1 + 3 + O(3^4), 2 + 3 + O(3^3), 2*3 + O(3^3), 1 + 2*3 + O(3^2), 2 + 2*3 + O(3^2), 0, 1 + O(3)) + O(w^4)
             sage: D4 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,4], base_coeffs=ZpCA(3, 4))
             sage: mu4 = D4([1,2,3,4,5,6,7,8,9,10]); mu4
-            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^4)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^4)
             sage: D4(mu8)
-            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^4)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^4)
             sage: mu4 == D4(mu8)
             True
             sage: D42 = FamiliesOfOverconvergentDistributions(0, prec_cap = [8 ,2], base_coeffs=ZpCA(3, 4))
             sage: mu42 = D42([1,2,3,4,5,6,7,8,9,10]); mu42 
-            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^2)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^2)
             sage: D42(mu8)
-            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3)) + O(w^2)
+            (1 + O(3^4), 2 + O(3^4), 3 + O(3^3), 1 + 3 + O(3^3), 2 + 3 + O(3^2), 2*3 + O(3^2), 1 + O(3), 2 + O(3)) + O(w^2)
             sage: mu42 == D42(mu8)
             True
             sage: D42(15)   #the last moment should be O(3) but power series don't work well
