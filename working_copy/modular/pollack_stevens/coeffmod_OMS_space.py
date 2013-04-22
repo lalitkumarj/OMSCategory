@@ -11,16 +11,16 @@ from sage.modular.pollack_stevens.coeffmod_element import WeightKAction_OMS
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 
 class CoeffMod_OMS_factory(UniqueFactory):
+    """
+    EXAMPLES::
+    
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
+        sage: D = OverconvergentDistributions(20, 3, 10); D    # indirect doctest
+        Space of 3-adic distributions with k=20 action and precision cap 10
+    """
     def create_key(self, k, p=None, prec_cap=None, base=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None):
-        """
-        EXAMPLES::
-        
-            sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
-            sage: OverconvergentDistributions(20, 3, 10)              # indirect doctest
-            Space of 3-adic distributions with k=20 action and precision cap 10
-        """
             #sage: TestSuite(OverconvergentDistributions).run()
         k = ZZ(k)
 #        if p is None:
@@ -62,8 +62,11 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
     
         sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
         sage: D = OverconvergentDistributions(0, 5, 10)
+    
+    TEST::
+    
+        sage: TestSuite(D).run()
     """
-        #sage: TestSuite(D).run()
     
     def __init__(self, k, p=None, prec_cap=None, base=None, \
                  character=None, adjuster=None, act_on_left=False, \
@@ -76,6 +79,9 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
                  element_class=CoeffMod_OMS_element, padic=True)
+    
+    #def __reduce__(self):
+    #    return OverconvergentDistributions.reduce_data(self)
     
     def _repr_(self):
         """

@@ -18,7 +18,52 @@ from sage.modular.pollack_stevens.modsym_OMS_element import ModSym_OMS_element
 from sage.interfaces.gp import gp
 
 class ModSym_OMS_factory(UniqueFactory):
+    """
+    TESTS::
+    
+        sage: from sage.modular.pollack_stevens.modsym_OMS_space import OverconvergentModularSymbols
+        sage: D = OverconvergentDistributions(4, 3, 10)
+        sage: MS = OverconvergentModularSymbols(14, coefficients=D); MS
+        Space of overconvergent modular symbols for Congruence Subgroup Gamma0(42) with sign 0 and values in Space of 3-adic distributions with k=4 action and precision cap 10
+    """
+#        sage: d0 = MS.__dict__; s0 = d0.keys(); s0.sort()
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS2 = loads(dumps(MS))
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS2 is MS
+#        True
+#        sage: MS2 == MS
+#        sage: type(MS2)
+#        sage: type(MS)
+#        sage: from sage.modular.pollack_stevens.modsym_OMS_space import ModSym_OMS_space
+#        sage: isinstance(MS2, ModSym_OMS_space)
+#        sage: isinstance(MS, ModSym_OMS_space)
+#        sage: d = MS2.__dict__; s = d.keys(); s.sort()
+#        sage: MS2 == MS
+#        sage: s == s0
+#        sage: print s; print s0
+#        sage: for k in s0:
+#        ...     print k, d0[k] is d[k]
+#        ...     print k, d0[k] == d[k]
+#        ...     print k, d0[k], d[k], "\n"
+#        sage: print OverconvergentModularSymbols.reduce_data(MS)
+#        sage: print OverconvergentModularSymbols.reduce_data(MS2)
+#        sage: from sage.modular.pollack_stevens.modsym_OMS_space import TESTER
+#        sage: TESTER()
+#        sage: save(MS, 'MS.obj')
+#        sage: MS2 = load('MS.obj')
+#        sage: MS2 is MS
+#        sage: MS3 = loads(dumps(MS2))
+#        sage: MS3 is MS2
+#        sage: MS0b = load('/Users/rharron/MS0.sobj')
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS0 = OverconvergentModularSymbols(23, 2, -1, 5, 10)
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS0b is MS0
+#        sage: MS0b == MS0
+
     def create_key(self, group, weight=None, sign=0, p=None, prec_cap=None, base=None, coefficients=None):
+        #print group, weight, sign, p, prec_cap, base, coefficients
         if sign not in (-1,0,1):
             raise ValueError("sign must be -1, 0, 1")
         if isinstance(group, (int, Integer)):
@@ -42,6 +87,13 @@ OverconvergentModularSymbols = ModSym_OMS_factory('OverconvergentModularSymbols'
 
 class ModSym_OMS_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):
+        """
+        TEST::
+        
+            sage: from sage.modular.pollack_stevens.modsym_OMS_space import OverconvergentModularSymbols
+            sage: MS = OverconvergentModularSymbols(23, 2, -1, 5, 10)
+            sage: TestSuite(MS).run()
+        """
         ModularSymbolSpace_generic.__init__(self, group, coefficients, sign=sign, element_class=ModSym_OMS_element)
     
     def _has_coerce_map_from_(self, other):
@@ -52,8 +104,20 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         else:
             return False
     
+#    def _cmp_(self, other):
+#        if self is other:
+#            return 0
+#        if not isinstance(other, ModSym_OMS_space):
+#            return cmp(type(self), type(other))
+#        return ((self.self._sign, self._group, self._coefficients), (self._sign, self._group, self._coefficients))
+    
     def _repr_(self):
         return "Space of overconvergent modular symbols for %s with sign %s and values in %s"%(self.group(), self.sign(), self.coefficient_module())
+    
+    #def __reduce__(self):
+        #return OverconvergentModularSymbols.reduce_data(self)
+        #print "In __reduce__", (self._group, None, self._sign, None, None, None, self._coefficients)
+        #return (OverconvergentModularSymbols, (self._group, None, self._sign, None, None, None, self._coefficients))
     
     def precision_cap(self):
         return self.coefficient_module().precision_cap()
@@ -563,3 +627,8 @@ def _prec_for_solve_diff_eqn(M, p, k):
         #print("An iteration in _prec_solve_diff_eqn")
     return Min
 
+#def TESTER():
+#    from sage.structure.sage_object import loads, dumps
+#    D = OverconvergentDistributions(4, 3, 10)
+#    MS = OverconvergentModularSymbols(14, coefficients=D)
+#    return loads(dumps(MS)) is MS

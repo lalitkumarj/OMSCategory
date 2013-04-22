@@ -13,6 +13,12 @@ from sage.modular.pollack_stevens.modsym_OMS_families_element import ModSym_OMS_
 from sage.interfaces.gp import gp
 
 class ModSym_OMS_Families_factory(UniqueFactory):
+    """
+    TESTS::
+    
+        sage: D = FamiliesOfOverconvergentDistributions(4, prec_cap=[5,3], base_coeffs=ZpCA(11))
+        sage: MS = FamiliesOfOMS(11, coefficients=D)
+    """
     def create_key(self, group, weight=None, sign=0, p=None, prec_cap=None, base=None, base_coeffs=None, coefficients=None):
         if sign not in (-1,0,1):
             raise ValueError("sign must be -1, 0, 1")
@@ -35,6 +41,13 @@ FamiliesOfOMS = ModSym_OMS_Families_factory('FamiliesOfOMS')
 
 class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):
+        """
+        TEST::
+        
+            sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import FamiliesOfOMS
+            sage: MS = FamiliesOfOMS(14, 0, -1, 3, [5, 4], base_coeffs=ZpCA(3))
+            sage: TestSuite(MS).run()
+        """
         ModularSymbolSpace_generic.__init__(self, group, coefficients, sign=sign, element_class=ModSym_OMS_Families_element)
     
     def _has_coerce_map_from_(self, other):
@@ -44,6 +57,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 return True
         else:
             return False
+    
+    #def __reduce__(self):
+    #    return FamiliesOfOMS.reduce_data(self)
     
     def _repr_(self):
         return "Space of families of overconvergent modular symbols for %s with sign %s and values in %s"%(self.group(), self.sign(), self.coefficient_module())
@@ -70,7 +86,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         # RP: _prec_for_solve... isn't working right
         # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
         M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p)))
-        print "M_in", M_in, "var_prec", M[1]
+        #print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M[1]])
         R = CM.base_ring()
         manin = self.source()
@@ -83,9 +99,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         t = CM(0)
         for g in gens[1:]:
             verbose("Looping over generators. At generator %s"%(g))
-            print "CM._prec_cap", CM.precision_cap()
+            #print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element([M_in, M[1]])
-            print "pre:",D[g]
+            #print "pre:",D[g]
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
                     raise ValueError("Level 1 not implemented")
@@ -150,7 +166,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t += err * gam - err
         
         verbose("Solve difference equation.")
-        print "t",t
+        #print "t",t
         mu = t.solve_diff_eqn()
         mu_pr = mu.precision_relative()
         # RP: commented out these lines as precision isn't set up to work properly yet
@@ -281,9 +297,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 c[r] += c_coef[r] * w**j
 
         return c
-            
-                
-
+    
+    def linear_relation_new(self, List):
+        pass
+    
     def hecke_matrix(self, q, basis):
         r"""
         Finds the matrix of T_q wrt to the given basis

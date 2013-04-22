@@ -78,6 +78,12 @@ def _prec_cap_parser(prec_cap):
 #    return
 
 class CoeffMod_OMS_Families_factory(UniqueFactory):
+    """
+    EXAMPLES::
+    
+        sage: D = FamiliesOfOverconvergentDistributions(0, prec_cap=[5,3], base_coeffs=ZpCA(7)); D    # indirect doctest
+        Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 7-adic Ring with capped absolute precision 20
+    """
     def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None, variable_name = 'w'):
@@ -140,6 +146,10 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         3
         sage: D.precision_cap()
         [10, 5]
+    
+    TEST::
+    
+        sage: TestSuite(D).run()
     """
     
     def __init__(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
@@ -163,6 +173,9 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
                  element_class=CoeffMod_OMS_Families_element, padic=True)
+    
+    #def __reduce__(self):
+    #    return FamiliesOfOverconvergentDistributions.reduce_data(self)
     
     def _coerce_map_from_(self, other):
         if isinstance(other, CoeffMod_OMS_Families_element) \
