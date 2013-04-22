@@ -20,7 +20,7 @@ class ModSym_OMS_Families_factory(UniqueFactory):
             character = None
         if coefficients is None:
             #WHERE TO GET CHARACTER?
-            coeffcients = FamiliesOfOverconvergentDistributions(weight, p, prec_cap, base, base_coeffs, character)
+            coefficients = FamiliesOfOverconvergentDistributions(weight, p, prec_cap, base, base_coeffs, character)
         if isinstance(group, (int, Integer)):
             p = coefficients.prime()
             if group % p != 0:
