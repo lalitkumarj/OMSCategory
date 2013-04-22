@@ -91,7 +91,7 @@ class ModularSymbolSpaces(Category_module):
     class ElementMethods:
 
         @abstract_method
-        def _call_(self):
+        def __call__(self, a):
             """
             A modular symbol is a homomorphism, so one should be able to evaluate
             it. This is accomplished by this function.

@@ -455,5 +455,5 @@ class ModularSymbolElement_generic(ModuleElement):
 
         print "This modular symbol satisfies the manin relations"
     
-    #def __call__(self):
-    #    pass
+    def __call__(self, a):
+        return self._map(a)
