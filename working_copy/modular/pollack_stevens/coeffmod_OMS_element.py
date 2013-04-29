@@ -105,7 +105,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #    self._var_prec = parent._prec_cap[1]
         #else:
         #    self._var_prec = var_prec
-        self.ordp = ordp
+        self.ordp = ZZ(ordp)
     
     #def __reduce__(self):
 #        """
@@ -347,7 +347,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if rrprec == 0:
                 return 0
             else:
-                return -1
+                return -1   # RH: This is probably incorrect
         elif rrprec == 0:
             return 1
         rprec = min(lrprec, rrprec)
@@ -686,9 +686,20 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             
             See Theorem 4.5 and Lemma 4.4 of [PS].
             
+            INPUT:
+            
+            - ``self`` - an overconvergent distribution `\mu` of absolute
+              precision `M`
+            
             OUTPUT:
             
-            - a distribution v so that self = v | Delta, where Delta = [1, 1; 0, 1] - 1.
+            - an overconvergent distribution `\nu` of absolute precision
+              `M - \lfloor\log_p(M)\rfloor - 1` such that
+            
+            .. math::
+            
+                \nu|\Delta = \mu,\text{ where }\Delta=\begin{pmatrix}1&1\\0&1
+                \end{pmatrix} - 1.
             
             EXAMPLES::
             
