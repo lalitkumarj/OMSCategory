@@ -1,6 +1,6 @@
 # This should be cythoned once it's done.
 
-from copy import copy   #Not necessary in cython version
+from copy import copy, deepcopy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ
@@ -297,36 +297,48 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         
     def __cmp__(left, right):
         r"""
-            Compare left (i.e. self) and right, which are both elements of left.parent().
-            
-            EXAMPLES::
-            
-                sage: D = OverconvergentDistributions(0,base=Zp(3,5))
-                sage: mu = D([1])
-                sage: nu = D(0)
-                sage: mu == nu
-                False
-                sage: mu = D([3,3,3,3,3,3])
-                sage: nu = D([3,3,3])
-                sage: mu == nu
-                True
-                sage: mu * 3^4 == mu << 4
-                True
-                sage: mu * 3^3 == 0
-                False
-            
-            Check that something with no moments is 0.
-            
-                sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
-                sage: R = ZpCA(7, 5)
-                sage: D = OverconvergentDistributions(2, base=R)
-                sage: mu = CoeffMod_OMS_element((R**0)([]), D, ordp=6, check=False)
-                sage: mu == 0
-                True
+        Compare left (i.e. self) and right, which are both elements of left.parent().
+        
+        EXAMPLES::
+        
+            sage: D = OverconvergentDistributions(0,base=Zp(3,5))
+            sage: mu = D([1])
+            sage: nu = D(0)
+            sage: mu == nu
+            False
+            sage: mu = D([3,3,3,3,3,3])
+            sage: nu = D([3,3,3])
+            sage: mu == nu
+            True
+            sage: mu * 3^4 == mu << 4
+            True
+            sage: mu * 3^3 == 0
+            False
+        
+        Check that something with no moments is 0::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(7, 5)
+            sage: D = OverconvergentDistributions(2, base=R)
+            sage: mu = CoeffMod_OMS_element((R**0)([]), D, ordp=6, check=False)
+            sage: mu == 0
+            True
+        
+        Check that deepcopy is deep enough (the last two commands fail with copy
+        instead of deepcopy)::
+        
+            sage: mu = CoeffMod_OMS_element((R**2)([R(2 * 7, 2), R(0, 1)]), D, ordp=-1, check=False)
+            sage: nu = CoeffMod_OMS_element(D.approx_module(1)([R(2, 1)]), D, ordp=0, check=False)
+            sage: mu == nu
+            True
+            sage: mu == nu
+            True
+            sage: mu
+            (2 + O(7))
         """
         #RH: "copied" from dist.pyx, but then changed
-        left = copy(left)
-        right = copy(right)
+        left = deepcopy(left)
+        right = deepcopy(right)
         left.normalize()
         right.normalize()
         lrprec = left.precision_relative()
