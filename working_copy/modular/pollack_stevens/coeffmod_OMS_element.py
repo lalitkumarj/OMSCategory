@@ -63,6 +63,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     TEST::
     
         sage: TestSuite(mu8).run()
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import test_correctness_and_precision_of_solve_diff_eqn
+        sage: test_correctness_and_precision_of_solve_diff_eqn(10, 0)
     """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
@@ -660,6 +662,19 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         ordp = self.ordp   #Should this be updated?
         return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)  #should latter be true?
     
+    def reduce_precision_absolute(self, new_prec):
+        #This isn't quite right, e.g. mu = (2*3^2 + 2*3^3 + O(3^4), 2*3 + O(3^3), O(3^2), 2 + O(3)) with new_prec=2
+        if new_prec > self.precision_absolute():
+            raise ValueError("new_prec(=%s) must be less than absolute precision of self."%(new_prec))
+        ordp = self.ordp
+        if new_prec - ordp <= 0:
+            moments = self.parent().approx_module(0)([])
+            ordp = new_prec
+        else:
+            moments = self._moments[:new_prec - ordp]
+            moments[new_prec - ordp - 1] = moments[new_prec - ordp - 1].add_bigoh(1)
+        return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)
+    
     def lift(self, DD=None):
         #RH: should be good
         r"""
@@ -791,6 +806,104 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         verbose("mu.ordp: %s, mu._moments: %s"%(mu.ordp, mu._moments), level=2)
         return mu.normalize()
 
+def test_correctness_and_precision_of_solve_diff_eqn(number=20, verbosity=1):
+    """
+    ``number`` is how many different random distributions to check. 
+    
+    Currently, avoids the prime 2.
+    """
+    from sage.misc.prandom import randint
+    from sage.rings.arith import random_prime
+    from sage.rings.padics.factory import ZpCA
+    from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
+    from sage.structure.sage_object import dumps
+    errors = []
+    munus = []
+    for i in range(number):
+        Mspace = randint(1, 20)    #Moments of space
+        M = randint(max(0, Mspace - 5), Mspace)
+        p = random_prime(13, lbound=3)
+        k = randint(0, 6)
+        Rprec = Mspace + randint(0, 5)
+        R = ZpCA(p, Rprec)
+        D = OverconvergentDistributions(k, base=R, prec_cap=Mspace)
+        S0 = D.action().actor()
+        Delta_mat = S0([1,1,0,1])
+        mu = D.random_element(M)
+        mu_save = dumps(mu)#[deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "\nTest #{0} data (Mspace, M, p, k, Rprec) =".format(i+1), (Mspace, M, p, k, Rprec)
+            print "mu =", mu
+        
+        nu = mu * Delta_mat - mu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        mu2 = nu.solve_diff_eqn()
+        nu_abs_prec = nu.precision_absolute()
+        expected = nu_abs_prec - nu_abs_prec.exact_log(p) - 1
+        if M != 1:
+            try:
+                agree = (mu - mu2).is_zero(expected)
+            except PrecisionError:
+                print (Mspace, M, p, k, Rprec), mu_save._repr_(), nu_save
+                assert False
+        else:
+            agree = mu2.is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       mu2 =", mu2
+            print "        nu = ", nu
+        if not agree:
+            errors.append((i+1, 1))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec)))
+        if verbosity > 0:
+            print "    Test finding mu from mu|Delta accurate: %s"%(agree)
+            print "        nu_abs_prec  soln_abs_prec_expected  actual  agree"
+        mu2_abs_prec = mu2.precision_absolute()
+        agree = (expected == mu2_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(nu_abs_prec, expected, mu2_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 2))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec)))
+        
+        if mu.precision_relative() > 0:
+            mu._moments[0] = R(0, mu.precision_relative())
+        mu_save = [deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "    mu modified =", mu
+        nu = mu.solve_diff_eqn()
+        mu_abs_prec = mu.precision_absolute()
+        expected = mu_abs_prec - mu_abs_prec.exact_log(p) - 1
+        nud = nu * Delta_mat - nu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        agree = (nud - mu).is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            print "        mu =", mu
+            print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       nud =", nud
+        if not agree:
+            errors.append((i+1, 3))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec)))
+        if verbosity > 0:
+            print "    Test finding nu with nu|Delta == mu: %s"%(agree)
+            print "        mu_abs_prec  soln_abs_prec_expected  actual  agree"
+        nu_abs_prec = nu.precision_absolute()
+        agree = (expected == nu_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(mu_abs_prec, expected, nu_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 4))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec)))
+    if len(errors) == 0:
+        if verbosity > 0:
+            print "\nTest passed with no errors."
+        return
+    if verbosity > 0:
+        print "\nTest failed with errors: %s\n"%(errors)
+    return errors, munus
+    
 #def create__CoeffMod_OMS_element(moments, parent, ordp):
 #    """
 #    Used for unpickling.
