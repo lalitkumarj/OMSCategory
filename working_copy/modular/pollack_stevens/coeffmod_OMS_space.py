@@ -1,5 +1,6 @@
 import sage.rings.ring as ring
 
+from sage.misc.prandom import randint
 from sage.structure.factory import UniqueFactory
 from sage.rings.integer_ring import ZZ
 from sage.misc.cachefunc import cached_method
@@ -146,10 +147,13 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
             raise ValueError("p_prec must be less than or equal to the p-adic precision cap")
         return self.base_ring()**prec
     
-    def random_element(self, prec=None):
+    def random_element(self, prec=None, total_measure_zero=False):
         #RH: copied from RP's change
         if prec == None:
             prec = self._prec_cap
+        if prec == 0:
+            V = self.approx_module(0)
+            return CoeffMod_OMS_element(V([]), self, ordp=randint(1, self._prec_cap), check=False)
         R = self.base_ring().integer_ring()
         return self((R**prec).random_element())
     
