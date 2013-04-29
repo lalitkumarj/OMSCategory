@@ -17,20 +17,12 @@ class CoeffMod_OMS_factory(UniqueFactory):
         sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
         sage: D = OverconvergentDistributions(20, 3, 10); D    # indirect doctest
         Space of 3-adic distributions with k=20 action and precision cap 10
+        sage: TestSuite(OverconvergentDistributions).run()
     """
     def create_key(self, k, p=None, prec_cap=None, base=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None):
-            #sage: TestSuite(OverconvergentDistributions).run()
         k = ZZ(k)
-#        if p is None:
-#            try:
-#                p = base.prime()
-#            except AttributeError:
-#                raise ValueError("You must specify a prime")
-#        else:
-#            p = ZZ(p)
-        
         if base is None:
             if p is None:
                 raise ValueError("Must specify a prime or a base ring.")
@@ -40,7 +32,12 @@ class CoeffMod_OMS_factory(UniqueFactory):
                 base = ZpCA(p, prec_cap)
         if prec_cap is None:
             prec_cap = base.precision_cap()
-        p = base.prime()
+        elif prec_cap > base.precision_cap():
+            raise ValueError("Insufficient precision in base ring (%s < %s)."%(base.precision_cap(), prec_cap))
+        if p is None:
+            p = base.prime()
+        elif p != base.prime():
+            raise ValueError("Prime p(=%s) must equal the prime of the base ring(=%s)"%(p, base.prime()))
         if adjuster is None:
             adjuster = _default_adjuster()
         if dettwist is not None:
