@@ -2,7 +2,7 @@
 
 #from sage.rings.power_series_ring import PowerSeriesRing
 
-from copy import copy   #Not necessary in cython version
+from copy import copy, deepcopy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
 from sage.rings.padics.precision_error import PrecisionError
@@ -218,8 +218,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     
     def __cmp__(left, right):
         #RH: adapted from coeffmod_OMS_element.py
-        left = copy(left)
-        right = copy(right)
+        left = deepcopy(left)
+        right = deepcopy(right)
         left.normalize()
         right.normalize()
         lrprec = left.precision_relative()[0]
