@@ -725,17 +725,29 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
                 sage: nu.solve_diff_eqn()
                 5 * (1 + 3*5 + O(5^2), O(5))
+                
+            Check input of relative precision 2::
+            
+                sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+                sage: R = ZpCA(3, 9)
+                sage: D = OverconvergentDistributions(0, base=R, prec_cap=4)
+                sage: V = D.approx_module(2)
+                sage: nu = CoeffMod_OMS_element(V([R(0, 9), R(2*3^2 + 2*3^4 + 2*3^7 + 3^8 + O(3^9))]), D, ordp=0, check=False)
+                sage: mu = nu.solve_diff_eqn()
+                sage: mu
+                3^2 * ()
         """
         #RH: see tests.sage for randomized verification that this function works correctly
         p = self.parent().prime()
         if self.is_zero():
             M = ZZ(self.precision_absolute())
             mu = self.parent()(0)
-            mu.ordp = M-M.exact_log(p)-1
+            mu.ordp = M - M.exact_log(p) - 1
             return mu
         if self._unscaled_moment(0) != 0:
             raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
         M = ZZ(len(self._moments))
+        abs_prec = self.precision_absolute()
         ## RP: This should never happen -- the distribution must be 0 at this point if M==1
         if M == 1:
             return self.parent()(0)
@@ -743,6 +755,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if p == 2:
                 raise ValueError("Not enough accuracy to return anything")
             else:
+                out_prec = abs_prec - abs_prec.exact_log(p) - 1
+                if self.ordp >= out_prec:
+                    mu = self.parent()(0)
+                    mu.ordp = out_prec
+                    return mu
                 mu = self.parent()(self._unscaled_moment(1))
                 mu.ordp = self.ordp
                 return mu
@@ -758,7 +775,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
         ordp = min(a.valuation() for a in v)
         #Is this correct in ramified extensions of QQp?
-        abs_prec = self.precision_absolute()
         verbose("abs_prec: %s, ordp: %s"%(abs_prec, ordp), level=2)
         if ordp != 0:
             new_M = abs_prec - 1 - (abs_prec).exact_log(p) - ordp
