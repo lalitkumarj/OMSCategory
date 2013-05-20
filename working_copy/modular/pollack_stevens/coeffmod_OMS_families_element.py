@@ -589,6 +589,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     
     def solve_diff_eqn(self):
         #Do something about ordp
+        p = self.parent().prime()
         if self.is_zero():
             M, var_prec = self.precision_absolute()
             V = self.parent().approx_module(0, var_prec)
@@ -622,7 +623,11 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             mu._moments[j-1] = R.zero()
             mus += self.moment(j) * mu.solve_diff_eqn().lift(DD)
         prec = DD.length_reverse_lookup(M)
-        mus = mus.reduce_precision(prec-1)
+        new_prec = prec - prec.exact_log(p) - 1 - mus.ordp
+        v = mus._moments[:DD.length_of_moments(new_prec)]
+        S = DD.base_ring()
+        v[len(v) - 1] = S(_add_big_ohs_list(v[len(v) - 1], [1, self._var_prec]))
+        mus = CoeffMod_OMS_Families_element(v, self.parent(), ordp=mus.ordp, check=False, var_prec=self._var_prec)
         #Should we remove precision like at end of non-family code, or is this taken care of?
         return mus.normalize()  #Is it necessary to normalize?
 
@@ -709,7 +714,7 @@ def _add_big_ohs_list(f, prec_cap):
     INPUT:
     
         - ``f`` -- a power series over a `p`-adic ring
-        - ``prec_cap`` -- a pair [``p_prec``, ``var_prec``, where ``p_prec`` is
+        - ``prec_cap`` -- a pair [``p_prec``, ``var_prec``], where ``p_prec`` is
         the desired `p`-adic precision of the coefficients of f and ``var_prec``
         is the desired variable-adic precision
     
@@ -817,3 +822,102 @@ def _sanitize_alpha(alpha):
 #    Used for unpickling.
 #    """
 #    return CoeffMod_OMS_Families_element(moments, parent, ordp=ordp, check=False, var_prec=var_prec)
+
+def test_correctness_and_precision_of_solve_diff_eqn_fam(number=20, verbosity=1):
+    """
+    ``number`` is how many different random distributions to check. 
+    
+    Currently, avoids the prime 2.
+    """
+    from sage.misc.prandom import randint
+    from sage.rings.arith import random_prime
+    from sage.rings.padics.factory import ZpCA
+    from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
+    from sage.structure.sage_object import dumps
+    errors = []
+    munus = []
+    for i in range(number):
+        Mspace = randint(1, 20)    #Moments of space
+        M = randint(max(0, Mspace - 5), Mspace)
+        var_prec = randint(1, 8)
+        p = random_prime(13, lbound=3)
+        k = randint(0, 6)
+        Rprec = Mspace + randint(0, 5)
+        R = ZpCA(p, Rprec)
+        D = FamiliesOfOverconvergentDistributions(k, base_coeffs=R, prec_cap=[Mspace, var_prec])
+        S0 = D.action().actor()
+        Delta_mat = S0([1,1,0,1])
+        mu = D.random_element(M)
+        mu_save = dumps(mu)#[deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "\nTest #{0} data (Mspace, M, p, k, Rprec, var_prec) =".format(i+1), (Mspace, M, p, k, Rprec, var_prec)
+            print "mu =", mu
+        
+        nu = mu * Delta_mat - mu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        mu2 = nu.solve_diff_eqn()
+        nu_abs_prec = nu.precision_absolute()[0]
+        expected = nu_abs_prec - nu_abs_prec.exact_log(p) - 1
+        if M != 1:
+            try:
+                agree = (mu - mu2).is_zero(expected)
+            except PrecisionError:
+                print (Mspace, M, p, k, Rprec), mu_save._repr_(), nu_save
+                assert False
+        else:
+            agree = mu2.is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            #print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       mu2 =", mu2
+            print "        nu = ", nu
+        if not agree:
+            errors.append((i+1, 1))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec, var_prec)))
+        if verbosity > 0:
+            print "    Test finding mu from mu|Delta accurate: %s"%(agree)
+            print "        nu_abs_prec  soln_abs_prec_expected  actual  agree"
+        mu2_abs_prec = mu2.precision_absolute()[0]
+        agree = (expected == mu2_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(nu_abs_prec, expected, mu2_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 2))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec, var_prec)))
+        
+        if mu.precision_relative()[0] > 0:
+            mu._moments[0] = R(0, mu.precision_relative()[0])
+        mu_save = [deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "    mu modified =", mu
+        nu = mu.solve_diff_eqn()
+        mu_abs_prec = mu.precision_absolute()[0]
+        expected = mu_abs_prec - mu_abs_prec.exact_log(p) - 1
+        nud = nu * Delta_mat - nu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        agree = (nud - mu).is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            print "        mu =", mu
+            #print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       nud =", nud
+        if not agree:
+            errors.append((i+1, 3))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec, var_prec)))
+        if verbosity > 0:
+            print "    Test finding nu with nu|Delta == mu: %s"%(agree)
+            print "        mu_abs_prec  soln_abs_prec_expected  actual  agree"
+        nu_abs_prec = nu.precision_absolute()[0]
+        agree = (expected == nu_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(mu_abs_prec, expected, nu_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 4))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec, var_prec)))
+    if len(errors) == 0:
+        if verbosity > 0:
+            print "\nTest passed with no errors."
+        return
+    if verbosity > 0:
+        print "\nTest failed with errors: %s\n"%(errors)
+    return errors, munus
