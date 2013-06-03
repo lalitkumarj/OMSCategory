@@ -34,12 +34,14 @@ from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
 from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.rational_field import QQ
+from sage.rings.padics.factory import Qp
 from sage.structure.sage_object import SageObject
 from sage.modules.free_module_element import zero_vector
 from copy import deepcopy
 from sage.misc.cachefunc import cached_method
 from sage.rings.arith import convergents,xgcd,gcd
 from sage.structure.unique_representation import UniqueRepresentation
+from sage.rings.infinity import infinity
 
 from sage.modular.pollack_stevens.sigma0 import Sigma0, Sigma0Element
 
@@ -1504,6 +1506,98 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                    ans[B].append(tmp)
 
         return ans
+    
+    def _nice_gamma(self, p, k):
+        r"""
+        TODO: Only works for even weights right now (and some odd weights).
+        
+        TESTS::
+        
+            sage: for p in prime_range(3,7):
+            ...         MR = ManinRelations(p)
+            ...         for k in range(0, p, 2):
+            ...                 print MR._nice_gamma(p, k % (p-1))
+            ([ 0 -1]
+            [ 1  1], [-2 -1]
+            [ 3  1])
+            ([ 0 -1]
+            [ 1  1], [-2 -1]
+            [ 3  1])
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2])
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2])
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2])
+        """
+        key = (p, k)
+        try:
+            return self._nice_gamma_dict[key]
+        except AttributeError:
+            self._nice_gamma_dict = {}
+        except KeyError:
+            pass
+        QQp = Qp(p, 20)    #Is this enough precision?
+        gens = self.gens()
+        found = False
+        if k == 0:  # Find gamma with minimal p-adic valuation of its lower-left
+                    # entry
+            gam_shift = infinity
+            for g in gens[1:]:
+                threetor = False
+                try:
+                    gam = self.gammas[g]
+                except KeyError:
+                    try:
+                        gam = self.two_torsion_matrix(g)
+                    except KeyError:
+                        gam = self.three_torsion_matrix(g)
+                        threetor = True
+                c = gam.matrix()[1,0]
+                if c == 0:
+                    continue
+                found = True
+                if threetor:
+                    cc = (gam ** 2).matrix()[1,0]
+                    val = max(QQp(c).valuation(), QQp(cc).valuation())
+                else:
+                    val = QQp(c).valuation()
+                if val < gam_shift:
+                    gam_shift = val
+                    g0 = g
+                    gam0 = gam
+            if not found:
+                raise NotImplementedError
+            self._nice_gamma_dict[key] = (g0, gam0)
+        else:   # Find gamma such that omega(a)^k != 1
+            Id = gens[0]
+            gam_keys = self.gammas.keys()
+            gam_keys.remove(Id)
+            for g0 in gam_keys:
+                gam0 = self.gammas[g0]
+                a = gam0.matrix()[0, 0]
+                if QQp.teichmuller(a) ** k != 1:
+                    self._nice_gamma_dict[key] = (g0, gam0)
+                    found = True
+                    break
+            if not found:
+                for g0 in gens[1:]:
+                    if not g0 in gam_keys:
+                        if g0 in self.reps_with_two_torsion():
+                            gam0 = self.two_torsion_matrix(g0)
+                        else:
+                            gam0 = self.three_torsion_matrix(g0)
+                        a = gam0.matrix()[0,0]
+                        if QQp.teichmuller(a) ** k != 1:
+                            self._nice_gamma_dict[key] = (g0, gam0)
+                            found = True
+                            break
+                if not found:
+                    raise NotImplementedError
+        return (g0, gam0)
 
 def basic_hecke_matrix(a, l):
     r"""
