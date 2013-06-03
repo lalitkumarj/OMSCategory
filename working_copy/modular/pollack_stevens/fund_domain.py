@@ -1519,19 +1519,19 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
             ...                 print MR._nice_gamma(p, k % (p-1))
             ([ 0 -1]
             [ 1  1], [-2 -1]
-            [ 3  1])
+            [ 3  1], 1)
             ([ 0 -1]
             [ 1  1], [-2 -1]
-            [ 3  1])
+            [ 3  1], 1)
             ([ 0 -1]
             [ 1  2], [ 2  1]
-            [-5 -2])
+            [-5 -2], 1)
             ([ 0 -1]
             [ 1  2], [ 2  1]
-            [-5 -2])
+            [-5 -2], 0)
             ([ 0 -1]
             [ 1  2], [ 2  1]
-            [-5 -2])
+            [-5 -2], 1)
         """
         key = (p, k)
         try:
@@ -1571,7 +1571,7 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                     gam0 = gam
             if not found:
                 raise NotImplementedError
-            self._nice_gamma_dict[key] = (g0, gam0)
+            self._nice_gamma_dict[key] = (g0, gam0, gam_shift)
         else:   # Find gamma such that omega(a)^k != 1
             Id = gens[0]
             gam_keys = self.gammas.keys()
@@ -1592,12 +1592,12 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                             gam0 = self.three_torsion_matrix(g0)
                         a = gam0.matrix()[0,0]
                         if QQp.teichmuller(a) ** k != 1:
-                            self._nice_gamma_dict[key] = (g0, gam0)
+                            self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
                             found = True
                             break
                 if not found:
                     raise NotImplementedError
-        return (g0, gam0)
+        return self._nice_gamma_dict[key]
 
 def basic_hecke_matrix(a, l):
     r"""
