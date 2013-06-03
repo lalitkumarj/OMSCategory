@@ -83,15 +83,18 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
-        # RP: _prec_for_solve... isn't working right
-        # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
-        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p)))
-        #print "M_in", M_in, "var_prec", M[1]
-        CM = self.coefficient_module().change_precision([M_in, M[1]])
-        R = CM.base_ring()
         manin = self.source()
         gens = manin.gens()
         gammas = manin.gammas
+        Id = gens[0]
+        g0, gam0, gam_shift = manin._nice_gamma(p, k)
+        
+        # RP: _prec_for_solve... isn't working right
+        # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
+        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift  #fix this
+        #print "M_in", M_in, "var_prec", M[1]
+        CM = self.coefficient_module().change_precision([M_in, M[1]])
+        R = CM.base_ring()
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
@@ -120,25 +123,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     t += D[g] * gammas[g] - D[g]
         
         ## Fill in this comment?
-
-        Id = gens[0]
-        if len(gammas) > 1:
-            #There is a non-torsion generator
-            gam_keys = gammas.keys()
-            gam_keys.remove(Id)
-            g = gam_keys[0]
-            gam = gammas[g]
-        else:
-            verbose("All generators are torsion.")
-            g = gens[1]
-            if g in manin.reps_with_two_torsion():
-                gam = manin.two_torsion_matrix(g)
-            else:
-                gam = manin.three_torsion_matrix(g)
         
-        a = gam.matrix()[0,0]
-        c = gam.matrix()[1,0]
+        a = gam0.matrix()[0,0]
+        c = gam0.matrix()[1,0]
         
+        shift = 0
         if CM._character != None:
             raise(NotImplementedError)
             chara = CM._character(a)
@@ -153,17 +142,24 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
             err = CM(v)
         else:
+            from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _padic_val_of_pow_series, _shift_coeffs
             err = -t.moment(0) / (K[1])
+            err_val = _padic_val_of_pow_series(err) ###
+            if err_val < 0:
+                shift -= err_val
+                err = _shift_coeffs(err, shift, right=False)
+                t.ordp += shift
             v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
         
-        if g in manin.reps_with_two_torsion() or g in manin.reps_with_three_torsion():
-            err = err * gam - err
-            D[g] += err
-            t += err
+        if g0 in manin.reps_with_two_torsion():
+            err = err - err * gam0
+            t -= err
+        elif g0 in manin.reps_with_three_torsion():
+            err = 2 * err - err * gam0 - err * gam0**2
+            t -= err
         else:
-            D[g] += err
-            t += err * gam - err
+            t += err * gam0 - err
         
         verbose("Solve difference equation.")
         #print "t",t
@@ -173,7 +169,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #        if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
         #            raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
-        ret = self(D)
+        ret = self(D).reduce_precision(M)
         if self.sign() == 1:
             return ret.plus_part()
         if self.sign() == -1:
