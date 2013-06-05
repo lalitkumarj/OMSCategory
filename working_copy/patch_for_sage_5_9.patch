@@ -1,0 +1,73 @@
+# HG changeset patch
+# User Robert Harron <rharron@math.wisc.edu>
+# Date 1370399158 18000
+# Node ID 3e92ddea34edac7d6dc41a81fecc4b676890e34e
+# Parent  1077314f416653b28e199c382667a1f11e444bdd
+Changes to sage 5.9 for OMS family code
+
+diff --git a/sage/matrix/matrix_integer_2x2.pyx b/sage/matrix/matrix_integer_2x2.pyx
+--- a/sage/matrix/matrix_integer_2x2.pyx
++++ b/sage/matrix/matrix_integer_2x2.pyx
+@@ -392,10 +392,13 @@
+             sage: m == n
+             False
+         """
+-        return mpz_cmp(left.a, (<Matrix_integer_2x2>right).a) or \
+-               mpz_cmp(left.b, (<Matrix_integer_2x2>right).b) or \
+-               mpz_cmp(left.c, (<Matrix_integer_2x2>right).c) or \
+-               mpz_cmp(left.d, (<Matrix_integer_2x2>right).d)
++        cdef int c = mpz_cmp(left.a, (<Matrix_integer_2x2>right).a) or \
++                     mpz_cmp(left.b, (<Matrix_integer_2x2>right).b) or \
++                     mpz_cmp(left.c, (<Matrix_integer_2x2>right).c) or \
++                     mpz_cmp(left.d, (<Matrix_integer_2x2>right).d)
++        if c < 0: return -1
++        if c > 0: return 1
++        return 0
+        
+     def __neg__(self):
+         """
+diff --git a/sage/modular/all.py b/sage/modular/all.py
+--- a/sage/modular/all.py
++++ b/sage/modular/all.py
+@@ -30,6 +30,8 @@
+ 
+ from overconvergent.all import *
+ 
++from pollack_stevens.all import *
++
+ from local_comp.all import *
+ 
+ from cusps_nf import NFCusp, NFCusps, NFCusps_clear_cache, Gamma0_NFCusps
+diff --git a/sage/rings/padics/padic_capped_absolute_element.pyx b/sage/rings/padics/padic_capped_absolute_element.pyx
+--- a/sage/rings/padics/padic_capped_absolute_element.pyx
++++ b/sage/rings/padics/padic_capped_absolute_element.pyx
+@@ -1402,7 +1402,7 @@
+         else:
+             return self
+ 
+-    def valuation(self):
++    def valuation(self, p=None):
+         """
+         Returns the valuation of ``self``, ie the largest power of `p`
+         dividing ``self``.
+@@ -1432,6 +1432,8 @@
+         """
+         # We override this, rather than using the valuation in
+         # padic_generic_element, for speed reasons.
++        if p is not None and p != self.prime_pow.prime:
++            raise ValueError("p must be the same as the prime")
+         
+         cdef Integer ans
+         ans = PY_NEW(Integer)
+diff --git a/setup.py b/setup.py
+--- a/setup.py
++++ b/setup.py
+@@ -545,7 +545,7 @@
+     for dirpath, dirnames, filenames in os.walk(os.path.join(root, 'sage')):
+         if '__init__.py' in filenames:
+             packages.append(dirpath.replace(os.path.sep, '.'))
+-    return packages
++    return packages + ['sage.modular.pollack_stevens']
+ 
+ code = setup(name = 'sage',
+ 
