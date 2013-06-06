@@ -1580,7 +1580,7 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                 gam0 = self.gammas[g0]
                 a = gam0.matrix()[0, 0]
                 if QQp.teichmuller(a) ** k != 1:
-                    self._nice_gamma_dict[key] = (g0, gam0)
+                    self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
                     found = True
                     break
             if not found:
