@@ -126,11 +126,11 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
             dettwist = ZZ(dettwist)
             if dettwist == 0: 
                 dettwist = None
-        return (k, p, base, character, adjuster, act_on_left, dettwist)
+        return (k, p, tuple(prec_cap), base, character, adjuster, act_on_left, dettwist)
     
     def create_object(self, version, key):
-        k, p, base, character, adjuster, act_on_left, dettwist = key
-        return CoeffMod_OMS_Families_space(k, p=p, base=base, character=character, \
+        k, p, prec_cap, base, character, adjuster, act_on_left, dettwist = key
+        return CoeffMod_OMS_Families_space(k, p=p, prec_cap=prec_cap, base=base, character=character, \
                  adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
 FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('FamiliesOfOverconvergentDistributions')
@@ -166,7 +166,8 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         #elif not isinstance(base, ring.Ring):
         #    raise TypeError("base must be a ring")
         self._p = base.base_ring().prime()
-        self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
+        #self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
+        self._prec_cap = tuple(prec_cap)
         k = k % (self._p - 1)
         #self._cp = (self._p-2) / (self._p-1)
         CoefficientModule_generic.__init__(self, k, base=base, \
