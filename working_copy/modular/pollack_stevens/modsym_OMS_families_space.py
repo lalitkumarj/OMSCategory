@@ -78,6 +78,20 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         return self(self.coefficient_module().an_element())
     
     def random_element(self, M=None):
+        r"""
+        EXAMPLES::
+        
+            sage: DD = FamiliesOfOverconvergentDistributions(4, base_coeffs=Qp(11, 6), prec_cap=[6,4])
+            sage: MM = FamiliesOfOMS(11, 4, coefficients=DD)
+            sage: Phis = MM.random_element()
+            sage: Phis._consistency_check()
+            This modular symbol satisfies the manin relations
+            sage: DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(11, 4), prec_cap=[4,4])
+            sage: MM = FamiliesOfOMS(11, 0, coefficients=DD, sign=-1)
+            sage: Phis = MM.random_element()
+            sage: Phis._consistency_check()
+            This modular symbol satisfies the manin relations
+        """
         if M is None:
             M = self.precision_cap()
         #if M == 1?
@@ -139,8 +153,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R)  #Maybe modify aut... to only return 2 first coeffs?
         if k != 0:
             err = -t.moment(0) / (K[0] - 1)
-            print "a,c =", a, c
-            print "k =", k
             v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
             err = CM(v)
         else:
@@ -154,9 +166,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
         
-        from sage.structure.sage_object import dumps
-        print "\nt:\n", dumps(t).__repr__()
-        print "\nerr:\n", dumps(err).__repr__()
         if g0 in manin.reps_with_two_torsion():
             err = err - err * gam0
             t -= err
@@ -164,7 +173,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             err = 2 * err - err * gam0 - err * gam0**2
             t -= err
         else:
-            print "Non-torsion generator"
             t += err * gam0 - err
         
         verbose("Solve difference equation.")
@@ -173,17 +181,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t_pr = t.precision_relative()
             t = t.reduce_precision([t_pr[0] - gam_shift, t_pr[1]])
         t.normalize()
-        print "\nTotal measure:", t._moments[0]
         mu = t.solve_diff_eqn()
-        print "\nSome info:"
-        print "\n", t._moments[0]
-        print "\n", mu.valuation(), shift
         mu_val = mu.valuation()
         if mu_val < 0:
             shift -= mu_val
             mu.ordp -= mu_val
             err.ordp -= mu_val
-        print "\n", shift
         mu.normalize()
         mu_pr = mu.precision_relative()
         # RP: commented out these lines as precision isn't set up to work properly yet
