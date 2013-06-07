@@ -212,7 +212,7 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         a, b, c, d = self._adjuster(g)
         # if g.parent().base_ring().is_exact():
         #     self._check_mat(a, b, c, d)
-        k = self._k
+        #k = self._k
         if g.parent().base_ring() is ZZ:
             if self._symk:
                 base_ring = QQ
@@ -229,7 +229,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         #tim = verbose("Checked, made R",tim)
         # special case for small precision, large weight
         scale = (b+d*y)/(a+c*y)
-        t = (a+c*y)**k # will already have precision M
+        #t = (a+c*y)**k # will already have precision M
+        t = R.one()
         #cdef long row, col #
         #tim = verbose("Made matrix",tim)
         for col in range(M):
