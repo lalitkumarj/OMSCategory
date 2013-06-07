@@ -105,9 +105,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         
         # RP: _prec_for_solve... isn't working right
         # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
-        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift  #fix this
+        ADD = 10    # Trying to fix precision issue!
+        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift + ADD  #fix this
         #print "M_in", M_in, "var_prec", M[1]
-        CM = self.coefficient_module().change_precision([M_in, M[1]])
+        CM = self.coefficient_module().change_precision([M_in, M_in])
         R = CM.base_ring()
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
@@ -117,7 +118,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         for g in gens[1:]:
             verbose("Looping over generators. At generator %s"%(g))
             #print "CM._prec_cap", CM.precision_cap()
-            D[g] = CM.random_element([M_in, M[1]])
+            D[g] = CM.random_element([M_in, M_in])
             #print "pre:",D[g]
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
@@ -150,7 +151,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
         R = CM.base_ring()
         verbose("Compute automorphy factor.")
-        K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R)  #Maybe modify aut... to only return 2 first coeffs?
+        K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
         if k != 0:
             err = -t.moment(0) / (K[0] - 1)
             v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
@@ -177,10 +178,17 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         
         verbose("Solve difference equation.")
         #print "t",t
+        err_pr = err.precision_relative()
+        err.reduce_precision([err_pr[0] - ADD, err_pr[1] - ADD])
         if shift > 0:
             t_pr = t.precision_relative()
-            t = t.reduce_precision([t_pr[0] - gam_shift, t_pr[1]])
+            t = t.reduce_precision([t_pr[0] - gam_shift - ADD, t_pr[1] - ADD])
+        else:
+            t_pr = t.precision_relative()
+            t = t.reduce_precision([t_pr[0] - ADD, t_pr[1] - ADD])
         t.normalize()
+        print "M_in =", M_in
+        print "t[0] =", t.moment(0)
         mu = t.solve_diff_eqn()
         mu_val = mu.valuation()
         if mu_val < 0:
