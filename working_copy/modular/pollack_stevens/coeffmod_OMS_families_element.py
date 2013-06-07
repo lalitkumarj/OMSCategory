@@ -610,7 +610,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             M, var_prec = self.precision_absolute()
             V = self.parent().approx_module(0, var_prec)
             return CoeffMod_OMS_Families_element(V([]), self.parent(), ordp=(M - ZZ(M).exact_log(p) - 1), check=False, var_prec=var_prec)
-        if self._unscaled_moment(0) != 0:
+        if not self._unscaled_moment(0).is_zero():
             raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator.")
         M = ZZ(len(self._moments))
         if M == 2:
