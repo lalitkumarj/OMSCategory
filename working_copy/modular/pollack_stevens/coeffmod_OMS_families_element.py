@@ -69,7 +69,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 # You should call normalize if you want that.
                 moments = moments._moments[:parent.length_of_moments(par_p_prec)]
                 moments = moments.change_ring(parent.base_ring())
-            if isinstance(moments, CoeffMod_OMS_element):
+            elif isinstance(moments, CoeffMod_OMS_element):
                 # Coerce in using constant family
                 # Need to truncate
                 ordp = moments.ordp
