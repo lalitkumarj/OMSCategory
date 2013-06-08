@@ -107,7 +107,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
         ADD = 10    # Trying to fix precision issue!
         M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift + ADD  #fix this
-        #print "M_in", M_in, "var_prec", M[1]
+        print "M_in", M_in, "var_prec", M[1]
         CM = self.coefficient_module().change_precision([M_in, M_in])
         R = CM.base_ring()
         
@@ -177,7 +177,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t += err * gam0 - err
         
         verbose("Solve difference equation.")
-        #print "t",t
+        print "t",t
         err_pr = err.precision_relative()
         err.reduce_precision([err_pr[0] - ADD, err_pr[1] - ADD])
         if shift > 0:
