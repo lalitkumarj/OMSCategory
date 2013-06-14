@@ -59,6 +59,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             True
             sage: D(15)
             3 * (2 + O(3))
+            sage: D = OverconvergentDistributions(0, base=ZpCA(5, 8))
+            sage: D([25+O(5^2), 5+O(5)])
+            5^2 * ()
+            sage: D([25, 5])
+            5 * (5 + O(5^2), 1 + O(5))
     
     TEST::
     
@@ -82,10 +87,18 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 V = parent.approx_module(M)
                 VK = V.base_extend(K)
                 moments = VK(moments[:M])
-                if len(moments) == 0 or moments == 0:   #should do something with how "zero" moments is
+                if len(moments) == 0 or moments == 0:
                     V = parent.approx_module(0)
+                    if len(moments) > 0:
+                        #Determine ordp
+                        m = len(moments)
+                        diff = 0
+                        for i in range(m):
+                            diff = max(diff, m - i - moments[i].precision_absolute())
+                        ordp = m - diff
+                    else:
+                        ordp = parent.precision_cap()
                     moments = V([])
-                    ordp = parent.precision_cap()
                 else:
                     ordp = min([a.valuation() for a in moments])
                     for i in range(M):
