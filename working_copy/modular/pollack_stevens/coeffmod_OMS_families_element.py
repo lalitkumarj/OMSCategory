@@ -358,6 +358,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             except IndexError:
                 raise ValueError("self is zero")
             v = _padic_val_of_pow_series(a, p)
+            verbose("a = %s"%(a))
         relprec = p_precs[i] - v
         var_prec = min(s_var_prec, other_var_prec)  #should this depend on w-adic valuation?
         Rbase = R.base_ring()
@@ -383,10 +384,19 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             if check:
 #                   verbose("self.moment=%s, other.moment=%s"%(a, other._unscaled_moment(i)))
                 #if other._unscaled_moment(i) != _add_big_ohs_list(alpha * a, [ceil((n - i) * self._cp), var_prec]):
-                verbose("val, self._unscaled_moment(%s) = %s, %s"%(i, self.ordp, other._moments[i]))
+                verbose("val, self._unscaled_moment(%s) = %s, %s"%(i, self.ordp, self._moments[i]))
                 verbose("val, other._unscaled_moment(%s) = %s, %s"%(i, other.ordp, other._moments[i]))
                 if other._unscaled_moment(i) != alpha * a:
-                    raise ValueError("not a scalar multiple")
+                    var_prec = (other._unscaled_moment(i) - alpha * a).valuation()
+                    if var_prec < 1:
+                        print i,"\n"
+                        print other._unscaled_moment(i),"\n"
+                        print alpha * a,"\n"
+                        print other._unscaled_moment(i) - alpha * a,"\n"
+                        print var_prec,"\n"
+                        raise ValueError("not a scalar multiple")
+                    alpha = alpha.add_bigoh(var_prec)
+                    verbose("Resetting alpha (lowering variable prec)")
             v = _padic_val_of_pow_series(a, p)
             if p_precs[i] - v > relprec:
                 verbose("Resetting alpha: relprec=%s, i=%s, p_precs[i]=%s, v=%s"%(relprec, i,p_precs[i], v))
