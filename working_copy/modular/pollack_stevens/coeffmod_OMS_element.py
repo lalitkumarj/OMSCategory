@@ -170,6 +170,17 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         return self._addsub(right, False)
     
     def _sub_(self, right):
+        r"""
+        TESTS::
+        
+            sage: D = OverconvergentDistributions(0, base=ZpCA(5, 8), prec_cap=3)
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: V = D.approx_module(3)
+            sage: mu = CoeffMod_OMS_element(V((5^2 + O(5^3), 5 + O(5^2), 1 + O(5))), D, ordp=0, check=False)
+            sage: mu2 = D([O(5^2), O(5)])
+            sage: mu - mu2
+            5^2 * ()
+        """
         #RH: "copied" from dist.pyx
         return self._addsub(right, True)
     
@@ -202,6 +213,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             rmoments = -rmoments
         verbose(self._moments, level=2)
         ans._moments = smoments + rmoments
+        #if rprec > 0:
+        #    ans._moments[rprec - 1] = ans._moments[rprec - 1].add_bigoh(1)    #To force normalize to deal with this properly
         verbose("ans_ordp %s, ans_moments %s"%(ans.ordp, ans._moments), level=2)
         verbose("\n******** end _addsub ********", level=2)
         return ans
@@ -539,8 +552,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             sage: mu._valuation()
             5
         """
-        #RH: "copied" from dist.pyx, but then adjusted
-        verbose("\n******** begin valuation ********", level=2)
+        verbose("\n******** begin _valuation ********", level=2)
         verbose("ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
         n = self.precision_relative()
         if n == 0:
@@ -559,14 +571,52 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 vv.append(min_val)
             ret = self.ordp + min_val#min(n, min_val)
             verbose("ret %s"%(ret), level=2)
-            verbose("\n******** end valuation ********", level=2)
+            verbose("\n******** end _valuation ********", level=2)
             return [ret, vv]
         ret = self.ordp + min([self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])#min([n] + [self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])
         verbose("ret %s"%(ret), level=2)
-        verbose("\n******** end valuation ********", level=2)
+        verbose("\n******** end _valuation ********", level=2)
         return ret
     
     def normalize(self):
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+                sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+        """
+        n = self.precision_relative()
+        if n == 0:
+            return self
+        adjust_moms = 0
+        for i in range(n):
+            adjust_moms = max(adjust_moms, n - i - self._moments[i].precision_absolute())
+        if adjust_moms >= n:
+            assert False
+        if adjust_moms == 0:
+            for i in range(n):
+                self._moments[i] = self._moments[i].add_bigoh(n - i)
+        else:
+            n -= adjust_moms
+            V = self.parent().approx_module(n)
+            self._moments = V([self._moments[i].add_bigoh(n - i) for i in range(n)])
+        val_diff = self._valuation() - self.ordp
+        if val_diff > 0:
+            n -= val_diff
+            self.ordp += val_diff
+            V = self.parent().approx_module(n)
+            self._moments = V([self._moments[i] >> val_diff for i in range(n)])
+        return self
+    
+    def normalize_old(self):
         r"""
             EXAMPLES::
             
@@ -763,7 +813,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 sage: nu = CoeffMod_OMS_element(V([R(0, 9), R(2*3^2 + 2*3^4 + 2*3^7 + 3^8 + O(3^9))]), D, ordp=0, check=False)
                 sage: mu = nu.solve_diff_eqn()
                 sage: mu
-                3^2 * ()
+                3 * ()
         """
         #RH: see tests.sage for randomized verification that this function works correctly
         p = self.parent().prime()
