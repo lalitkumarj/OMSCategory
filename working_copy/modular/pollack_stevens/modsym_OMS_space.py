@@ -1,6 +1,6 @@
 from sage.structure.factory import UniqueFactory
 from sage.misc.misc import verbose
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_method, cached_function
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
@@ -8,7 +8,6 @@ from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.rational_field import QQ
 from sage.rings.padics.factory import Qp
 from sage.rings.finite_rings.constructor import GF
-from sage.functions.other import ceil
 from sage.matrix.constructor import Matrix
 from sage.modules.free_module_element import vector
 from sage.modular.arithgroup.all import Gamma0
@@ -152,6 +151,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
+        k_val = ZZ(k).valuation(p) if k != 0 else ZZ.zero()
         manin = self.source()
         gens = manin.gens()
         Id = gens[0]
@@ -183,7 +183,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             else:
                 gam_shift = c.valuation(p)
         
-        M_in = _prec_for_solve_diff_eqn(M, p, k) + gam_shift
+        M_in = _prec_for_solve_diff_eqn(M, p) + k_val + gam_shift
         verbose("Working with precision %s (M, p, k, gam_shift) = (%s, %s, %s, %s)"%(M_in, M, p, k, gam_shift))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
@@ -256,8 +256,9 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #except PrecisionError:
         #    verbose("t"%(t.ordp, t._moments, t.precision_absolute()
         verbose("Shift before mu = %s"%(shift))
-        if shift > 0:
-            t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
+        #if shift > 0:
+        #    t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
+        t = t.reduce_precision_absolute(t.precision_absolute() - k_val - gam_shift)
         verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         t.normalize()
         verbose("After normalize: About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
@@ -272,16 +273,17 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 err.ordp -= mu_val
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments and mu: %s, %s, %s"%(mu.ordp, mu._moments, mu))
-        mu = mu.reduce_precision(M)
+        mu = mu.reduce_precision_absolute(M)
         mu.normalize()
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
-        if mu.precision_relative() < M:
+        if mu.precision_absolute() < M: #Eventually, should just remove this check
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
         if shift > 0:
             for h in gens[1:]:
                 D[h].ordp += shift
+        #Should the absolute precision of the other values be lowered as well?
         if k != 0:
             D[g0] += err
         ret = self(D)
@@ -594,38 +596,68 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             T.append(row)
         return Matrix(T).transpose()
 
-#@cached_method
-def _prec_for_solve_diff_eqn(M, p, k):
+@cached_function
+def _prec_for_solve_diff_eqn(M, p):
     r"""
-        A helper function for determining the (relative) precision of the input
-        to solve_diff_eqn required in order obtain an answer with (relative)
-        precision ``M``. The parameter ``p`` is the prime and ``k`` is the weight.
+    A helper function for determining the (absolute) precision of the input
+    to solve_diff_eqn required in order obtain an answer with (absolute)
+    precision ``M``. The parameter ``p`` is the prime.
+    
+    Given input (absolute) precision `M_\text{in}`, the output of
+    solve_diff_eqn has (absolute) precision
+    
+    .. MATH::
         
-        Given input precision `M_\text{in}`, the output has precision
-        
-        .. MATH::
-            
-            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3 - v_p(k),
-        
-        where the latter term only appears if ``k`` is not 0.
-        
-        ::EXAMPLES:
-        
-            sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
-            sage: [_prec_for_solve_diff_eqn(M, p, k) for p in [2,3,11] for M in [1,3,10,20] for k in [0, 2, 6]]
-            [7, 8, 8, 10, 11, 11, 18, 19, 19, 28, 29, 29, 6, 6, 7, 8, 8, 9, 16, 16, 17, 26, 26, 27, 5, 5, 5, 7, 7, 7, 15, 15, 15, 25, 25, 25]
+        M = M_\text{in} - \lfloor\log_p(M_\text{in})\rfloor - 1.
+    
+    ::EXAMPLES:
+    
+        sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
+        sage: [_prec_for_solve_diff_eqn(M, p) for p in [3,7,11,29] for M in [1,3,10,20]]
+        [2, 5, 13, 23, 2, 4, 12, 22, 2, 4, 12, 22, 2, 4, 11, 21]
     """
-    # A good guess to begin:
-    val_k = ZZ(k).valuation(p) if k != 0 else 0
     if M < 1:
         raise ValueError("Desired precision M(=%s) must be at least 1."%(M))
-    Min = ZZ(3 + M + ceil(ZZ(M).log(p)) + val_k)
+    # A good guess to begin:
+    M_in = ZZ(1 + M + ZZ(M).exact_log(p))
     # It looks like usually there are no iterations
-    # For low M, there can be 1 or 2
-    while M > Min - ceil(Min.log(p)) - 3 - val_k:
-        Min += 1
+    while M > M_in - M_in.exact_log(p) - 1:
+        M_in += 1
         #print("An iteration in _prec_solve_diff_eqn")
-    return Min
+    return M_in
+
+#@cached_method
+#def _prec_for_solve_diff_eqn_old(M, p, k):
+#    r"""
+#        A helper function for determining the (relative) precision of the input
+#        to solve_diff_eqn required in order obtain an answer with (relative)
+#        precision ``M``. The parameter ``p`` is the prime and ``k`` is the weight.
+#        
+#        Given input precision `M_\text{in}`, the output has precision
+#        
+#        .. MATH::
+#            
+#            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3 - v_p(k),
+#        
+#        where the latter term only appears if ``k`` is not 0.
+#        
+#        ::EXAMPLES:
+#        
+#            sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
+#            sage: [_prec_for_solve_diff_eqn(M, p, k) for p in [2,3,11] for M in [1,3,10,20] for k in [0, 2, 6]]
+#            [7, 8, 8, 10, 11, 11, 18, 19, 19, 28, 29, 29, 6, 6, 7, 8, 8, 9, 16, 16, 17, 26, 26, 27, 5, 5, 5, 7, 7, 7, 15, 15, 15, 25, 25, 25]
+#    """
+#    # A good guess to begin:
+#    val_k = ZZ(k).valuation(p) if k != 0 else 0
+#    if M < 1:
+#        raise ValueError("Desired precision M(=%s) must be at least 1."%(M))
+#    Min = ZZ(3 + M + ceil(ZZ(M).log(p)) + val_k)
+#    # It looks like usually there are no iterations
+#    # For low M, there can be 1 or 2
+#    while M > Min - ceil(Min.log(p)) - 3 - val_k:
+#        Min += 1
+#        #print("An iteration in _prec_solve_diff_eqn")
+#    return Min
 
 #def TESTER():
 #    from sage.structure.sage_object import loads, dumps

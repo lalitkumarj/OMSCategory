@@ -83,6 +83,10 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
     
         sage: D = FamiliesOfOverconvergentDistributions(0, prec_cap=[5,3], base_coeffs=ZpCA(7)); D    # indirect doctest
         Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 7-adic Ring with capped absolute precision 20
+        sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap = [8 ,4], base_coeffs=ZpCA(11, 4))
+        Traceback (most recent call last):
+        ...
+        ValueError: Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.
     """
     def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
@@ -101,7 +105,16 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
                 raise ValueError("Must specify a precision cap or a base ring.")
             else:
                 prec_cap = _prec_cap_parser(prec_cap)
+                if base_coeffs.precision_cap() < prec_cap[0]:
+                    raise ValueError("Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.")
             base = PowerSeriesRing(base_coeffs, name=variable_name, default_prec=prec_cap[1])
+        elif prec_cap is None:
+            prec_cap = [ZZ(base.base_ring().precision_cap()), ZZ(base.default_prec())]
+        else:
+            if base.base_ring().precision_cap() < prec_cap[0]:
+                raise ValueError("Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.")
+            if base.default_prec() < prec_cap[1]:
+                raise ValueError("Default precision on the variable of base ring must be at least the w-adic precision cap of this space.")
         base_coeffs = None
         p = base.base_ring().prime()
         k_shift = 0
@@ -145,7 +158,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         sage: D.prime()
         3
         sage: D.precision_cap()
-        [10, 5]
+        (10, 5)
     
     TEST::
     
