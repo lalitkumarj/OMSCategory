@@ -470,8 +470,28 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return ret
     
     def normalize(self):
-        #RH: adapted from coeffmod_OMS_element.py
-        #Not tested
+        r"""
+        TESTS::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element
+            sage: DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(5, 4), prec_cap=[4,2])
+            sage: V = DD.approx_module()
+            sage: R = DD.base_ring()
+            sage: w = R.gen()
+            sage: mus = V((4*5 + 5^3 + O(5^4) + (1 + 3*5 + 5^2 + 4*5^3 + O(5^4))*w + O(w^2), 1 + 5 + 4*5^2 + 5^3 + O(5^4) + (5 + 3*5^2 + 5^3 + O(5^4))*w + O(w^2), 4 + 2*5 + 2*5^2 + 4*5^3 + O(5^4) + (1 + 2*5^2 + 5^3 + O(5^4))*w + O(w^2), 1 + 5 + O(5^4) + (3 + 5 + 4*5^2 + O(5^4))*w + O(w^2), 4 + 3*5 + 5^2 + 2*5^3 + O(5^4) + (1 + 3*5 + 4*5^2 + O(5^4))*w + O(w^2), 2*5 + 4*5^2 + 2*5^3 + O(5^4) + (2*5 + 3*5^2 + 5^3 + O(5^4))*w + O(w^2)))
+            sage: mus = CoeffMod_OMS_Families_element(mus, DD, check=False, var_prec=2)
+            sage: mus   #Indirect doctest
+            (4*5 + 5^3 + O(5^4) + (1 + 3*5 + 5^2 + 4*5^3 + O(5^4))*w, 1 + 5 + 4*5^2 + 5^3 + O(5^4) + (5 + 3*5^2 + 5^3 + O(5^4))*w, 4 + 2*5 + 2*5^2 + O(5^3) + (1 + 2*5^2 + O(5^3))*w, 1 + 5 + O(5^2) + (3 + 5 + O(5^2))*w, 4 + O(5) + (1 + O(5))*w, 0) + O(w^2)
+            sage: mus = V((4*5 + 5^3 + O(5^4) + (1 + 3*5 + 5^2 + 4*5^3 + O(5^4))*w + O(w^2), 1 + 5 + O(5^2) + (5 + 3*5^2 + 5^3 + O(5^4))*w + O(w^2), 4 + 2*5 + 2*5^2 + 4*5^3 + O(5^4) + (1 + 2*5^2 + 5^3 + O(5^4))*w + O(w^2), 1 + 5 + O(5^4) + (3 + 5 + 4*5^2 + O(5^4))*w + O(w^2), 4 + 3*5 + 5^2 + 2*5^3 + O(5^4) + (1 + 3*5 + 4*5^2 + O(5^4))*w + O(w^2), 2*5 + 4*5^2 + 2*5^3 + O(5^4) + (2*5 + 3*5^2 + 5^3 + O(5^4))*w + O(w^2)))
+            sage: mus = CoeffMod_OMS_Families_element(mus, DD, check=False, var_prec=2); mus   #Indirect doctest
+            (4*5 + O(5^2) + (1 + 3*5 + O(5^2))*w, 1 + 5 + O(5^2) + (5 + O(5^2))*w, 4 + O(5) + (1 + O(5))*w) + O(w^2)
+            sage: mus = V((4*5^2 + 5^3 + O(5^4) + (5^2 + 4*5^3 + O(5^4))*w + O(w^2), 4*5^2 + 5^3 + O(5^42) + (3*5^2 + 5^3 + O(5^4))*w + O(w^2), 2*5^2 + 4*5^3 + O(5^4) + (2*5^2 + 5^3 + O(5^4))*w + O(w^2), O(5^4) + (4*5^2 + O(5^4))*w + O(w^2), 5^2 + 2*5^3 + O(5^4) + (4*5^2 + O(5^4))*w + O(w^2), 4*5^2 + 2*5^3 + O(5^4) + (3*5^2 + 5^3 + O(5^4))*w + O(w^2)))
+            sage: mus = CoeffMod_OMS_Families_element(mus, DD, check=False, var_prec=2); mus    #Indirect doctest
+            5^2 * (4 + 5 + O(5^2) + (1 + 4*5 + O(5^2))*w, 4 + 5 + O(5^2) + (3 + 5 + O(5^2))*w, 2 + O(5) + (2 + O(5))*w) + O(w^2)
+            sage: mus = V((4*5^2 + 5^3 + O(5^4) + (5^2 + 4*5^3 + O(5^4))*w + O(w^2), 4*5^2 + 5^3 + O(5^42) + (3*5^2 + 5^3 + O(5^4))*w + O(w^2), 2*5^2 + 4*5^3 + O(5^4) + (2*5^2 + 5^3 + O(5^4))*w + O(w^2), O(5^4) + (4*5^2 + O(5^4))*w + O(w^2), 5^2 + 2*5^3 + O(5^4) + (4*5^2 + O(5^4))*w + O(w^2), 4*5^2 + 2*5^3 + O(5^4) + (2*5 + 3*5^2 + 5^3 + O(5^4))*w + O(w^2)))
+            sage: mus = CoeffMod_OMS_Families_element(mus, DD, check=False, var_prec=2); mus   #Indirect doctest
+            5^2 * (4 + 5 + O(5^2) + (1 + 4*5 + O(5^2))*w, 4 + 5 + O(5^2) + (3 + 5 + O(5^2))*w, 2 + O(5) + (2 + O(5))*w) + O(w^2)
+        """
         n, v_prec = self.precision_relative()
         if n == 0:
             return self
@@ -480,10 +500,11 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         length = len(p_precs)
         for i in range(length):
             adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+        #print "adjust_moms:", adjust_moms
         if adjust_moms >= n:
             assert False    #Deal with this later...
+        R = self.parent().base_ring()
         if adjust_moms == 0:
-            R = self.parent().base_ring()
             for i in range(length):
                 self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], self._var_prec]), self._var_prec)
         else:
