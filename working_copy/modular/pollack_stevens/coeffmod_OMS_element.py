@@ -726,7 +726,18 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)  #should latter be true?
     
     def reduce_precision_absolute(self, new_prec):
-        #This isn't quite right, e.g. mu = (2*3^2 + 2*3^3 + O(3^4), 2*3 + O(3^3), O(3^2), 2 + O(3)) with new_prec=2
+        r"""
+        TESTS::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: D = OverconvergentDistributions(0, base=ZpCA(3, 4))
+            sage: V = D.approx_module()
+            sage: mu = V((2*3^2 + 2*3^3 + O(3^4), 2*3 + O(3^3), O(3^2), 2 + O(3)))
+            sage: mu = CoeffMod_OMS_element(mu, D, check=False)
+            sage: mu.reduce_precision_absolute(2)
+            3^2 * ()
+        """
+        #The other possible answer for the above example is 3 * (2*3 + O(3^2), 2 + O(3)), but I don't think that's right since mu is indeed in Fil^2.
         if new_prec > self.precision_absolute():
             raise ValueError("new_prec(=%s) must be less than absolute precision of self."%(new_prec))
         ordp = self.ordp
@@ -735,7 +746,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             ordp = new_prec
         else:
             moments = self._moments[:new_prec - ordp]
-            moments[new_prec - ordp - 1] = moments[new_prec - ordp - 1].add_bigoh(1)
         return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)
     
     def lift(self, DD=None):
