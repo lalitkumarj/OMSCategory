@@ -440,30 +440,69 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return self.normalize().ordp
     
     def _valuation(self, val_vector=False):
-        n = self.precision_relative()[0]
+        n, v_prec = self.precision_relative()
         if n == 0:
             if val_vector:
                 return [self.ordp, []]
             return self.ordp
         length = self.parent().length_of_moments(n)
+        p_precs = self.parent().filtration_precisions(n)
+        #print "ordp, moms:", self.ordp, "\n", self._moments
         if val_vector:
-            cur = _padic_val_of_pow_series(self._unscaled_moment(0))
+            cur = _padic_val_of_pow_series(self._unscaled_moment(0), var_prec=self._var_prec)
             min_val = cur# if not cur.is_zero() else Infinity
             vv = [min_val]
             for a in range(1, length):
                 cur_mom = self._unscaled_moment(a)
-                cur = _padic_val_of_pow_series(cur_mom) if not cur_mom.is_zero() else a + _padic_val_of_pow_series(cur_mom) #Is this last part right with our filtration?
+                cur = _padic_val_of_pow_series(cur_mom, var_prec=self._var_prec) if not cur_mom.is_zero() else n - p_precs[a] + _padic_val_of_pow_series(cur_mom, var_prec=self._var_prec)
                 if cur < min_val:
                     min_val = cur
                 vv.append(min_val)
             ret = self.ordp + min_val#min(n, min_val)
+            if ret == Infinity: #This can happen because power series over ZpCA don't treat the zero power series properly
+                ret = self.ordp + n
             #verbose("ret %s"%(ret), level=2)
             #verbose("\n******** end valuation ********", level=2)
             return [ret, vv]
-        ret = self.ordp + min([_padic_val_of_pow_series(self._unscaled_moment(a)) if not self._unscaled_moment(a).is_zero() else a + _padic_val_of_pow_series(self._unscaled_moment(a)) for a in range(length)])    #Is this last part right with our filtration?
+        ret = self.ordp + min([_padic_val_of_pow_series(self._unscaled_moment(a), var_prec=self._var_prec) if not self._unscaled_moment(a).is_zero() else n - p_precs[a] + _padic_val_of_pow_series(self._unscaled_moment(a), var_prec=self._var_prec) for a in range(length)])
+        if ret == Infinity: #This can happen because power series over ZpCA don't treat the zero power series properly
+            ret = self.ordp + n
         return ret
     
     def normalize(self):
+        #RH: adapted from coeffmod_OMS_element.py
+        #Not tested
+        n, v_prec = self.precision_relative()
+        if n == 0:
+            return self
+        adjust_moms = 0
+        p_precs = self.parent().filtration_precisions(n)
+        length = len(p_precs)
+        for i in range(length):
+            adjust_moms = max(adjust_moms, p_precs[i] - _padic_abs_prec_of_pow_series(self._moments[i], v_prec))
+        if adjust_moms >= n:
+            assert False    #Deal with this later...
+        if adjust_moms == 0:
+            R = self.parent().base_ring()
+            for i in range(length):
+                self._moments[i] = R(_add_big_ohs_list(self._moments[i], [p_precs[i], self._var_prec]), self._var_prec)
+        else:
+            n -= adjust_moms
+            p_precs = self.parent().filtration_precisions(n)
+            length = len(p_precs)
+            V = self.parent().approx_module(n, self._var_prec)
+            self._moments = V([R(_add_big_ohs_list(self._moments[i], [p_precs[i], self._var_prec]), self._var_prec) for i in range(length)])
+        val_diff = self._valuation() - self.ordp
+        if val_diff > 0:
+            n -= val_diff
+            p_precs = self.parent().filtration_precisions(n)
+            length = len(p_precs)
+            self.ordp += val_diff
+            V = self.parent().approx_module(n, self._var_prec)
+            self._moments = V([_shift_coeffs(self._moments[i], val_diff) for i in range(length)])
+        return self
+    
+    def normalize_old(self):
         #RH: adapted from coeffmod_OMS_element.py
         #Not tested
         V = self._moments.parent()
@@ -657,14 +696,17 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #Should we remove precision like at end of non-family code, or is this taken care of?
         return mus.normalize()  #Is it necessary to normalize?
 
-def _padic_val_of_pow_series(f, p=None):
+def _padic_val_of_pow_series(f, p=None, var_prec=None):
     r"""
         Given a power series ``f`` return its ``p``-adic valuation, i.e. the
         minimum ``p``-adic valuation of its coefficients
     """
     if f == 0:
         return Infinity
-    return min([coeff.valuation() if not coeff.is_zero() else coeff.precision_absolute() for coeff in f])
+    if var_prec is None:
+        return min([coeff.valuation() if not coeff.is_zero() else coeff.precision_absolute() for coeff in f])
+    flist = f.padded_list()[:var_prec]
+    return min([coeff.valuation() if not coeff.is_zero() else coeff.precision_absolute() for coeff in flist])
 
 def _padic_val_unit_of_pow_series(f, p=None):
     r"""
