@@ -111,7 +111,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #print "M_in", M_in
         ADD = 0    # Trying to fix precision issue!
         #M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift + ADD  #fix this
-        M_in = _prec_for_solve_diff_eqn(M[0], p) + gam_shift + ADD  #fix this
+        M_in = _prec_for_solve_diff_eqn(M[0], p) + gam_shift + ADD
         #print "M[0]", M[0], "M_in", M_in, "var_prec", M[1]
         #print "We'l get", M_in - 1 - ceil()
         CM = self.coefficient_module().change_precision([M_in, M[1]])
