@@ -600,7 +600,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         for i in range(n):
             adjust_moms = max(adjust_moms, n - i - self._moments[i].precision_absolute())
         if adjust_moms >= n:
-            assert False
+            assert False    #Deal with this later...
         if adjust_moms == 0:
             for i in range(n):
                 self._moments[i] = self._moments[i].add_bigoh(n - i)
@@ -760,72 +760,71 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def solve_diff_eqn(self):
         r"""
-            Solves the difference equation.
+        Solves the difference equation.
+        
+        See Theorem 4.5 and Lemma 4.4 of [PS].
+        
+        INPUT:
+        
+        - ``self`` - an overconvergent distribution `\mu` of absolute
+            precision `M`
+        
+        OUTPUT:
+        
+        - an overconvergent distribution `\nu` of absolute precision
+            `M - \lfloor\log_p(M)\rfloor - 1` such that
+        
+        .. math::
+        
+            \nu|\Delta = \mu,\text{ where }\Delta=\begin{pmatrix}1&1\\0&1
+            \end{pmatrix} - 1.
+        
+        EXAMPLES::
+        
+            sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
+            sage: D10 = D.change_precision(10)
+            sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
+            sage: nu10 = mu10.solve_diff_eqn()
+            sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+            sage: MR = MS.source()
+            sage: Id = MR.gens()[0]
+            sage: nu10 * MR.gammas[Id] - nu10 - mu10
+            7^8 * ()
+            sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
+            sage: D10 = D.change_precision(10)
+            sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
+            sage: nu10 = mu10.solve_diff_eqn()
+            sage: MS = OverconvergentModularSymbols(14, coefficients=D);
+            sage: MR = MS.source();
+            sage: Id = MR.gens()[0]
+            sage: nu10 * MR.gammas[Id] - nu10 - mu10
+            7^8 * ()
+            sage: R = ZpCA(5, 5); D = OverconvergentDistributions(0,base=R);
+            sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
+            sage: nu.solve_diff_eqn()
+            5 * (1 + 3*5 + O(5^2), O(5))
             
-            See Theorem 4.5 and Lemma 4.4 of [PS].
-            
-            INPUT:
-            
-            - ``self`` - an overconvergent distribution `\mu` of absolute
-              precision `M`
-            
-            OUTPUT:
-            
-            - an overconvergent distribution `\nu` of absolute precision
-              `M - \lfloor\log_p(M)\rfloor - 1` such that
-            
-            .. math::
-            
-                \nu|\Delta = \mu,\text{ where }\Delta=\begin{pmatrix}1&1\\0&1
-                \end{pmatrix} - 1.
-            
-            EXAMPLES::
-            
-                sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
-                sage: D10 = D.change_precision(10)
-                sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
-                sage: nu10 = mu10.solve_diff_eqn()
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D)
-                sage: MR = MS.source()
-                sage: Id = MR.gens()[0]
-                sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^8 * ()
-                sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
-                sage: D10 = D.change_precision(10)
-                sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
-                sage: nu10 = mu10.solve_diff_eqn()
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D);
-                sage: MR = MS.source();
-                sage: Id = MR.gens()[0]
-                sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^8 * ()
-                sage: R = ZpCA(5, 5); D = OverconvergentDistributions(0,base=R);
-                sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
-                sage: nu.solve_diff_eqn()
-                5 * (1 + 3*5 + O(5^2), O(5))
-                
-            Check input of relative precision 2::
-            
-                sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
-                sage: R = ZpCA(3, 9)
-                sage: D = OverconvergentDistributions(0, base=R, prec_cap=4)
-                sage: V = D.approx_module(2)
-                sage: nu = CoeffMod_OMS_element(V([R(0, 9), R(2*3^2 + 2*3^4 + 2*3^7 + 3^8 + O(3^9))]), D, ordp=0, check=False)
-                sage: mu = nu.solve_diff_eqn()
-                sage: mu
-                3 * ()
+        Check input of relative precision 2::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(3, 9)
+            sage: D = OverconvergentDistributions(0, base=R, prec_cap=4)
+            sage: V = D.approx_module(2)
+            sage: nu = CoeffMod_OMS_element(V([R(0, 9), R(2*3^2 + 2*3^4 + 2*3^7 + 3^8 + O(3^9))]), D, ordp=0, check=False)
+            sage: mu = nu.solve_diff_eqn()
+            sage: mu
+            3 * ()
         """
         #RH: see tests.sage for randomized verification that this function works correctly
         p = self.parent().prime()
+        abs_prec = ZZ(self.precision_absolute())
         if self.is_zero():
-            M = ZZ(self.precision_absolute())
             mu = self.parent()(0)
-            mu.ordp = M - M.exact_log(p) - 1
+            mu.ordp = abs_prec - abs_prec.exact_log(p) - 1
             return mu
         if self._unscaled_moment(0) != 0:
             raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
         M = ZZ(len(self._moments))
-        abs_prec = self.precision_absolute()
         ## RP: This should never happen -- the distribution must be 0 at this point if M==1
         if M == 1:
             return self.parent()(0)
@@ -860,11 +859,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             V = self.parent().approx_module(new_M)
             v = V([R(v[i] >> ordp) for i in range(new_M)])
         else:
-            new_M = abs_prec - 1 - (abs_prec).exact_log(p)
+            new_M = abs_prec - abs_prec.exact_log(p) - 1
             verbose("new_M: %s"%(new_M), level=2)
             V = self.parent().approx_module(new_M)
             v = V([R(v[i]) for i in range(new_M)])
-        v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly
+        v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly. May not be necessary any more.
         mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
         verbose("mu.ordp: %s, mu._moments: %s"%(mu.ordp, mu._moments), level=2)
         return mu.normalize()

@@ -613,7 +613,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
 #            V = self.parent().approx_module(0)
 #            self._moments = V([])
 #            #self.ordp = adjust_moms
-#            verbose("adjust_mom %s, \nn %s, \nself.ordp %s"%(adjust_moms, n, self.ordp))
+#            verbose("adjust_moms %s, \nn %s, \nself.ordp %s"%(adjust_moms, n, self.ordp))
 #        elif adjust_moms > 0:
 #            n -= adjust_moms    #Is this going to give the correct precision?
 #            p_precs = self.parent().filtration_precisions(n)
@@ -681,7 +681,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             V = self.parent().approx_module(0, var_prec)
             return CoeffMod_OMS_Families_element(V([]), self.parent(), ordp=(M - ZZ(M).exact_log(p) - 1), check=False, var_prec=var_prec)
         if not self._unscaled_moment(0).is_zero():
-            raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator.")
+            raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator; total measure is %s"%self.moment(0))
         M = ZZ(len(self._moments))
         if M == 2:
             if p == 2:
