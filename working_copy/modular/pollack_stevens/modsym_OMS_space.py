@@ -277,12 +277,13 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         mu.normalize()
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
-        if mu.precision_absolute() < M:
+        if mu.precision_absolute() < M: #Eventually, should just remove this check
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
         if shift > 0:
             for h in gens[1:]:
                 D[h].ordp += shift
+        #Should the absolute precision of the other values be lowered as well?
         if k != 0:
             D[g0] += err
         ret = self(D)

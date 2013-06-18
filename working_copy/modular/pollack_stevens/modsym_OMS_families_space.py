@@ -10,6 +10,7 @@ from sage.matrix.constructor import Matrix
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
 from sage.modular.pollack_stevens.modsym_OMS_families_element import ModSym_OMS_Families_element
+from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
 from sage.interfaces.gp import gp
 
 class ModSym_OMS_Families_factory(UniqueFactory):
@@ -104,11 +105,16 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         g0, gam0, gam_shift = manin._nice_gamma(p, k)
         
         # RP: _prec_for_solve... isn't working right
-        # M_in = _prec_for_solve_diff_eqn_families(M[0], p)
-        ADD = 10    # Trying to fix precision issue!
-        M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift + ADD  #fix this
-        #print "M_in", M_in, "var_prec", M[1]
-        CM = self.coefficient_module().change_precision([M_in, M_in])
+        #M_in = _prec_for_solve_diff_eqn_families(M[0], p)
+        #print "M_in", M_in
+        #M_in += gam_shift
+        #print "M_in", M_in
+        ADD = 0    # Trying to fix precision issue!
+        #M_in = ZZ(1 + M[0] + ceil(ZZ(M[0]).log(p))) + gam_shift + ADD  #fix this
+        M_in = _prec_for_solve_diff_eqn(M[0], p) + gam_shift + ADD  #fix this
+        #print "M[0]", M[0], "M_in", M_in, "var_prec", M[1]
+        #print "We'l get", M_in - 1 - ceil()
+        CM = self.coefficient_module().change_precision([M_in, M[1]])
         R = CM.base_ring()
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
@@ -118,7 +124,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         for g in gens[1:]:
             verbose("Looping over generators. At generator %s"%(g))
             #print "CM._prec_cap", CM.precision_cap()
-            D[g] = CM.random_element([M_in, M_in])
+            D[g] = CM.random_element([M_in, M[1]])
             #print "pre:",D[g]
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
@@ -152,6 +158,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         R = CM.base_ring()
         verbose("Compute automorphy factor.")
         K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
+        #K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R) #Should this be it instead
         if k != 0:
             err = -t.moment(0) / (K[0] - 1)
             v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
@@ -178,35 +185,52 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         
         verbose("Solve difference equation.")
         #print "t",t
-        err_pr = err.precision_relative()
-        err.reduce_precision([err_pr[0] - ADD, err_pr[1] - ADD])
-        if shift > 0:
-            t_pr = t.precision_relative()
-            t = t.reduce_precision([t_pr[0] - gam_shift - ADD, t_pr[1] - ADD])
-        else:
-            t_pr = t.precision_relative()
-            t = t.reduce_precision([t_pr[0] - ADD, t_pr[1] - ADD])
+        #Are the following two lines even necessary?
+        err_pa = err.precision_absolute()
+        err.reduce_precision_absolute([err_pa[0] - gam_shift - ADD, err_pa[1]])
+        #if shift > 0:
+        #    t_pr = t.precision_relative()
+        #    t = t.reduce_precision([t_pr[0] - gam_shift - ADD, t_pr[1] - ADD])
+        #else:
+        #    t_pr = t.precision_relative()
+        #    t = t.reduce_precision([t_pr[0] - ADD, t_pr[1] - ADD])
+        t_pa = t.precision_absolute()
+        t = t.reduce_precision_absolute([t_pa[0] - gam_shift - ADD, t_pa[1]])
         t.normalize()
-        print "M_in =", M_in
-        print "t[0] =", t.moment(0)
+        #print "M_in =", M_in
+        #print "t[0] =", t.moment(0)
         mu = t.solve_diff_eqn()
         mu_val = mu.valuation()
+        #print "Shift:", shift
+        #print "mu_val:", mu_val
         if mu_val < 0:
             shift -= mu_val
             mu.ordp -= mu_val
             err.ordp -= mu_val
+        mu.reduce_precision_absolute(M)
         mu.normalize()
-        mu_pr = mu.precision_relative()
         # RP: commented out these lines as precision isn't set up to work properly yet
         #        if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
         #            raise ValueError("Insufficient precision after solving the difference equation.")
+        #print "mu.ordp:", mu.ordp
         D[Id] = -mu
+        #print "D[Id]:",
+        #print "Shift:", shift
+        #for h in gens[1:]:
+        #    print h, D[h].ordp
         if shift > 0:
             for h in gens[1:]:
                 D[h].ordp += shift
+        #for h in gens[1:]:
+        #    print h, D[h].ordp
         D[g0] += err
         #ret = self(D).reduce_precision(M)
+        #ret = ModSym_OMS_Families_element(D, self, construct=True)
         ret = self(D)
+        #for h in gens[1:]:
+        #    print h, ret._map[h].ordp
+        #t.ordp -= mu_val    #only for verbose
+        #print "Check difference equation (at end): %s"%self.coefficient_module()(mu * gammas[Id] - mu - t)
         if self.sign() == 1:
             return ret.plus_part()
         if self.sign() == -1:

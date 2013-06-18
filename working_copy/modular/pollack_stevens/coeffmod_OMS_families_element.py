@@ -657,6 +657,25 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         ordp = self.ordp
         return CoeffMod_OMS_Families_element(moments, self.parent(), ordp=ordp, check=False, var_prec=var_prec)
     
+    def reduce_precision_absolute(self, new_prec):
+        aprec = self.precision_absolute()
+        try:
+            p_prec, var_prec = new_prec
+        except TypeError:   #if new_prec isn't iterable (wrong size is ValueError)
+            p_prec = new_prec
+            var_prec = aprec[1]
+        if p_prec > aprec[0] or var_prec > aprec[1]:
+            raise ValueError("Precisions specified must be less than current precisions.")
+        if p_prec == aprec[0] and var_prec == aprec[1]:
+            return self
+        ordp = self.ordp
+        if p_prec - ordp <= 0:
+            moments = self.parent().approx_module(0)([])
+            ordp = new_prec
+        else:
+            moments = self._moments[:self.parent().length_of_moments(p_prec - ordp)]
+        return CoeffMod_OMS_Families_element(moments, self.parent(), ordp, check=False, var_prec=var_prec)
+    
     def solve_diff_eqn(self):
         r"""
         EXAMPLES::
@@ -673,13 +692,24 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             sage: Delta_mat = S0([1,1,0,1])
             sage: nu * Delta_mat - nu - mu
             11^7 * () + O(w^8)
+            sage: DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(5, 8), prec_cap=[8, 8])
+            sage: V = DD.approx_module()
+            sage: R = DD.base_ring()
+            sage: w = R.gen()
+            sage: mu = V((O(w^8), 4 + 5 + 5^2 + 4*5^3 + 2*5^4 + O(5^8) + (3 + 2*5 + 2*5^2 + 2*5^4 + 4*5^5 + 4*5^6 + 5^7 + O(5^8))*w + (3*5 + 4*5^2 + 4*5^4 + 2*5^5 + 5^6 + 4*5^7 + O(5^8))*w^2 + (2 + 3*5^2 + 2*5^3 + 5^4 + 2*5^6 + 4*5^7 + O(5^8))*w^3 + (1 + 4*5 + 4*5^2 + 3*5^3 + 4*5^4 + 2*5^5 + 2*5^6 + 5^7 + O(5^8))*w^4 + (3 + 2*5^3 + 5^4 + 4*5^5 + 2*5^6 + 5^7 + O(5^8))*w^5 + (1 + 2*5 + 5^2 + 3*5^3 + 4*5^4 + 5^5 + 3*5^7 + O(5^8))*w^6 + (3 + 2*5 + 3*5^3 + 3*5^4 + O(5^8))*w^7 + O(w^8), 2 + 5 + 2*5^2 + 4*5^3 + 5^5 + 5^6 + O(5^8) + (4 + 3*5^3 + 2*5^4 + 4*5^5 + 4*5^6 + O(5^8))*w + (1 + 3*5 + 3*5^2 + 4*5^3 + 2*5^4 + 5^6 + 5^7 + O(5^8))*w^2 + (4 + 3*5 + 3*5^3 + 2*5^5 + 2*5^6 + 5^7 + O(5^8))*w^3 + (4 + 5 + 2*5^2 + 3*5^3 + 4*5^4 + O(5^8))*w^4 + (1 + 3*5 + 4*5^3 + 2*5^4 + 2*5^6 + 3*5^7 + O(5^8))*w^5 + (3 + 2*5 + 5^2 + 2*5^3 + 3*5^4 + 4*5^5 + 5^6 + 4*5^7 + O(5^8))*w^6 + (3 + 4*5 + 5^2 + 3*5^3 + 5^4 + 4*5^5 + 4*5^6 + 4*5^7 + O(5^8))*w^7 + O(w^8), 3 + 3*5 + 5^2 + 4*5^3 + 4*5^4 + 4*5^7 + O(5^8) + (4 + 2*5 + 2*5^2 + 5^3 + 4*5^4 + 3*5^5 + 3*5^6 + 4*5^7 + O(5^8))*w + (5^2 + 3*5^3 + 4*5^4 + 5^5 + 5^6 + 2*5^7 + O(5^8))*w^2 + (3 + 4*5 + 2*5^3 + 2*5^4 + 5^5 + 2*5^6 + 2*5^7 + O(5^8))*w^3 + (4*5 + 5^2 + 4*5^3 + 4*5^4 + 4*5^6 + 3*5^7 + O(5^8))*w^4 + (4 + 4*5 + 3*5^2 + 5^4 + 4*5^5 + 4*5^6 + 5^7 + O(5^8))*w^5 + (2 + 4*5 + 4*5^2 + 4*5^3 + 2*5^5 + 3*5^6 + 5^7 + O(5^8))*w^6 + (2 + 2*5^2 + 3*5^3 + 4*5^5 + 3*5^6 + 3*5^7 + O(5^8))*w^7 + O(w^8), 2 + 2*5 + 5^2 + 2*5^3 + 5^4 + 2*5^5 + 2*5^7 + O(5^8) + (4 + 3*5^2 + 3*5^3 + 3*5^4 + 3*5^6 + O(5^8))*w + (4*5 + 4*5^3 + 4*5^4 + 5^5 + 4*5^7 + O(5^8))*w^2 + (2 + 3*5 + 2*5^4 + 3*5^5 + 5^6 + O(5^8))*w^3 + (4*5 + 2*5^2 + 5^3 + 2*5^4 + 5^5 + 4*5^7 + O(5^8))*w^4 + (3 + 5 + 5^3 + 4*5^4 + 5^6 + 5^7 + O(5^8))*w^5 + (3*5 + 3*5^3 + 5^5 + 2*5^6 + 3*5^7 + O(5^8))*w^6 + (4*5 + 2*5^2 + 5^4 + 5^5 + 3*5^6 + 5^7 + O(5^8))*w^7 + O(w^8), 2 + 2*5 + 3*5^2 + 3*5^3 + 4*5^5 + 5^6 + 3*5^7 + O(5^8) + (2 + 4*5 + 2*5^4 + 5^5 + 4*5^6 + 5^7 + O(5^8))*w + (3 + 5 + 2*5^2 + 3*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + 3*5^7 + O(5^8))*w^2 + (2 + 4*5 + 2*5^2 + 5^3 + 3*5^4 + 5^5 + 4*5^7 + O(5^8))*w^3 + (2 + 2*5 + 3*5^2 + 2*5^3 + 5^4 + 4*5^5 + 5^6 + 5^7 + O(5^8))*w^4 + (1 + 3*5 + 5^3 + 5^4 + 2*5^5 + 5^6 + 3*5^7 + O(5^8))*w^5 + (1 + 5 + 4*5^3 + 3*5^4 + 3*5^5 + 2*5^6 + 4*5^7 + O(5^8))*w^6 + (2*5^2 + 2*5^3 + 2*5^4 + 4*5^5 + 5^6 + 2*5^7 + O(5^8))*w^7 + O(w^8), 2 + 5 + 3*5^2 + 5^3 + 3*5^5 + 4*5^6 + O(5^8) + (1 + 2*5 + 4*5^2 + 5^4 + 4*5^5 + 2*5^6 + 2*5^7 + O(5^8))*w + (3 + 3*5^2 + 4*5^3 + 3*5^4 + 4*5^5 + 2*5^7 + O(5^8))*w^2 + (1 + 2*5^2 + 5^3 + 2*5^4 + 3*5^7 + O(5^8))*w^3 + (4 + 2*5 + 2*5^2 + 4*5^3 + 2*5^4 + 5^6 + 4*5^7 + O(5^8))*w^4 + (4 + 2*5^2 + 2*5^3 + 4*5^4 + 4*5^6 + 2*5^7 + O(5^8))*w^5 + (1 + 2*5 + 5^2 + 5^3 + 3*5^5 + 3*5^6 + O(5^8))*w^6 + (3 + 3*5 + 2*5^3 + 5^4 + O(5^8))*w^7 + O(w^8), 1 + 3*5^2 + 2*5^3 + 5^4 + 2*5^5 + 3*5^6 + 4*5^7 + O(5^8) + (2 + 2*5 + 4*5^2 + 4*5^3 + 2*5^4 + 2*5^5 + 5^7 + O(5^8))*w + (3 + 2*5 + 3*5^4 + 3*5^5 + 4*5^7 + O(5^8))*w^2 + (1 + 3*5 + 2*5^2 + 2*5^4 + 2*5^5 + 4*5^6 + 2*5^7 + O(5^8))*w^3 + (1 + 5 + 4*5^2 + 5^3 + 3*5^4 + 5^6 + O(5^8))*w^4 + (2 + 2*5 + 5^3 + 5^4 + 3*5^5 + 3*5^6 + 3*5^7 + O(5^8))*w^5 + (4 + 2*5 + 5^2 + 5^3 + 2*5^4 + 4*5^5 + 4*5^6 + 2*5^7 + O(5^8))*w^6 + (2 + 2*5 + 2*5^2 + 4*5^4 + 3*5^5 + 2*5^6 + 5^7 + O(5^8))*w^7 + O(w^8), 2*5 + 5^2 + 3*5^3 + 4*5^5 + 5^6 + 2*5^7 + O(5^8) + (2*5 + 4*5^2 + 2*5^3 + 5^4 + 2*5^5 + 3*5^6 + O(5^8))*w + (2 + 4*5 + 4*5^3 + 2*5^5 + 5^6 + 4*5^7 + O(5^8))*w^2 + (3 + 4*5 + 2*5^2 + 3*5^3 + 2*5^4 + 2*5^5 + 2*5^6 + 2*5^7 + O(5^8))*w^3 + (4 + 4*5 + 3*5^2 + 5^4 + 2*5^5 + 5^6 + 2*5^7 + O(5^8))*w^4 + (1 + 3*5 + 5^2 + 5^3 + 4*5^4 + 5^5 + 3*5^6 + O(5^8))*w^5 + (3 + 3*5 + 5^2 + 4*5^3 + 4*5^4 + 5^5 + 2*5^6 + O(5^8))*w^6 + (1 + 5 + 2*5^3 + 2*5^4 + 4*5^5 + 5^6 + 3*5^7 + O(5^8))*w^7 + O(w^8), 2 + 2*5 + 5^2 + 4*5^3 + 2*5^5 + 3*5^6 + 5^7 + O(5^8) + (3 + 4*5 + 5^2 + 3*5^3 + 4*5^4 + 2*5^5 + 3*5^7 + O(5^8))*w + (3*5 + 2*5^2 + 2*5^3 + 4*5^4 + 4*5^5 + 4*5^6 + O(5^8))*w^2 + (1 + 3*5 + 4*5^3 + 4*5^4 + 4*5^5 + 5^6 + 5^7 + O(5^8))*w^3 + (4 + 2*5 + 3*5^2 + 4*5^3 + 3*5^6 + 4*5^7 + O(5^8))*w^4 + (2*5 + 3*5^2 + 5^3 + 3*5^4 + 2*5^5 + 2*5^6 + 4*5^7 + O(5^8))*w^5 + (2 + 3*5 + 4*5^3 + 3*5^4 + 3*5^6 + 4*5^7 + O(5^8))*w^6 + (1 + 3*5 + 5^2 + 3*5^3 + 2*5^6 + 2*5^7 + O(5^8))*w^7 + O(w^8), 3 + 5^2 + 2*5^4 + 2*5^7 + O(5^8) + (2*5 + 5^2 + 5^4 + 5^6 + 3*5^7 + O(5^8))*w + (3 + 3*5^2 + 5^3 + 4*5^4 + 3*5^5 + 2*5^6 + 5^7 + O(5^8))*w^2 + (2 + 2*5 + 4*5^3 + 5^4 + 2*5^5 + 4*5^6 + 3*5^7 + O(5^8))*w^3 + (3 + 3*5 + 4*5^2 + 5^3 + 3*5^4 + 4*5^5 + 3*5^7 + O(5^8))*w^4 + (3 + 3*5 + 2*5^2 + 4*5^3 + 3*5^5+ 2*5^6 + O(5^8))*w^5 + (1 + 2*5 + 4*5^2 + 5^3 + 2*5^5 + 2*5^6 + 2*5^7 + O(5^8))*w^6 + (3 + 5 + 4*5^2 + 3*5^3 + 4*5^4 + 3*5^5+ 4*5^6 + O(5^8))*w^7 + O(w^8)))
+            sage: mu = CoeffMod_OMS_Families_element(mu, DD, check=False, var_prec=8)
+            sage: nu = mu.solve_diff_eqn()
+            sage: S0 = DD.action().actor()
+            sage: Delta_mat = S0([1,1,0,1])
+            sage: nu * Delta_mat - nu - mu
+            5^6 * () + O(w^8)
         """
-        #Do something about ordp
+        #Do something about ordp. Is this comment still relevant?
         p = self.parent().prime()
+        abs_prec, var_prec = self.precision_absolute()
         if self.is_zero():
-            M, var_prec = self.precision_absolute()
             V = self.parent().approx_module(0, var_prec)
-            return CoeffMod_OMS_Families_element(V([]), self.parent(), ordp=(M - ZZ(M).exact_log(p) - 1), check=False, var_prec=var_prec)
+            return CoeffMod_OMS_Families_element(V([]), self.parent(), ordp=(abs_prec - ZZ(abs_prec).exact_log(p) - 1), check=False, var_prec=var_prec)
         if not self._unscaled_moment(0).is_zero():
             raise ValueError("Family of distribution must have total measure 0 to be in image of difference operator; total measure is %s"%self.moment(0))
         M = ZZ(len(self._moments))
@@ -687,8 +717,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             if p == 2:
                 raise ValueError("Not enough accuracy to return anything")
             else:
-                mu = self.parent()()
-                mu.ordp = self.ordp
+                #mu = self.parent()()
+                #mu.ordp = self.ordp
                 V = self.parent().approx_module(1, var_prec)
                 return CoeffMod_OMS_Families_element(V([self._unscaled_moment(1), V.base_ring().base_ring()(0, 1)]), self.parent(), ordp=self.ordp, check=False, var_prec=var_prec)
         from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
@@ -708,13 +738,17 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             mu._moments[j] = R.one()
             mu._moments[j-1] = R.zero()
             mus += self.moment(j) * mu.solve_diff_eqn().lift(DD)
-        prec = DD.length_reverse_lookup(M)
-        new_prec = prec - prec.exact_log(p) - 1 - mus.ordp
-        v = mus._moments[:DD.length_of_moments(new_prec)]
-        S = DD.base_ring()
-        v[len(v) - 1] = S(_add_big_ohs_list(v[len(v) - 1], [1, self._var_prec]))
-        mus = CoeffMod_OMS_Families_element(v, self.parent(), ordp=mus.ordp, check=False, var_prec=self._var_prec)
+        #prec = DD.length_reverse_lookup(M)
+        #new_prec = prec - prec.exact_log(p) - 1 - mus.ordp
+        #v = mus._moments[:DD.length_of_moments(new_prec)]
+        #S = DD.base_ring()
+        #v[len(v) - 1] = S(_add_big_ohs_list(v[len(v) - 1], [1, self._var_prec]))
+        #mus = CoeffMod_OMS_Families_element(v, self.parent(), ordp=mus.ordp, check=False, var_prec=self._var_prec)
         #Should we remove precision like at end of non-family code, or is this taken care of?
+        verbose("Abs_prec of self: %s"%(abs_prec))
+        verbose("mus_abs_prec before reduction: %s"%(mus.precision_absolute()))
+        mus = mus.reduce_precision_absolute([abs_prec - abs_prec.exact_log(p) - 1, var_prec])
+        verbose("mus_abs_prec after reduction: %s"%(mus.precision_absolute()))
         return mus.normalize()  #Is it necessary to normalize?
 
 def _padic_val_of_pow_series(f, p=None, var_prec=None):
