@@ -158,7 +158,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
         R = CM.base_ring()
         verbose("Compute automorphy factor.")
-        K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
+        K = automorphy_factor_vector(p, a, c, k, CM._character, CM.length_of_moments(M_in), M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
         #K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R) #Should this be it instead
         if k != 0:
             err = -t.moment(0) / (K[0] - 1)
