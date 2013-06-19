@@ -5,7 +5,7 @@ from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
 from sage.misc.misc_c import prod
-from sage.functions.other import factorial
+from sage.functions.other import factorial, ceil
 from sage.matrix.constructor import Matrix
 
 def ps_normalize(f, p, p_prec):
@@ -93,10 +93,10 @@ def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
     for n in range(1, var_prec):
         ## RP: I doubled the precision in "z" here to account for the loss of precision from plugging in arg in below
         ## This should be done better.
-        LB = logpp_binom(n, p, p_prec * 2)
+        LB = logpp_binom(n, p, ceil(p_prec * (p-1)/(p-2)))
         ta = ZZ(Qp(p, 2 * max(p_prec, var_prec)).teichmuller(a))
         arg = (a / ta - 1) / p + c / (p * ta) * z
-        aut += LB(arg) * (w ** n)
+        aut += LB(arg).truncate(p_prec) * (w ** n)
     aut *= (ta ** k)
     if not (chi is None):
         aut *= chi(a)
