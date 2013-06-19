@@ -1562,6 +1562,7 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                 found = True
                 if threetor:
                     cc = (gam ** 2).matrix()[1,0]
+                    ## RP:  This doesn't look right.  I think this was copied from old wrong code of mine (see random for OMS)
                     val = max(QQp(c).valuation(), QQp(cc).valuation())
                 else:
                     val = QQp(c).valuation()

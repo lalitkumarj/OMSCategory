@@ -179,7 +179,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             if g0 in manin.reps_with_three_torsion():
                 aa = (gam0**2).matrix()[0,0]
                 cc = (gam0**2).matrix()[1,0]
-                gam_shift = max(c.valuation(p),cc.valuation(p))
+                #                gam_shift = max(c.valuation(p),cc.valuation(p)) 
+                gam_shift = (a**(k-1) * c + aa**(k-1) * cc).valuation(p)
             else:
                 gam_shift = c.valuation(p)
         
@@ -187,7 +188,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("Working with precision %s (M, p, k, gam_shift) = (%s, %s, %s, %s)"%(M_in, M, p, k, gam_shift))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
-        #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
+        verbose("M_in, new base ring R = %s, %s"%(M_in, R))
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
@@ -210,6 +211,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                     t -= D[g]
                 else:
                     t += D[g] * gammas[g] - D[g]
+
+        verbose("t after first random choices: %s"%(t))
         
         ## If k = 0, then t has total measure zero.  However, this is not true when k != 0  
         ## (unlike Prop 5.1 of [PS1] this is not a lift of classical symbol).  
@@ -238,7 +241,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v = [R(0)] * M_in
             v[1] = R(err)
             err = CM(v)
-
+            verbose("err is: %s"%(err))
             ## In the two and three torsion case, we now adjust err to make it satisfy the torsion Manin relations
             if g0 in manin.reps_with_two_torsion():
                 err = err - err * gam0
