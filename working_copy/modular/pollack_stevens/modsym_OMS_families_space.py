@@ -523,3 +523,9 @@ def find_linear_relation(vs, p, M):
         v = [R(v[a]) for a in range(1,len(v)+1)]
         return v + [R(-1)]
 
+def random_check(p,N,r,M,var_prec):
+    DD = FamiliesOfOverconvergentDistributions(r, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
+    MM = FamiliesOfOMS(N, r, coefficients=DD)
+    Phis = MM.random_element()
+    Phis._consistency_check()
+    

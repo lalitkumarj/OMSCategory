@@ -457,6 +457,7 @@ class ModularSymbolElement_generic(ModuleElement):
         if f[id]*MR.gammas[id] - f[id] != -t:
             print -t
             print f[id]*MR.gammas[id] - f[id]
+            verbose("Sum around loop is: %s"%(f[id]*MR.gammas[id] - f[id]+t))
             raise ValueError("Does not add up correctly around loop")
 
         print "This modular symbol satisfies the manin relations"

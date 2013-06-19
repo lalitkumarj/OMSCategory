@@ -261,7 +261,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         verbose("Shift before mu = %s"%(shift))
         #if shift > 0:
         #    t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
-        t = t.reduce_precision_absolute(t.precision_absolute() - k_val - gam_shift)
+        #        t = t.reduce_precision_absolute(t.precision_absolute() - k_val - gam_shift)
+        t = t.reduce_precision_absolute(_prec_for_solve_diff_eqn(M, p))
         verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         t.normalize()
         verbose("After normalize: About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
