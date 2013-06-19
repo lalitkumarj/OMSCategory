@@ -1513,7 +1513,7 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
         
         TESTS::
         
-            sage: for p in prime_range(3,7):
+            sage: for p in prime_range(3,12):
             ...         MR = ManinRelations(p)
             ...         for k in range(0, p, 2):
             ...                 print MR._nice_gamma(p, k % (p-1))
@@ -1532,7 +1532,38 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
             ([ 0 -1]
             [ 1  2], [ 2  1]
             [-5 -2], 1)
+            ([ 0 -1]
+            [ 1  2], [-3 -1]
+            [ 7  2], 1)
+            ([-1 -1]
+            [ 2  1], [-5 -3]
+            [ 7  4], 0)
+            ([-1 -1]
+            [ 2  1], [-5 -3]
+            [ 7  4], 0)
+            ([ 0 -1]
+            [ 1  2], [-3 -1]
+            [ 7  2], 1)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 1)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 1)
         """
+        from sage.misc.misc import verbose
         key = (p, k)
         try:
             return self._nice_gamma_dict[key]
@@ -1544,8 +1575,10 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
         gens = self.gens()
         found = False
         if k == 0:  # Find gamma with minimal p-adic valuation of its lower-left
-                    # entry
+                    # entry. Try to avoid three-torsion elements at all costs.
             gam_shift = infinity
+            three_tor_found = False
+            three_tor_gam_shift = infinity
             for g in gens[1:]:
                 threetor = False
                 try:
@@ -1559,24 +1592,34 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                 c = gam.matrix()[1,0]
                 if c == 0:
                     continue
-                found = True
                 if threetor:
+                    three_tor_found = True
                     cc = (gam ** 2).matrix()[1,0]
                     ## RP:  This doesn't look right.  I think this was copied from old wrong code of mine (see random for OMS)
                     val = max(QQp(c).valuation(), QQp(cc).valuation())
+                    if val < three_tor_gam_shift:
+                        three_tor_gam_shift = val
+                        three_tor_g0 = g
+                        three_tor_gam0 = gam
                 else:
+                    found = True
                     val = QQp(c).valuation()
-                if val < gam_shift:
-                    gam_shift = val
-                    g0 = g
-                    gam0 = gam
+                    if val < gam_shift:
+                        gam_shift = val
+                        g0 = g
+                        gam0 = gam
             if not found:
-                raise NotImplementedError
-            self._nice_gamma_dict[key] = (g0, gam0, gam_shift)
+                if not three_tor_found:
+                    raise NotImplementedError
+                verbose("Must use a three-torsion generator.")
+                self._nice_gamma_dict[key] = (three_tor_g0, three_tor_gam0, three_tor_gam_shift)
+            else:    
+                self._nice_gamma_dict[key] = (g0, gam0, gam_shift)
         else:   # Find gamma such that omega(a)^k != 1
             Id = gens[0]
             gam_keys = self.gammas.keys()
             gam_keys.remove(Id)
+            # Try to find a non-torsion generator first.
             for g0 in gam_keys:
                 gam0 = self.gammas[g0]
                 a = gam0.matrix()[0, 0]
@@ -1584,20 +1627,28 @@ class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
                     self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
                     found = True
                     break
-            if not found:
+            if not found:   #Then try torsion generators and void three-torsion at all costs
+                three_tor_found = False
                 for g0 in gens[1:]:
+                    three_tor = False
                     if not g0 in gam_keys:
                         if g0 in self.reps_with_two_torsion():
                             gam0 = self.two_torsion_matrix(g0)
                         else:
+                            three_tor = True
                             gam0 = self.three_torsion_matrix(g0)
                         a = gam0.matrix()[0,0]
                         if QQp.teichmuller(a) ** k != 1:
                             self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
-                            found = True
-                            break
+                            if three_tor:
+                                three_tor_found = True
+                            else:
+                                found = True
+                                break
                 if not found:
-                    raise NotImplementedError
+                    if not three_tor_found:
+                        raise NotImplementedError
+                    verbose("Must use a three-torsion generator.")
         return self._nice_gamma_dict[key]
 
 def basic_hecke_matrix(a, l):
