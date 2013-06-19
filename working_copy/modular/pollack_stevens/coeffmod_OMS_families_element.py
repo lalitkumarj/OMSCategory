@@ -375,6 +375,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             verbose("val, other._unscaled_moment(%s) = %s, %s"%(i, other.ordp, other._moments[i]))
             #alpha = _sanitize_alpha(RK(other._unscaled_moment(i)) / RK(a))
             alpha = RK(other._unscaled_moment(i)) / RK(a)
+            alpha = _truncate_low_prec(alpha)
             #alpha, var_prec_loss = _custom_ps_div(other._unscaled_moment(i), a)
             #alpha = R(_add_big_ohs_list(alpha, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
             #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
@@ -410,6 +411,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
                 #Should we alter var_prec, too?
                 #Hack
                 alpha = RK(other._unscaled_moment(i)) / RK(a)
+                alpha = _truncate_low_prec(alpha)   #Is this necessary?
                 #alpha = R(_add_big_ohs_list(other._unscaled_moment(i) / a, [ceil((n - i) * self._cp), min(s_var_prec, other_var_prec)]))
                 verbose("alpha=%s"%(alpha))
         if relprec < M[0]:  #May need to change this
@@ -910,7 +912,13 @@ def _sanitize_alpha(alpha):
     if i == len_alpha:
         return alpha
     return RK(alpha_list[:i], i)
-    
+
+def _truncate_low_prec(alpha):
+    alist = alpha.padded_list()
+    for i in range(len(alist)):
+        if alist[i].precision_absolute() <= 0:
+            return alpha.add_bigoh(i)
+    return alpha
 #Hack to overcome lack of functionality in dividing power series
 #def _custom_ps_div(num, denom):
 #    #print "\n", num
