@@ -1,7 +1,7 @@
 from sage.misc.cachefunc import cached_method
 from sage.misc.misc import verbose
 from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
-#from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _padic_val_of_pow_series
+from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _add_big_ohs_list#, _padic_val_of_pow_series
 
 class ModSym_OMS_Families_element(ModularSymbolElement_generic):
     """
@@ -94,14 +94,21 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
         aq = self._map[g].find_scalar(qhecke._map[g], M, check)
         verbose("Found eigenvalues of %s"%(aq))
         R = self.parent().base_ring()   #needed for hack below
+        Rbase = R.base_ring()
+        RK = R.change_ring(Rbase.fraction_field())
         if check:
             verbose("Checking that this is actually an eigensymbol")
             if p is None or M is None:
                 for g in gens[1:]:
                     #Hack
-                    if qhecke._map[g] != R(aq) * self._map[g]:
+                    diff = qhecke._map[g] - R(aq) * self._map[g]
+                    if diff != 0:
                     #if qhecke._map[g] != aq * self._map[g]:
-                        raise ValueError("not a scalar multiple")
+                        val = diff.valuation()
+                        if val < 1:
+                            raise ValueError("not a scalar multiple. difference is %s"%(qhecke._map[g] - R(aq) * self._map[g]))
+                        verbose("Resetting aq (lowering p-adic precision to %s)"%(val))
+                        aq = RK(_add_big_ohs_list(aq, [val, aq.prec()]), aq.prec())
             #Hack
             elif (M is not None and qhecke - R(aq) * self).valuation(p) < M[0]:            
             #elif (M is not None and qhecke - aq * self).valuation(p) < M[0]:
