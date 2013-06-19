@@ -8,6 +8,7 @@ from sage.rings.infinity import Infinity
 from sage.rings.padics.precision_error import PrecisionError
 from sage.modular.pollack_stevens.coeffmod_element import CoefficientModuleElement_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
 from sage.rings.integer_ring import ZZ
 from sage.rings.padics.factory import Qp
 from sage.functions.other import ceil
@@ -350,7 +351,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         verbose("n = %s"%n)
         verbose("moment 0")
         a = self._unscaled_moment(i)
-        verbose("a = %s"%(a))
+        verbose("a, val = %s, %s"%(a, self.ordp))
         p = self.parent().prime()
         v = _padic_val_of_pow_series(a, p)
         R = self.parent().base_ring()
@@ -363,7 +364,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             except IndexError:
                 raise ValueError("self is zero")
             v = _padic_val_of_pow_series(a, p)
-            verbose("a = %s"%(a))
+            verbose("a, val = %s, %s"%(a, self.ordp))
         relprec = p_precs[i] - v
         var_prec = min(s_var_prec, other_var_prec)  #should this depend on w-adic valuation?
         Rbase = R.base_ring()
@@ -519,6 +520,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             V = self.parent().approx_module(n, self._var_prec)
             self._moments = V([R(_add_big_ohs_list(self._moments[i], [p_precs[i], self._var_prec]), self._var_prec) for i in range(length)])
         val_diff = self._valuation() - self.ordp
+        #print "val_diff:", val_diff
         if val_diff > 0:
             n -= val_diff
             p_precs = self.parent().filtration_precisions(n)
@@ -730,13 +732,13 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         DD = self.parent()
         ## Hack fix here -- the problem is that because we are using fixed weight distributions
         ## with the regular filtration, one needs more precision than the base ring has.
-        ## RH: We can take something smaller than M
-        R = Qp(DD.prime(),M)
+        M_in = _prec_for_solve_diff_eqn(M, p)
+        R = Qp(DD.prime(), M_in)
         #R = self.base_ring().base_ring()
-        D = OverconvergentDistributions(0, base=R, prec_cap=M, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
-        V = D.approx_module(M)
+        D = OverconvergentDistributions(0, base=R, prec_cap=M_in, character=DD._character, adjuster=DD._adjuster, act_on_left=DD.action().is_left(), dettwist=DD._dettwist)
+        V = D.approx_module(M_in)
         Elem = D.Element
-        v = V([R.zero(), R.one()] + [R.zero()]*(M-2))
+        v = V([R.zero(), R.one()] + [R.zero()]*(M_in-2))
         mu = Elem(v, D, ordp=0, check=False)
         mus = self.moment(1) * mu.solve_diff_eqn().lift(DD)
         for j in range(2, M):
@@ -752,6 +754,8 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         #Should we remove precision like at end of non-family code, or is this taken care of?
         verbose("Abs_prec of self: %s"%(abs_prec))
         verbose("mus_abs_prec before reduction: %s"%(mus.precision_absolute()))
+        from sage.structure.sage_object import dumps
+        verbose("self dump: %s"%(repr(dumps(self))))
         mus = mus.reduce_precision_absolute([abs_prec - abs_prec.exact_log(p) - 1, var_prec])
         verbose("mus_abs_prec after reduction: %s"%(mus.precision_absolute()))
         return mus.normalize()  #Is it necessary to normalize?
