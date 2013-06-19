@@ -233,9 +233,14 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
             return 1
         c = cmp(left.ordp, right.ordp)
         if c: return c
-        #Will this work? Not sure power series compare well (see e.g. trac 9457)
         length = left.parent().length_of_moments(min(lrprec, rrprec))
-        return cmp(left._moments[:length], right._moments[:length])
+        #Will this work? Not sure power series compare well (see e.g. trac 9457)
+        #So, ues a hack
+        #return cmp(left._moments[:length], right._moments[:length])
+        for i in range(length):
+            c = cmp(left._moments[i].padded_list(), right._moments[i].padded_list())
+            if c: return c
+        return 0
 #
 #        p = left.parent().prime()
 #        if left.ordp > right.ordp:
