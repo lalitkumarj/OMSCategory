@@ -40,6 +40,7 @@ def logpp(p, p_prec):
 def logpp_gam(p, p_prec):
     """returns the (integral) power series log_p(1+p*z)*(1/log_p(1+p)) where the denominator is computed with some accuracy"""
     L = logpp(p, p_prec)
+    ## RP: what is that p^2 factor doing there?
     loggam = ZZ(logp_fcn(p, p_prec * (p ** 2), 1 + p))
     return ps_normalize(L / loggam, p, p_prec)
 
@@ -90,7 +91,9 @@ def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
     w = R.gen()
     aut = S(1)
     for n in range(1, var_prec):
-        LB = logpp_binom(n, p, p_prec)
+        ## RP: I doubled the precision in "z" here to account for the loss of precision from plugging in arg in below
+        ## This should be done better.
+        LB = logpp_binom(n, p, p_prec * 2)
         ta = ZZ(Qp(p, 2 * max(p_prec, var_prec)).teichmuller(a))
         arg = (a / ta - 1) / p + c / (p * ta) * z
         aut += LB(arg) * (w ** n)
