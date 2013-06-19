@@ -160,13 +160,25 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         verbose("Compute automorphy factor.")
         K = automorphy_factor_vector(p, a, c, k, CM._character, CM.length_of_moments(M_in), M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
         #K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R) #Should this be it instead
+
+        if g0 in manin.reps_with_three_torsion():
+            aa = (gam0**2).matrix()[0,0]
+            cc = (gam0**2).matrix()[1,0]
+            KK = automorphy_factor_vector(p, aa, cc, k, CM._character, CM.length_of_moments(M_in), M_in, R) 
+            
         if k != 0:
-            err = -t.moment(0) / (K[0] - 1)
+            if g0 in manin.reps_with_three_torsion():
+                err = -t.moment(0)/ (2 - K[0] - KK[0])
+            else:
+                err = -t.moment(0) / (K[0] - 1)
             v = [err] + [R(0)] * (CM.length_of_moments(M_in) - 1)
             err = CM(v)
         else:
             from sage.modular.pollack_stevens.coeffmod_OMS_families_element import _padic_val_of_pow_series, _shift_coeffs
-            err = -t.moment(0) / (K[1])
+            if g0 in manin.reps_with_three_torsion():
+                err = - t.moment(0) / (K[1] + KK[1])
+            else:
+                err = -t.moment(0) / (K[1])
             err_val = _padic_val_of_pow_series(err) ###
             if err_val < 0:
                 shift -= err_val
