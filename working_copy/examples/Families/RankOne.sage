@@ -8,8 +8,11 @@ var_prec = M
 max_ell = 11
 ells = prime_range(max_ell + 1)
 
+the_phis = {}
 for N in Ns:
     print N
+    if N == 17 or N == 19:
+        continue
     E = EllipticCurve('%sa'%N)
     a_ells_E = dict(zip(ells, [E.ap(ell) for ell in ells]))
     for p in N.prime_factors():
@@ -20,21 +23,44 @@ for N in Ns:
         r = (k - 2) % (p - 1)
         ZmodpM = Zmod(p ** (M+1))
         
-        DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
+        DD = FamiliesOfOverconvergentDistributions(r, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
         MM = FamiliesOfOMS(N, r, coefficients=DD, sign=-1)
         print "\nGenerating random modular symbol."
         sys.stdout.flush()
-        Phis = MM.random_element()
+        try:
+            Phis = MM.random_element()
+        except ValueError:
+            print "VALUE ERRORRRRRRRR!!!!!11!!!!1!!"
+            continue
+        the_phis[tuple([N, p])] = Phis
+        try:
+            Phis._consistency_check()
+        except ValueError:
+            print "Consistency FAIL!!"
+            continue
+
         Phis.normalize();
         print "\nProjecting to ordinary subspace."
         sys.stdout.flush()
         for i in range(M + 2):
             Phis = Phis.hecke(p)
+            val = Phis.valuation()
+            if val > 0:
+                for key in Phis._map._dict.keys():
+                    Phis._map._dict[key].ordp -= val
         Phis.normalize();
         
         a_ells = {}
         for ell in ells:
-            a_ells[ell] = Phis.Tq_eigenvalue(ell)
+            okay = False
+            while not okay:
+                try:
+                    a_ells[ell] = Phis.Tq_eigenvalue(ell)
+                    okay = True
+                except ValueError:
+                    print "---- Applying Up some more..."
+                    for i in range(M):
+                        Phis = Phis.hecke(p)
             print "\na_{0} = {1}".format(ell, a_ells[ell])
             sys.stdout.flush()
         
