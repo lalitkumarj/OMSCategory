@@ -311,6 +311,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             print "-----------------------"
             print "Forming a random symbol"
             Phi = self.random_element()
+            val = Phi.valuation()
+            if val > 0:
+                for key in Phi._map._dict.keys():
+                    Phi._map._dict[key].ordp -= val
 
             verbose("Projecting to ordinary subspace")
             print "projecting"
