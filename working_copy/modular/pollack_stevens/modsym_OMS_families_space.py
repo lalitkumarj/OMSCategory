@@ -263,7 +263,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             return ret.minus_part()
         return ret
 
-    def is_start_of_basis(self, list):
+    def is_start_of_basis(self, List):
         r"""
         Determines if the inputed list of OMS families can be extended to a basis of this space
 
@@ -275,12 +275,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
         - True/False
         """
-        for Phi in list:
+        for Phi in List:
             assert Phi.valuation() >= 0, "Symbols must be integral"
         R = self.base().base()
-        list = [Phi.list_of_total_measures_at_fixed_weight() for Phi in list]
-        d = len(list)
-        A = Matrix(R.residue_field(), d, len(list[0]), list)
+        List = [Phi.list_of_total_measures_at_fixed_weight() for Phi in List]
+        d = len(List)
+        A = Matrix(R.residue_field(), d, len(List[0]), List)
         return A.rank() == d
 
     #@cached_method
