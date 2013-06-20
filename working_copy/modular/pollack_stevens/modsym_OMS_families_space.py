@@ -92,6 +92,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             sage: Phis = MM.random_element()
             sage: Phis._consistency_check()
             This modular symbol satisfies the manin relations
+            sage: DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(3, 4), prec_cap=[4,4])
+            sage: MM = FamiliesOfOMS(11, 0, coefficients=DD, sign=-1)
+            sage: MM.random_element()._consistency_check()
+            This modular symbol satisfies the manin relations
         """
         if M is None:
             M = self.precision_cap()
@@ -184,6 +188,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 shift -= err_val
                 err = _shift_coeffs(err, shift, right=False)
                 t.ordp += shift
+            verbose("shift after err_val: %s"%(shift))
             v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
         
@@ -197,7 +202,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t += err * gam0 - err
         
         verbose("Solve difference equation.")
-
+        
         #print "t",t
         #Are the following two lines even necessary?
         #        err_pa = err.precision_absolute()
@@ -210,23 +215,28 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #    t = t.reduce_precision([t_pr[0] - ADD, t_pr[1] - ADD])
         t_pa = t.precision_absolute()
         t = t.reduce_precision_absolute([t_pa[0] - gam_shift - ADD, M[1]])
-
+        
         t.normalize()
         #print "M_in =", M_in
         #print "t[0] =", t.moment(0)
         mu = t.solve_diff_eqn()
-        mu_val = mu.valuation()
-        #print "Shift:", shift
-        #print "mu_val:", mu_val
-        if mu_val < 0:
+        val, val_vector = mu._valuation(val_vector=True)
+        if val < 0:
+            Dmu = mu.parent()
+            length = Dmu.length_of_moments(M[0])
+            mu_val = val_vector[length - 1] + mu.ordp   #This is >= val
             shift -= mu_val
-            mu.ordp -= mu_val
             err.ordp -= mu_val
-        mu.reduce_precision_absolute(M)
+            verbose("val = %s, mu_val = %s"%(val, mu_val))
+            if val == mu_val:
+                mu.ordp -= mu_val
+                mu = mu.reduce_precision_absolute(M)
+            else:
+                from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element, _shift_coeffs
+                V = Dmu.approx_module(M[0], M[1])
+                mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=mu_val, check=False, var_prec=mu._var_prec)
+        verbose("shift after mu_val: %s"%(shift))
         mu.normalize()
-        # RP: commented out these lines as precision isn't set up to work properly yet
-        #        if mu_pr[0] < M[0] or mu_pr[1] < M[1]:
-        #            raise ValueError("Insufficient precision after solving the difference equation.")
         #print "mu.ordp:", mu.ordp
         D[Id] = -mu
         #print "D[Id]:",
