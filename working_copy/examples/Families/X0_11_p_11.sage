@@ -65,7 +65,7 @@ for i in range(M+2):
 #    i += 1
 print "Time elapsed:", walltime() - before
 
-print "Killing Eisenstein componant (the dumb way)."
+print "Killing Eisenstein component (the dumb way)."
 sys.stdout.flush()
 before = walltime()
 Phis = Phis.hecke(p) - Phis
