@@ -2,7 +2,7 @@ import sys
 
 Ns = [11, 14, 15, 17, 19, 20, 21, 24]
 k = 2
-M = 4
+M = 6
 var_prec = M
 
 max_ell = 11
@@ -12,6 +12,7 @@ the_phis = {}
 for N in Ns:
     print N
     if N == 17 or N == 19:
+        print "Skipping N =", N, "because it takes too long."
         continue
     E = EllipticCurve('%sa'%N)
     a_ells_E = dict(zip(ells, [E.ap(ell) for ell in ells]))
