@@ -249,6 +249,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #for h in gens[1:]:
         #    print h, D[h].ordp
         D[g0] += err
+        verbose("mu.valuation: %s, err.valuation: %s"%(mu.valuation(), err.valuation()))
         #ret = self(D).reduce_precision(M)
         #ret = ModSym_OMS_Families_element(D, self, construct=True)
         ret = self(D)
