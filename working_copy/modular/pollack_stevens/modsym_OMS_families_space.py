@@ -114,7 +114,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         M_in = _prec_for_solve_diff_eqn(M[0], p) + gam_shift + ADD
         #print "M[0]", M[0], "M_in", M_in, "var_prec", M[1]
         #print "We'l get", M_in - 1 - ceil()
-        CM = self.coefficient_module().change_precision([M_in, M[1]+1])
+        CM = self.coefficient_module().change_precision([M_in, M[1]+1])  ## RP: the +1 here on M[1] is only need for k=0
 
         R = CM.base_ring()
         
@@ -200,8 +200,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
         #print "t",t
         #Are the following two lines even necessary?
-        err_pa = err.precision_absolute()
-        err.reduce_precision_absolute([err_pa[0] - gam_shift - ADD, err_pa[1]])
+        #        err_pa = err.precision_absolute()
+        #        err.reduce_precision_absolute([err_pa[0] - gam_shift - ADD, err_pa[1]])
         #if shift > 0:
         #    t_pr = t.precision_relative()
         #    t = t.reduce_precision([t_pr[0] - gam_shift - ADD, t_pr[1] - ADD])
