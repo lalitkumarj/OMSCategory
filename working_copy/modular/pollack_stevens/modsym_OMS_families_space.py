@@ -471,6 +471,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
             sage: MM.hecke_polynomial(29)
             1 + O(3^4) + O(w^4)
+            sage: MM = FamiliesOfOMS(11, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
+            sage: MM.hecke_polynomial(3, verbose=False)
+            (1 + O(3^8))*x^2 + (2 + 2*3 + 3^2 + O(3^4) + (2*3 + 2*3^2 + O(3^4))*w + O(3^4)*w^2 + (3^3 + O(3^4))*w^3 + O(w^4))*x + 1 + 2*3 + 3^2 + O(3^4) + O(3^4)*w + (2*3^2 + 3^3 + O(3^4))*w^2 + (3^3 + O(3^4))*w^3 + O(w^4)
         """
         #TODO: create a cache for this
         HM = self.hecke_matrix(q, basis, verbose=verbose)
@@ -480,7 +483,34 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             prec_cap = self.precision_cap()
             return PolynomialRing(R ,var)(R(R.base_ring()(1, prec_cap[0]), prec_cap[1]))
         return self.hecke_matrix(q, basis).charpoly(var)
-
+    
+    def hecke_polynomial_in_T_variable(self, q, var='x', basis=None, verbose=True):
+        r"""
+        The function hecke_polynomial returns a polynomial whose coefficients
+        are power series in the variable `w`, which represents an element in the
+        disc of radius `1/p`. This function instead uses the more standard
+        variable `T`, which represents an element in the disc of radius `1`.
+        
+        EXAMPLES::
+        
+            sage: MM = FamiliesOfOMS(11, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
+            sage: HP = MM.hecke_polynomial_in_T_variable(3, verbose=False); HP
+            (1 + O(3^8))*x^2 + (2 + 2*3 + 3^2 + O(3^4) + (2 + 2*3 + 3^3 + O(3^4))*T + O(3^2)*T^2 + (1 + O(3^2))*T^3 + O(T^4))*x + 1 + 2*3 + 3^2 + O(3^4) + (3^3 + O(3^4))*T + (2 + 3 + O(3^2))*T^2 + (1 + O(3^2))*T^3 + O(T^4)
+        """
+        HPw = self.hecke_polynomial(q, var, basis, verbose)
+        from sage.rings.power_series_ring import PowerSeriesRing
+        from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+        v_prec = self.precision_cap()[1]
+        RT = PowerSeriesRing(self.base_ring().base_ring(), 'T', default_prec=v_prec)
+        R = PolynomialRing(RT, var)
+        poly_coeffs = []
+        for c in HPw.padded_list():
+            prec = c.prec()
+            cL = c.padded_list()
+            length = len(cL)
+            poly_coeffs.append(RT([c[i] >> i for i in range(length)], prec))
+        return R(poly_coeffs)
+        
 #@cached_method
 def _prec_for_solve_diff_eqn_families(M, p):
     #UPDATE THIS with valuation of K[0]-1 and K[1]
@@ -602,4 +632,51 @@ def random_check(p,N,r,M,var_prec):
     MM = FamiliesOfOMS(N, r, coefficients=DD)
     Phis = MM.random_element()
     Phis._consistency_check()
+
+def Iwasawa_invariants(F):
+    r"""
+    Computes the Iwasawa invariants of the power series `F`. It returns a pair
+    `(\mu, \lambda)` where `\mu` is the `\mu`-invariant and `\lambda` is the
+    `\lambda`-invariant.
     
+    The `\mu`-invariant is is maximum power of `p` dividing the coefficients of
+    `F` and the `\lambda`-invariant is the least power of `T` exactly divisible
+    by `p^\mu`.
+    
+    Since the power series is represented by a finite amount of data, what is
+    returned is an upper-bound on `\mu` and a lower-bound on `\lambda`.
+    
+    EXAMPLES::
+    
+        sage: R = PowerSeriesRing(ZpCA(3, 4), 'T')
+        sage: F = R([1,0,1])
+        sage: Iwasawa_invariants(F)
+        (0, 0)
+        sage: F = R([0,0,0])
+        sage: Iwasawa_invariants(F)
+        (+Infinity, +Infinity)
+        sage: F = R([3, 9, 3])
+        sage: Iwasawa_invariants(F)
+        (1, 0)
+        sage: F = R([9, 9, 3])
+        sage: Iwasawa_invariants(F)
+        (1, 2)
+        sage: F = R(0, 3)
+        sage: Iwasawa_invariants(F)
+        (+Infinity, 3)
+        sage: F = R([9,9,9], 4)
+        sage: Iwasawa_invariants(F)
+        (2, 0)
+    """
+    from sage.rings.infinity import Infinity
+    if F == 0:
+        return (Infinity, F.prec())
+    Flist = F.padded_list()
+    mu = Infinity
+    Lambda = -1
+    for i in range(len(Flist)):
+        val = Flist[i].valuation() if Flist[i] !=0 else Infinity
+        if val < mu:
+            mu = val
+            Lambda = ZZ(i)
+    return (mu, Lambda)
