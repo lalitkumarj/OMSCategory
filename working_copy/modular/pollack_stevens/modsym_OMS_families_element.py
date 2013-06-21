@@ -61,7 +61,7 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
         p = self.parent().prime()
         return [mu.moment(0).polynomial().substitute(w=((1+p)**k-1)/p) if mu.precision_relative()[0] != 0 else z for mu in self.values()]
     
-    @cached_method
+    #@cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
         r"""
         Determines if self is an eigenvector for `T_q` to precision ``M``.
@@ -73,7 +73,7 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
         except ValueError:
             return False
     
-    @cached_method
+    #@cached_method
     def Tq_eigenvalue(self, q, p=None, M=None, check=True):
         #TODO: deal with var_prec
         qhecke = self.hecke(q)
