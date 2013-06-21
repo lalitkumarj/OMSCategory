@@ -451,6 +451,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             r = r + 1
             h = Phi.hecke(q)
             row = self.linear_relation(basis + [h], verbose=verbose)
+            if len(row) == 0:
+                raise ValueError("basis does not span a T_q-stable subspace")
             row = [-row[a]/row[len(row)-1] for a in range(len(row)-1)]
             ## Probably should put some check here that it really worked.
             T.append(row)
