@@ -91,26 +91,65 @@ class ModularSymbolSpace_generic(Module):
     def level(self):
         return self.source().level()
     
-    @cached_method
+    #@cached_method
     def dimension_of_ordinary_subspace(self, p=None, cusp=False):
         """
-            If ``cusp`` is ``True``, return dimension of cuspidal ordinary
-            subspace. This does a weight 2 computation with sage's ModularSymbols.
+        If ``cusp`` is ``True``, return dimension of cuspidal ordinary
+        subspace. This does a weight 2 computation with sage's ModularSymbols.
+        
+        EXAMPLES::
+        
+            sage: M = OverconvergentModularSymbols(11, 0, sign=-1, p=3, prec_cap=4, base=ZpCA(3, 8))
+            sage: M.dimension_of_ordinary_subspace()
+            2
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            2
+            sage: M = OverconvergentModularSymbols(11, 0, sign=1, p=3, prec_cap=4, base=ZpCA(3, 8))
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            2
+            sage: M.dimension_of_ordinary_subspace()
+            4
+            sage: M = OverconvergentModularSymbols(11, 0, sign=0, p=3, prec_cap=4, base=ZpCA(3, 8))
+            sage: M.dimension_of_ordinary_subspace()
+            6
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            4
+            sage: M = OverconvergentModularSymbols(11, 0, sign=1, p=11, prec_cap=4, base=ZpCA(11, 8))
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            1
+            sage: M.dimension_of_ordinary_subspace()
+            2
+            sage: M = OverconvergentModularSymbols(11, 2, sign=1, p=11, prec_cap=4, base=ZpCA(11, 8))
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            0
+            sage: M.dimension_of_ordinary_subspace()
+            1
+            sage: M = OverconvergentModularSymbols(11, 10, sign=1, p=11, prec_cap=4, base=ZpCA(11, 8))
+            sage: M.dimension_of_ordinary_subspace(cusp=True)
+            1
+            sage: M.dimension_of_ordinary_subspace()
+            2
+
         """
         try:
             p = self.prime()
-        except:
+        except AttributeError:
             if p is None:
                 raise ValueError("If self doesn't have a prime, must specify p.")
-
+        try:
+            return self._ord_dim_dict[(p, cusp)]
+        except AttributeError:
+            self._ord_dim_dict = {}
+        except KeyError:
+            pass
         try:
             chi = self.character()
-        except:
+        except AttributeError:
             chi = None
-
+        
         if chi != None:
             raise NotImplementedError("Need to include character here.")
-            
+        
         from sage.modular.modsym.modsym import ModularSymbols
         from sage.rings.finite_rings.constructor import GF
         r = self.weight() % (p-1)
@@ -137,7 +176,9 @@ class ModularSymbolSpace_generic(Module):
         hecke_poly = M.hecke_polynomial(p)
         verbose("in dim: %s"%(hecke_poly))
         x = hecke_poly.parent().gen()
-        return hecke_poly.degree() - hecke_poly.ord(x)
+        d = hecke_poly.degree() - hecke_poly.ord(x)
+        self._ord_dim_dict[(p, cusp)] = d
+        return d
     #def prime(self):
     #    """
     #    
