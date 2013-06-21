@@ -1,5 +1,6 @@
 from sage.structure.factory import UniqueFactory
-from sage.misc.misc import verbose
+from sage.misc.cachefunc import cached_method
+from sage.misc.misc import verbose as Verbose
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
 from sage.rings.padics.factory import Qp
@@ -127,25 +128,25 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         D = {}
         t = CM(0)
         for g in gens[1:]:
-            verbose("Looping over generators. At generator %s"%(g))
+            Verbose("Looping over generators. At generator %s"%(g))
             #print "CM._prec_cap", CM.precision_cap()
             D[g] = CM.random_element([M_in, M[1]])
             #print "pre:",D[g]
             if g in manin.reps_with_two_torsion():
                 if g in manin.reps_with_three_torsion():
                     raise ValueError("Level 1 not implemented")
-                verbose("Generator is two-torsion")
+                Verbose("Generator is two-torsion")
                 gamg = manin.two_torsion_matrix(g)
                 D[g] = D[g] - D[g] * gamg
                 t -= D[g]
             else:
                 if g in manin.reps_with_three_torsion():
-                    verbose("Generator is three-torsion")
+                    Verbose("Generator is three-torsion")
                     gamg = manin.three_torsion_matrix(g)
                     D[g] = 2*D[g] - D[g] * gamg - D[g] * gamg**2
                     t -= D[g]
                 else:
-                    verbose("Generator is non-torsion")
+                    Verbose("Generator is non-torsion")
                     t += D[g] * gammas[g] - D[g]
         
         ## Fill in this comment?
@@ -161,7 +162,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             chara = 1
         from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
         R = CM.base_ring()
-        verbose("Compute automorphy factor.")
+        Verbose("Compute automorphy factor.")
         K = automorphy_factor_vector(p, a, c, k, CM._character, CM.length_of_moments(M_in), M_in, R)  #Maybe modify aut... to only return 2 first coeffs?
         #K = automorphy_factor_vector(p, a, c, k, CM._character, M_in, M[1], R) #Should this be it instead
 
@@ -188,7 +189,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 shift -= err_val
                 err = _shift_coeffs(err, shift, right=False)
                 t.ordp += shift
-            verbose("shift after err_val: %s"%(shift))
+            Verbose("shift after err_val: %s"%(shift))
             v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
         
@@ -201,7 +202,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         else:
             t += err * gam0 - err
         
-        verbose("Solve difference equation.")
+        Verbose("Solve difference equation.")
         
         #print "t",t
         #Are the following two lines even necessary?
@@ -227,7 +228,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             mu_val = val_vector[length - 1] + mu.ordp   #This is >= val
             shift -= mu_val
             err.ordp -= mu_val
-            verbose("val = %s, mu_val = %s"%(val, mu_val))
+            Verbose("val = %s, mu_val = %s"%(val, mu_val))
             if val == mu_val:
                 mu.ordp -= mu_val
                 mu = mu.reduce_precision_absolute(M)
@@ -235,7 +236,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element, _shift_coeffs
                 V = Dmu.approx_module(M[0], M[1])
                 mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=mu_val, check=False, var_prec=mu._var_prec)
-        verbose("shift after mu_val: %s"%(shift))
+        Verbose("shift after mu_val: %s"%(shift))
         mu.normalize()
         #print "mu.ordp:", mu.ordp
         D[Id] = -mu
@@ -249,13 +250,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #for h in gens[1:]:
         #    print h, D[h].ordp
         D[g0] += err
-        verbose("mu.valuation: %s, err.valuation: %s"%(mu.valuation(), err.valuation()))
+        Verbose("mu.valuation: %s, err.valuation: %s"%(mu.valuation(), err.valuation()))
         #ret = self(D).reduce_precision(M)
         #ret = ModSym_OMS_Families_element(D, self, construct=True)
         ret = self(D)
         #for h in gens[1:]:
         #    print h, ret._map[h].ordp
-        #t.ordp -= mu_val    #only for verbose
+        #t.ordp -= mu_val    #only for Verbose
         #print "Check difference equation (at end): %s"%self.coefficient_module()(mu * gammas[Id] - mu - t)
         if self.sign() == 1:
             return ret.plus_part()
@@ -265,7 +266,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
     def is_start_of_basis(self, List):
         r"""
-        Determines if the inputed list of OMS families can be extended to a basis of this space
+        Determines if the inputed list of OMS families can be extended to a basis of this space.
 
         INPUT:
 
@@ -281,10 +282,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         List = [Phi.list_of_total_measures_at_fixed_weight() for Phi in List]
         d = len(List)
         A = Matrix(R.residue_field(), d, len(List[0]), List)
+        Verbose("A =", A)
         return A.rank() == d
 
     #@cached_method
-    def basis_of_ordinary_subspace(self, d=None):
+    def basis_of_ordinary_subspace(self, d=None, verbose=True):
         r"""
         Finds a basis of the ordinary subspace of this space.
     
@@ -297,39 +299,55 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         OUTPUT:
 
         - A list of OMS families which form the desired basis
+        
+        EXAMPLES:
+        
+        sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 4))
+        sage: MM.basis_of_ordinary_subspace()
+        ()
+        
         """
         if d is None:
             d = self.dimension_of_ordinary_subspace()
+        try:
+            return self._ord_basis
+        except AttributeError:
+            pass
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()[0]
         p = self.prime()
 
         while not done:
-            print "basis has size %s out of predicted %s"%(len(basis),d)
-            verbose("Forming a random symbol")
-            print "-----------------------"
-            print "Forming a random symbol"
+            if verbose:
+                print "basis has size %s out of predicted %s"%(len(basis),d)
+            Verbose("Forming a random symbol")
+            if verbose:
+                print "-----------------------"
+                print "Forming a random symbol"
             Phi = self.random_element()
             val = Phi.valuation()
             if val > 0:
                 for key in Phi._map._dict.keys():
                     Phi._map._dict[key].ordp -= val
 
-            verbose("Projecting to ordinary subspace")
-            print "projecting"
+            Verbose("Projecting to ordinary subspace")
+            if verbose:
+                print "projecting"
             for a in range(M + 2):
-                print "%s out of %s"%(a,M+1)
+                if verbose:
+                    print "%s out of %s"%(a,M+1)
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
 
-            verbose("Forming U_p-span of this symbol")
-            print "Forming U_p-span"
+            Verbose("Forming U_p-span of this symbol")
+            if verbose:
+                print "Forming U_p-span"
             Phi_span = [Phi]
             LI = self.is_start_of_basis(Phi_span)
             if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
                 basis += [Phi_span[-1]]
-                verbose("basis now has size %s"%(len(basis)))
+                Verbose("basis now has size %s"%(len(basis)))
             done = (d <= len(basis))
             while LI and (not done):
                 Phi_span += [Phi_span[-1].hecke(p)]
@@ -337,9 +355,10 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
                     basis += [Phi_span[-1]]
                 done = (d <= len(basis))
-        return basis
+        self._ord_basis = tuple(basis)
+        return self._ord_basis
 
-    def linear_relation(self, List):
+    def linear_relation(self, List, verbose=True):
         r"""
         Finds a linear relation between the given list of OMSs.  If they are LI, returns a list of all 0's.
     
@@ -370,7 +389,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if c == []:
             return []
         for j in range(1,var_prec):
-            print "Working at coefficient %s"%(j)
+            if verbose:
+                print "Working at coefficient %s"%(j)
             v = [0 for k in range(len(vs[0]))]
             for i in range(len(vs)):
                 for a in range(j):
@@ -388,7 +408,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def linear_relation_new(self, List):
         pass
     
-    def hecke_matrix(self, q, basis):
+    #@cached_method
+    def hecke_matrix(self, q, basis=None, verbose=True):
         r"""
         Finds the matrix of T_q wrt to the given basis
     
@@ -401,26 +422,62 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         OUTPUT:
 
         - d x d matrix where d is the length of basis
+        
+        EXAMPLES::
+        
+            sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 4))
+            sage: MM.hecke_matrix(7)
+            []
         """
+        try:
+            return self._hecke_matrices[(q, tuple(basis) if basis is not None else None)]
+        except AttributeError:
+            self._hecke_matrices = {}
+        except KeyError:
+            pass
+        basis_was_None = basis is None
+        if basis_was_None:
+            basis = self.basis_of_ordinary_subspace(verbose=verbose)
+        if len(basis) == 0:
+            self._hecke_matrices[()] = Matrix(self.base_ring(), 0)  #Store answer for empty basis independently of q
+            return self._hecke_matrices[()]
+        basis = list(basis)
         #d = len(basis)
         T = []
         r = 1
         for Phi in basis:
-            print "At %s-th basis element"%(r)
+            if verbose:
+                print "At %s-th basis element"%(r)
             r = r + 1
             h = Phi.hecke(q)
-            row = self.linear_relation(basis + [h])
+            row = self.linear_relation(basis + [h], verbose=verbose)
             row = [-row[a]/row[len(row)-1] for a in range(len(row)-1)]
             ## Probably should put some check here that it really worked.
             T.append(row)
-        return Matrix(T).transpose()
-
-            
-
-
-
-
-
+        self._hecke_matrices[(q, tuple(basis))] = Matrix(self.base_ring(), T).transpose()
+        if basis_was_None:
+            self._hecke_matrices[(q, None)] = self._hecke_matrices[(q, tuple(basis))]
+        return self._hecke_matrices[(q, tuple(basis))]
+    
+    #@cached_method
+    def hecke_polynomial(self, q, var='x', basis=None, verbose=True):
+        r"""
+        Note: I (RH) think that the p-adic precision on the base ring of self should be > prec_cap[0] + prec_cap[1]
+        because w = pT. (Or using relative precision p-adics could work too I guess).
+        EXAMPLES::
+        
+            sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
+            sage: MM.hecke_polynomial(29)
+            1 + O(3^4) + O(w^4)
+        """
+        #TODO: create a cache for this
+        HM = self.hecke_matrix(q, basis, verbose=verbose)
+        if HM.nrows() == 0:
+            from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+            R = self.base_ring()
+            prec_cap = self.precision_cap()
+            return PolynomialRing(R ,var)(R(R.base_ring()(1, prec_cap[0]), prec_cap[1]))
+        return self.hecke_matrix(q, basis).charpoly(var)
 
 #@cached_method
 def _prec_for_solve_diff_eqn_families(M, p):
@@ -506,10 +563,10 @@ def find_linear_relation(vs, p, M):
             s += ';'
     s = s + ']'
         
-    verbose("s = %s"%(s))
+    Verbose("s = %s"%(s))
         
     A = gp(s)
-    verbose("A = %s"%(A))
+    Verbose("A = %s"%(A))
     if len(vs) == 2:
         A = A.Mat()
         
@@ -521,15 +578,15 @@ def find_linear_relation(vs, p, M):
             s += ','
     s += ']~'
         
-    verbose("s = %s"%(s))
+    Verbose("s = %s"%(s))
         
     B = gp(s)
         
-    verbose("B = %s"%(B))
+    Verbose("B = %s"%(B))
 
     v = A.mattranspose().matsolvemod(p**M,B)
         
-    verbose("v = %s"%(v))
+    Verbose("v = %s"%(v))
         
     if v == 0:
         return []
