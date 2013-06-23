@@ -397,6 +397,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     for r in range(len(vs[0])):
                         v[r] += c[i].padded_list()[a] * vs[i][r].padded_list()[j-a]
             c_coef = find_linear_relation(vs_coef + [v],p,M)
+            if len(c_coef) == 0:
+                raise ValueError("No linear relation exists.")
             #print "Found relation %s",%(c_coef)
             temp = [c_coef[r]/c_coef[len(c_coef)-1] for r in range(len(c_coef)-1)]
             c_coef = temp
