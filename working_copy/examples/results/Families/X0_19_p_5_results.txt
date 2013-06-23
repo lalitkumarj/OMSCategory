@@ -15,7 +15,7 @@ Projecting to ordinary subspace.
     Iteration 5 of Up
     Iteration 6 of Up
 Time elapsed: 41.4722518921
-Isolating connected component of X_0(10).
+Isolating connected component of X_0(19).
 Time elapsed: 64.8990359306
 
 Normalizing the symbol again.

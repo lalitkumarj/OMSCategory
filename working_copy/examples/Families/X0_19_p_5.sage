@@ -66,7 +66,7 @@ for i in range(M+2):
 #    i += 1
 print "Time elapsed:", walltime() - before
 
-print "Isolating connected component of X_0(10)."
+print "Isolating connected component of X_0(19)."
 sys.stdout.flush()
 before = walltime()
 for i in range(M+2):
