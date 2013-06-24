@@ -267,6 +267,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def is_start_of_basis(self, List):
         r"""
         Determines if the inputed list of OMS families can be extended to a basis of this space.
+        More precisely, it checks that the elements of ``List`` are linearly independent modulo
+        the uniformizer (by checking the total measures).
 
         INPUT:
 
@@ -298,7 +300,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
         OUTPUT:
 
-        - A list of OMS families which form the desired basis
+        - A tuple of OMS families which form the desired basis
         
         EXAMPLES:
         
@@ -358,7 +360,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         self._ord_basis = tuple(basis)
         return self._ord_basis
 
-    def linear_relation(self, List, verbose=True):
+    def linear_relation_old(self, List, verbose=True):
         r"""
         Finds a linear relation between the given list of OMSs.  If they are LI, returns a list of all 0's.
     
@@ -377,7 +379,6 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         R = vs[0][0].parent()
         w = R.gen()
         p = self.prime()
-        DD = self.coefficient_module()
         M = List[0].precision_absolute()[0]
         var_prec = List[0].precision_absolute()[1]
 
@@ -385,6 +386,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
 
         c = find_linear_relation(vs_coef,p,M)
         c = [R(c[a]).add_bigoh(var_prec) for a in range(len(c))]
+        #print "c = "
+        #print c
         
         if c == []:
             return []
@@ -396,19 +399,86 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 for a in range(j):
                     for r in range(len(vs[0])):
                         v[r] += c[i].padded_list()[a] * vs[i][r].padded_list()[j-a]
+            #print "j=%s, v=\n%s\n"%(j,v)
             c_coef = find_linear_relation(vs_coef + [v],p,M)
             if len(c_coef) == 0:
                 raise ValueError("No linear relation exists.")
             #print "Found relation %s",%(c_coef)
+            #print "c_coef[:-1], c_coef[-1] = \n%s\n%s\n"%(c_coef[:-1], c_coef[-1])
             temp = [c_coef[r]/c_coef[len(c_coef)-1] for r in range(len(c_coef)-1)]
             c_coef = temp
             for r in range(len(c)):
                 c[r] += c_coef[r] * w**j
-
+            #print "c at %s:\n%s\n"%(j, c)
         return c
     
-    def linear_relation_new(self, List):
-        pass
+    def linear_relation(self, List, Psi, verbose=True, prec=None):
+        r"""
+        INPUT::
+        
+            - ``List`` -- a list of families of OMSs
+            - ``Psi`` -- a family of OMSs
+        
+        OUTPUT::
+        
+            - `[v`, `c`]`, where `v` is a vector (over the base ring of self,
+            with ``len(List)`` entries) and c is a scalar (over the base ring
+            of self) such that
+            
+            .. MATH::
+            
+                c\Psi + \sum_{i}v_i\Phi_i = 0,
+            
+            where `\Phi_i` is the `i`th element of ``List`` and `v_i` is the
+            `i`th entry of `v`. If there is a non-trivial such relation, it is
+            returned, otherwise the pair [``None``, ``None``] is returned. If ``List``
+            has length 0, the first entry of the output is ``None`` while the
+            second is 1 or 0 depending on whether `\Psi` is 0 or not.
+        """
+        for Phi in List:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
+        assert Psi.valuation() >= 0
+        R = self.base()
+        w = R.gen()
+        d = len(List)
+        if d == 0:
+            if Psi.is_zero():
+                return [None, R(1)]
+            else:
+                return [None, 0]
+        if prec is None:
+            M, var_prec = Psi.precision_absolute()
+        else:
+            M, var_prec = prec
+        p = self.prime()
+        V = R**d
+        List_TMs = [Phi.list_of_total_measures() for Phi in List]
+        List_coef = [[TM.padded_list()[0] for TM in i] for i in List_TMs]
+        Psi_TMs = Psi.list_of_total_measures()
+        Psi_coef = [TM.padded_list()[0] for TM in Psi_TMs]
+        vectors_TMs = List_TMs + [Psi_TMs]
+        vectors_coef = List_coef + [Psi_coef]
+        
+        v, c = _find_linear_relation(List_coef, Psi_coef, p, M)
+        if c is None: #no relation found
+            return [None, None]
+        v = [R(vv, var_prec) for vv in v]
+        ans = v + [R(c, var_prec)]
+        #print "ans = "
+        #print ans
+        length = len(Psi_coef)
+        for j in range(1, var_prec):
+            if verbose:
+                print "Working at coefficient %s"%(j)
+            new_vector = [sum(ans[i].padded_list()[a] * vectors_TMs[i][r].padded_list()[j-a] for i in range(d + 1) for a in range(j)) for r in range(length)]
+            #print "j=%s, v=\n%s\n"%(j,new_vector)
+            higher_order, extra = _find_linear_relation(vectors_coef, new_vector, p, M)
+            #print "higher_order & extra =\n%s\n%s\n"%(higher_order, extra)
+            for i in range(d + 1):
+                ans[i] += (higher_order[i] / extra) * w**j
+            #print "ans at %s=\n%s\n"%(j, ans)
+        #print ans
+        return [V(ans[:-1]), ans[-1]]
     
     #@cached_method
     def hecke_matrix(self, q, basis=None, verbose=True):
@@ -444,6 +514,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             self._hecke_matrices[()] = Matrix(self.base_ring(), 0)  #Store answer for empty basis independently of q
             return self._hecke_matrices[()]
         basis = list(basis)
+        M, var_prec = basis[0].precision_absolute()
         #d = len(basis)
         T = []
         r = 1
@@ -452,10 +523,16 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 print "At %s-th basis element"%(r)
             r = r + 1
             h = Phi.hecke(q)
-            row = self.linear_relation(basis + [h], verbose=verbose)
-            if len(row) == 0:
+            extra = None
+            while extra is None and M > 0:
+                row, extra = self.linear_relation(basis, h, verbose=verbose, prec=[M, var_prec])
+                if extra is None:
+                    M -= 1
+                    if verbose:
+                        print "Reducing p-adic precision to %s."%(M)
+            if extra is None:
                 raise ValueError("basis does not span a T_q-stable subspace")
-            row = [-row[a]/row[len(row)-1] for a in range(len(row)-1)]
+            row = [-a / extra for a in row]
             ## Probably should put some check here that it really worked.
             T.append(row)
         self._hecke_matrices[(q, tuple(basis))] = Matrix(self.base_ring(), T).transpose()
@@ -497,7 +574,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         
             sage: MM = FamiliesOfOMS(11, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
             sage: HP = MM.hecke_polynomial_in_T_variable(3, verbose=False); HP
-            (1 + O(3^8))*x^2 + (2 + 2*3 + 3^2 + O(3^4) + (2 + 2*3 + 3^3 + O(3^4))*T + O(3^2)*T^2 + (1 + O(3^2))*T^3 + O(T^4))*x + 1 + 2*3 + 3^2 + O(3^4) + (3^3 + O(3^4))*T + (2 + 3 + O(3^2))*T^2 + (1 + O(3^2))*T^3 + O(T^4)
+            (1 + O(3^8))*x^2 + (2 + 2*3 + 3^2 + O(3^4) + (2 + 2*3 + O(3^3))*T + O(3^2)*T^2 + (1 + O(3))*T^3 + O(T^4))*x + 1 + 2*3 + 3^2 + O(3^4) + O(3^3)*T + (2 + 3 + O(3^2))*T^2 + (1 + O(3))*T^3 + O(T^4)
         """
         HPw = self.hecke_polynomial(q, var, basis, verbose)
         from sage.rings.power_series_ring import PowerSeriesRing
@@ -556,7 +633,7 @@ def find_linear_relation(vs, p, M):
     - A list of p-adic numbers describing the linear relation of the vs
     """
     d = len(vs)
-    R = Qp(p,M)
+    R = Qp(p, M)
     V = R**d
         
     if d == 1:
@@ -565,7 +642,7 @@ def find_linear_relation(vs, p, M):
             if vs[0][r] != 0:
                 z = False
         if z:
-            return [R(1)]
+            return [R(1, M)]
         else:
             return []
         # Would be better to use the library as follows. Unfortunately, matsolvemod
@@ -584,7 +661,7 @@ def find_linear_relation(vs, p, M):
             z = False
 
     if z:
-        return [R(0) for a in range(len(vs)-1)] + [1]
+        return [R(0, M) for a in range(len(vs)-1)] + [1]
         
     s = '['
     for c in range(d-1):
@@ -626,8 +703,115 @@ def find_linear_relation(vs, p, M):
         return []
     else:
             ## Move back to SAGE from Pari
-        v = [R(v[a]) for a in range(1,len(v)+1)]
-        return v + [R(-1)]
+        v = [R(v[a], M) for a in range(1,len(v)+1)]
+        return v + [R(-1, M)]
+
+def _find_linear_relation(Alist, B, p, M):    #new!
+    r"""
+    Finds a linear relation between a given list of vectors over Z/p^MZ.  If they are LI, returns an empty list.
+    
+    INPUT:
+
+    - ``vs`` -- a list of vectors over Z/p^MZ
+    - ``p`` -- a prime
+    - ``M`` -- positive integer
+    
+    OUTPUT:
+
+    - A list of p-adic numbers describing the linear relation of the vs
+    
+    TESTS::
+    
+        sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import _find_linear_relation
+        sage: R = ZpCA(3, 4)
+        sage: List = [Sequence([O(3^4), 2*3 + 3^2 + 3^3 + O(3^4), 2 + 3 + 3^2 + 2*3^3 + O(3^4), O(3^4), 1 + 3 + 3^2 + O(3^4), 2 + O(3^4), 1 + 3^2 + 3^3 + O(3^4), 2 + O(3^4), 1 + 3 + 3^2 + O(3^4)], universe=R), Sequence([O(3^4), 1 + 3^2 + O(3^4), 2 + 3 + 3^3 + O(3^4), O(3^4), 1 + 3 + 2*3^2 + 3^3 + O(3^4), 1 + 2*3^2 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 1 + 2*3^2 + O(3^4), 1 + 3 + 2*3^2 + 3^3 + O(3^4)], universe=R), Sequence([O(3^4), 2 + O(3^4), 3 + 3^2 + 3^3 + O(3^4), O(3^4), 2*3 + 3^2 + 3^3 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 3^3 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 2*3 + 3^2 + 3^3 + O(3^4)], universe=R)]
+        sage: _find_linear_relation(List[:-1], List[-1], 3, 4)
+        ([1 + 3^2 + O(3^4), 2 + 3 + 2*3^2 + O(3^4)], 2 + 2*3 + 2*3^2 + 2*3^3 + O(3^4))
+        sage: _find_linear_relation(List[:-1], List[-1], 3, 3)
+        ([1 + 3^2 + O(3^3), 2 + 3 + 2*3^2 + O(3^3)], 2 + 2*3 + 2*3^2 + O(3^3))
+        sage: List[-1][1] -= 1
+        sage: _find_linear_relation(List[:-1], List[-1], 3, 4)
+        ([], None)
+        sage: List[-1][1] += 1 + 3^3
+        sage: _find_linear_relation(List[:-1], List[-1], 3, 4)
+        ([], None)
+        sage: _find_linear_relation(List[:-1], List[-1], 3, 3)
+        ([1 + 3^2 + O(3^3), 2 + 3 + 2*3^2 + O(3^3)], 2 + 2*3 + 2*3^2 + O(3^3))
+    """
+    vs = list(Alist) + [B]
+    d = len(vs)
+    R = Qp(p,M)
+    V = R**d
+        
+    if d == 1:
+        z = True
+        for r in range(len(vs[0])):
+            if vs[0][r] != 0:
+                z = False
+        if z:
+            return [R(1, M)]
+        else:
+            return []
+        # Would be better to use the library as follows. Unfortunately, matsolvemod
+        # is not included in the gen class!!
+        #from sage.libs.pari.gen import pari
+        #cols = [List[c].list_of_total_measures() for c in range(len(List) - 1)]
+        #A = pari(Matrix(ZZ, len(cols[0]), d - 1, lambda i, j : cols[j][i].lift()))
+        #aug_col = pari([ZZ(a) for a in List[-1].list_of_total_measures()]).Col()
+        #v = A.matsolvemod(p ** M, aug_col)
+
+        ## Stupid hack here to deal with the fact that I can't get
+        ## matsolvemod to work if B=0
+    z = True
+    for r in range(len(vs[d-1])):
+        if vs[d-1][r] != 0:
+            z = False
+
+    if z:
+        return [R(0, M) for a in range(len(vs)-1)], 1
+        
+    s = '['
+    for c in range(d-1):
+        v = vs[c]
+        for r in range(len(v)):
+            s += str(ZZ(v[r]))
+            if r < len(v) - 1:
+                s += ','
+        if c < d - 2:
+            s += ';'
+    s = s + ']'
+        
+    Verbose("s = %s"%(s))
+        
+    A = gp(s)
+    Verbose("A = %s"%(A))
+    if len(vs) == 2:
+        A = A.Mat()
+        
+    s = '['
+    v = vs[d-1]
+    for r in range(len(v)):
+        s += str(ZZ(v[r]))
+        if r < len(v) - 1:
+            s += ','
+    s += ']~'
+        
+    Verbose("s = %s"%(s))
+        
+    B = gp(s)
+        
+    Verbose("B = %s"%(B))
+
+    v = A.mattranspose().matsolvemod(p**M,B)
+        
+    Verbose("v = %s"%(v))
+        
+    if v == 0:
+        return [], None
+    else:
+            ## Move back to SAGE from Pari
+        v = [R(v[a], M) for a in range(1,len(v)+1)]
+        return v, R(-1, M)
 
 def random_check(p,N,r,M,var_prec):
     DD = FamiliesOfOverconvergentDistributions(r, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
@@ -650,6 +834,7 @@ def Iwasawa_invariants(F):
     
     EXAMPLES::
     
+        sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import Iwasawa_invariants
         sage: R = PowerSeriesRing(ZpCA(3, 4), 'T')
         sage: F = R([1,0,1])
         sage: Iwasawa_invariants(F)
