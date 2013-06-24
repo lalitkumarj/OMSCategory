@@ -1,12 +1,12 @@
 import sys
 
-max_ell = 17
+max_ell = 19
 ells = prime_range(max_ell + 1)
 p = 3
 k = 2
 r = k % (p-1)
 sign = -1
-M = 4
+M = 6
 var_prec = M
 
 start = walltime()
