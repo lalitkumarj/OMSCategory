@@ -439,6 +439,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             assert Phi.valuation() >= 0, "Symbols must be integral"
         assert Psi.valuation() >= 0
         R = self.base()
+        Rbase = R.base()
         w = R.gen()
         d = len(List)
         if d == 0:
@@ -453,9 +454,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         p = self.prime()
         V = R**d
         List_TMs = [Phi.list_of_total_measures() for Phi in List]
-        List_coef = [[TM.padded_list()[0] for TM in i] for i in List_TMs]
+        #from sage.structure.sage_object import dumps
+        #print repr(dumps(List_TMs))
+        List_coef = [[TM.padded_list()[0] if TM != 0 else Rbase(0, M) for TM in i] for i in List_TMs]
         Psi_TMs = Psi.list_of_total_measures()
-        Psi_coef = [TM.padded_list()[0] for TM in Psi_TMs]
+        Psi_coef = [TM.padded_list()[0] if TM != 0 else Rbase(0, M) for TM in Psi_TMs]
         vectors_TMs = List_TMs + [Psi_TMs]
         vectors_coef = List_coef + [Psi_coef]
         
@@ -473,6 +476,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             new_vector = [sum(ans[i].padded_list()[a] * vectors_TMs[i][r].padded_list()[j-a] for i in range(d + 1) for a in range(j)) for r in range(length)]
             #print "j=%s, v=\n%s\n"%(j,new_vector)
             higher_order, extra = _find_linear_relation(vectors_coef, new_vector, p, M)
+            if extra is None:
+                return [None, None]
             #print "higher_order & extra =\n%s\n%s\n"%(higher_order, extra)
             for i in range(d + 1):
                 ans[i] += (higher_order[i] / extra) * w**j
@@ -618,7 +623,7 @@ def _prec_for_solve_diff_eqn_families(M, p):
         #print("An iteration in _prec_solve_diff_eqn")
     return Min
 
-def find_linear_relation(vs, p, M):
+def find_linear_relation(vs, p, M): #This is the old version. The new one is _find_linear_relation
     r"""
     Finds a linear relation between a given list of vectors over Z/p^MZ.  If they are LI, returns an empty list.
     
