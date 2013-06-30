@@ -17,61 +17,61 @@ max_iter = 50   #Maximum number of iterations of Up in projection to ordinary pa
 DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
 MM = FamiliesOfOMS(N, r, coefficients=DD, sign=-1)
 
-print "\nGenerating random modular symbol."
-sys.stdout.flush()
-before = walltime()
-Phis = MM.random_element()
-print "Time elapsed:", walltime() - before
+B = []
 
-print "\nNormalizing the symbol."
-sys.stdout.flush()
-before = walltime()
-Phis.normalize()
-print "Time elapsed:", walltime() - before
-
-val = Phis.valuation()
-if val > 0:
-    for key in Phis._map._dict.keys():
-        Phis._map._dict[key].ordp -= val
-
-print "Projecting to ordinary subspace."
-sys.stdout.flush()
-before = walltime()
-for i in range(M+4):
-    print "    Iteration %s of Up"%(i+1)
+while len(B) < 2:
+    print "\nGenerating a random modular symbol."
     sys.stdout.flush()
-    Phis = Phis.hecke(p)
-#i = 0
-#try:
-#    is_ord = Phis.is_ordinary()
-#except:
-#    is_ord = False
-#while i < max_iter and not is_ord:
-#    print "    Iteration %s of Up"%(i+1)
-#    sys.stdout.flush()
-#    Phis = Phis.hecke(p)
-#    if (i+1) % (M+2) == 0:
-#        try:
-#            is_ord = Phis.is_ordinary()
-#        except:
-#            pass
-#    i += 1
-print "Time elapsed:", walltime() - before
+    before = walltime()
+    Phis = MM.random_element()
+    print "Time elapsed:", walltime() - before
 
-print "Isolating connected component of rank 2."
-sys.stdout.flush()
-before = walltime()
-for i in range(M+4):
-    Phis = Phis.hecke(p) + Phis
-print "Time elapsed:", walltime() - before
+    Phis.normalize()
 
-print "\nNormalizing the symbol again."
-sys.stdout.flush()
-before = walltime()
-Phis.normalize()
-print "Time elapsed:", walltime() - before
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
 
-B = [Phis, Phis.hecke(p)]
-HM = MM.hecke_polynomial_in_T_variable(p, basis=B)
+    print "Projecting to ordinary subspace."
+    sys.stdout.flush()
+    before = walltime()
+    for i in range(M+4):
+        print "    Iteration %s of Up"%(i+1)
+        sys.stdout.flush()
+        Phis = Phis.hecke(p)
+    print "Time elapsed:", walltime() - before
 
-#add more code once the above works...
+    print "Isolating connected component of rank 2."
+    sys.stdout.flush()
+
+    print "  Killing off newform (applying U_3 + 1)"
+    sys.stdout.flush()
+    before = walltime()
+    for i in range(M+4):
+        Phis = Phis.hecke(p) + Phis
+    print "Time elapsed:", walltime() - before
+
+    Phis.normalize()
+
+    print "  Killing off oldform (applying T_2)"
+    sys.stdout.flush()
+    before = walltime()
+    for i in range(M+4):
+        Phis = Phis.hecke(2) 
+    print "Time elapsed:", walltime() - before
+
+    Phis.normalize()
+
+    if MM.is_start_of_basis(B + [Phis]):
+        B = B + [Phis]
+        print "Adding this new symbol to our basis"
+    else:
+        print "FAILED. Symbol combined with previous basis does not generate free module"
+
+
+T3_poly = MM.hecke_polynomial_in_T_variable(3,basis=B)
+b = T3_poly.padded_list()[1]
+c = T3_poly.padded_list()[0]
+
+print "The discriminant of char poly of U_3 is: %s"%(b^2-4*c)
