@@ -3,31 +3,32 @@ import sys
 start_time = walltime()
 
 #Initialization data
-p = 11
+p = 5
+N = 19
 k = 2
 r = (k-2) % (p-1)
-M = 8  #Number of moments
+M = 4  #Number of moments
 var_prec = M    #Precision on the variable
 max_iter = 50   #Maximum number of iterations of Up in projection to ordinary part
 
 #Verification data
-max_ell = 20
+max_ell = 11
 ells = prime_range(max_ell + 1)
-E = EllipticCurve('11a1')
+E = EllipticCurve('19a1')
 a_ells_E = dict(zip(ells, [E.ap(ell) for ell in ells]))
-f = Newforms(1, 12)[0]
-a_ells_f = dict(zip(ells, [f[ell] for ell in ells]))
-weights = (2, 12)
-a_ells_dict = dict(zip(weights, [a_ells_E, a_ells_f]))
-unstabilize = {2: False, 12: True}
+#f = Newforms(1, 12)[0]
+#a_ells_f = dict(zip(ells, [f[ell] for ell in ells]))
+weights = (2,)
+a_ells_dict = dict(zip(weights, [a_ells_E]))
+unstabilize = {2: True}
 ZmodpM = Zmod(p ** (M+1))
 weights_in_w = dict(zip(weights, [(ZmodpM(1+p) ** (wt-2) - 1).lift() / p for wt in weights]))
 
-print "This script computes the Hida family of X_0(11) at p = {0} with {1} moments and w-adic precision {2}.".format(p, M, var_prec)
-print "It verifies the computation by specializing to weights {0} and checking Hecke eigenvalues for primes up to {1}.".format(weights, max_ell)
+print "This script computes the Hida family of X_0(19) at p = {0} with {1} moments and w-adic precision {2}.".format(p, M, var_prec)
+print "It verifies the computation by specializing to weight {0} and checking Hecke eigenvalues for primes up to {1}.".format(weights, max_ell)
 
 DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
-MM = FamiliesOfOMS(p, r, coefficients=DD)
+MM = FamiliesOfOMS(N, r, coefficients=DD, sign=-1)
 
 print "\nGenerating random modular symbol."
 sys.stdout.flush()
@@ -65,10 +66,11 @@ for i in range(M+2):
 #    i += 1
 print "Time elapsed:", walltime() - before
 
-print "Killing Eisenstein component (the dumb way)."
+print "Isolating connected component of X_0(19)."
 sys.stdout.flush()
 before = walltime()
-Phis = Phis.hecke(p) - Phis
+for i in range(M+2):
+    Phis = Phis.hecke(p).hecke(p) - Phis
 print "Time elapsed:", walltime() - before
 
 print "\nNormalizing the symbol again."

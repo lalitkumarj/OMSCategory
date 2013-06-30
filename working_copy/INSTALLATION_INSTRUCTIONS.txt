@@ -1,5 +1,35 @@
+Sage 5.9:
+---------
+
 Assumptions:
-	*you have a fresh copy of sage (5.7)
+	*you have a copy of sage 5.9
+	*the "working_copy" folder of our git repository is located at /path/to/working_copy/
+	*(recommended) you've cloned your main branch of sage and this clone is your active branch
+
+# 1. Make sure assumptions are true, in particular you should have a copy of our git repository on your computer
+
+# 2. Apply patch to the Sage library:
+	sage -sh
+    	cd $SAGE_ROOT/devel/sage
+	hg qimport -P /path/to/working_copy/patch_for_sage_5_9.patch
+
+#3. Make symlinks:
+	sage -sh
+	cd $SAGE_ROOT/devel/sage/sage/modular/
+	ln -s /path/to/working_copy/modular/pollack_stevens .
+	cd $SAGE_ROOT/devel/sage/sage/categories/
+	ln -s /path/to/working_copy/categories/modsym_space_category.py .
+	ln -s /path/to/working_copy/categories/modsym_coefficient_module_category.py .
+
+#4. Rebuild:
+	sage -b
+
+************************
+Sage 5.7:
+---------
+
+Assumptions:
+	*you have a copy of sage 5.7
 	*the "working_copy" folder of our git repository is located at /path/to/working_copy/
 	*(recommended) you've cloned your main branch of sage and this clone is your active branch
 

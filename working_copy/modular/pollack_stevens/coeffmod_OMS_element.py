@@ -1,6 +1,6 @@
 # This should be cythoned once it's done.
 
-from copy import copy   #Not necessary in cython version
+from copy import copy, deepcopy   #Not necessary in cython version
 from sage.misc.misc import verbose
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ
@@ -59,6 +59,17 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             True
             sage: D(15)
             3 * (2 + O(3))
+            sage: D = OverconvergentDistributions(0, base=ZpCA(5, 8))
+            sage: D([25+O(5^2), 5+O(5)])
+            5^2 * ()
+            sage: D([25, 5])
+            5 * (5 + O(5^2), 1 + O(5))
+    
+    TEST::
+    
+        sage: TestSuite(mu8).run()
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import test_correctness_and_precision_of_solve_diff_eqn
+        sage: test_correctness_and_precision_of_solve_diff_eqn(10, 0)
     """
     #RH: copied from dist.pyx (fixed dealing with 0)
     def __init__(self, moments, parent, ordp=0, check=True):
@@ -76,10 +87,18 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 V = parent.approx_module(M)
                 VK = V.base_extend(K)
                 moments = VK(moments[:M])
-                if len(moments) == 0 or moments == 0:   #should do something with how "zero" moments is
+                if len(moments) == 0 or moments == 0:
                     V = parent.approx_module(0)
+                    if len(moments) > 0:
+                        #Determine ordp
+                        m = len(moments)
+                        diff = 0
+                        for i in range(m):
+                            diff = max(diff, m - i - moments[i].precision_absolute())
+                        ordp = m - diff
+                    else:
+                        ordp = parent.precision_cap()
                     moments = V([])
-                    ordp = parent.precision_cap()
                 else:
                     ordp = min([a.valuation() for a in moments])
                     for i in range(M):
@@ -101,7 +120,19 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         #    self._var_prec = parent._prec_cap[1]
         #else:
         #    self._var_prec = var_prec
-        self.ordp = ordp
+        self.ordp = ZZ(ordp)
+    
+    #def __reduce__(self):
+#        """
+#        TESTS::
+#        
+#            sage: D = OverconvergentDistributions(4, 3, 10)
+#            sage: mu = D.random_element()
+#            sage: loads(dumps(mu)) == mu
+#            True
+#        """
+#        from sage.modular.pollack_stevens.coeffmod_OMS_element import create__CoeffMod_OMS_element
+#        return (create__CoeffMod_OMS_element, (self._moments, self.parent(), self.ordp))
     
     #def _relprec(self):
     #    return len(self._moments)
@@ -139,6 +170,17 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         return self._addsub(right, False)
     
     def _sub_(self, right):
+        r"""
+        TESTS::
+        
+            sage: D = OverconvergentDistributions(0, base=ZpCA(5, 8), prec_cap=3)
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: V = D.approx_module(3)
+            sage: mu = CoeffMod_OMS_element(V((5^2 + O(5^3), 5 + O(5^2), 1 + O(5))), D, ordp=0, check=False)
+            sage: mu2 = D([O(5^2), O(5)])
+            sage: mu - mu2
+            5^2 * ()
+        """
         #RH: "copied" from dist.pyx
         return self._addsub(right, True)
     
@@ -171,6 +213,8 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             rmoments = -rmoments
         verbose(self._moments, level=2)
         ans._moments = smoments + rmoments
+        #if rprec > 0:
+        #    ans._moments[rprec - 1] = ans._moments[rprec - 1].add_bigoh(1)    #To force normalize to deal with this properly
         verbose("ans_ordp %s, ans_moments %s"%(ans.ordp, ans._moments), level=2)
         verbose("\n******** end _addsub ********", level=2)
         return ans
@@ -281,36 +325,48 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         
     def __cmp__(left, right):
         r"""
-            Compare left (i.e. self) and right, which are both elements of left.parent().
-            
-            EXAMPLES::
-            
-                sage: D = OverconvergentDistributions(0,base=Zp(3,5))
-                sage: mu = D([1])
-                sage: nu = D(0)
-                sage: mu == nu
-                False
-                sage: mu = D([3,3,3,3,3,3])
-                sage: nu = D([3,3,3])
-                sage: mu == nu
-                True
-                sage: mu * 3^4 == mu << 4
-                True
-                sage: mu * 3^3 == 0
-                False
-            
-            Check that something with no moments is 0.
-            
-                sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
-                sage: R = ZpCA(7, 5)
-                sage: D = OverconvergentDistributions(2, base=R)
-                sage: mu = CoeffMod_OMS_element((R**0)([]), D, ordp=6, check=False)
-                sage: mu == 0
-                True
+        Compare left (i.e. self) and right, which are both elements of left.parent().
+        
+        EXAMPLES::
+        
+            sage: D = OverconvergentDistributions(0,base=Zp(3,5))
+            sage: mu = D([1])
+            sage: nu = D(0)
+            sage: mu == nu
+            False
+            sage: mu = D([3,3,3,3,3,3])
+            sage: nu = D([3,3,3])
+            sage: mu == nu
+            True
+            sage: mu * 3^4 == mu << 4
+            True
+            sage: mu * 3^3 == 0
+            False
+        
+        Check that something with no moments is 0::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(7, 5)
+            sage: D = OverconvergentDistributions(2, base=R)
+            sage: mu = CoeffMod_OMS_element((R**0)([]), D, ordp=6, check=False)
+            sage: mu == 0
+            True
+        
+        Check that deepcopy is deep enough (the last two commands fail with copy
+        instead of deepcopy)::
+        
+            sage: mu = CoeffMod_OMS_element((R**2)([R(2 * 7, 2), R(0, 1)]), D, ordp=-1, check=False)
+            sage: nu = CoeffMod_OMS_element(D.approx_module(1)([R(2, 1)]), D, ordp=0, check=False)
+            sage: mu == nu
+            True
+            sage: mu == nu
+            True
+            sage: mu
+            (2 + O(7))
         """
         #RH: "copied" from dist.pyx, but then changed
-        left = copy(left)
-        right = copy(right)
+        left = deepcopy(left)
+        right = deepcopy(right)
         left.normalize()
         right.normalize()
         lrprec = left.precision_relative()
@@ -319,7 +375,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if rrprec == 0:
                 return 0
             else:
-                return -1
+                return -1   # RH: This is probably incorrect
         elif rrprec == 0:
             return 1
         rprec = min(lrprec, rrprec)
@@ -496,8 +552,7 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             sage: mu._valuation()
             5
         """
-        #RH: "copied" from dist.pyx, but then adjusted
-        verbose("\n******** begin valuation ********", level=2)
+        verbose("\n******** begin _valuation ********", level=2)
         verbose("ordp %s, _moments %s"%(self.ordp, self._moments), level=2)
         n = self.precision_relative()
         if n == 0:
@@ -516,14 +571,52 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 vv.append(min_val)
             ret = self.ordp + min_val#min(n, min_val)
             verbose("ret %s"%(ret), level=2)
-            verbose("\n******** end valuation ********", level=2)
+            verbose("\n******** end _valuation ********", level=2)
             return [ret, vv]
         ret = self.ordp + min([self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])#min([n] + [self._unscaled_moment(a).valuation() if not self._unscaled_moment(a).is_zero() else a + self._unscaled_moment(a).valuation() for a in range(n)])
         verbose("ret %s"%(ret), level=2)
-        verbose("\n******** end valuation ********", level=2)
+        verbose("\n******** end _valuation ********", level=2)
         return ret
     
     def normalize(self):
+        r"""
+            EXAMPLES::
+            
+                sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+                sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
+                sage: mu = D([1,1,1]); mu
+                (1 + O(7^3), 1 + O(7^2), 1 + O(7))
+                sage: mu - mu
+                7^3 * ()
+        """
+        n = self.precision_relative()
+        if n == 0:
+            return self
+        adjust_moms = 0
+        for i in range(n):
+            adjust_moms = max(adjust_moms, n - i - self._moments[i].precision_absolute())
+        if adjust_moms >= n:
+            assert False    #Deal with this later...
+        if adjust_moms == 0:
+            for i in range(n):
+                self._moments[i] = self._moments[i].add_bigoh(n - i)
+        else:
+            n -= adjust_moms
+            V = self.parent().approx_module(n)
+            self._moments = V([self._moments[i].add_bigoh(n - i) for i in range(n)])
+        val_diff = self._valuation() - self.ordp
+        if val_diff > 0:
+            n -= val_diff
+            self.ordp += val_diff
+            V = self.parent().approx_module(n)
+            self._moments = V([self._moments[i] >> val_diff for i in range(n)])
+        return self
+    
+    def normalize_old(self):
         r"""
             EXAMPLES::
             
@@ -632,6 +725,29 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
         ordp = self.ordp   #Should this be updated?
         return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)  #should latter be true?
     
+    def reduce_precision_absolute(self, new_prec):
+        r"""
+        TESTS::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: D = OverconvergentDistributions(0, base=ZpCA(3, 4))
+            sage: V = D.approx_module()
+            sage: mu = V((2*3^2 + 2*3^3 + O(3^4), 2*3 + O(3^3), O(3^2), 2 + O(3)))
+            sage: mu = CoeffMod_OMS_element(mu, D, check=False)
+            sage: mu.reduce_precision_absolute(2)
+            3^2 * ()
+        """
+        #The other possible answer for the above example is 3 * (2*3 + O(3^2), 2 + O(3)), but I don't think that's right since mu is indeed in Fil^2.
+        if new_prec > self.precision_absolute():
+            raise ValueError("new_prec(=%s) must be less than absolute precision of self."%(new_prec))
+        ordp = self.ordp
+        if new_prec - ordp <= 0:
+            moments = self.parent().approx_module(0)([])
+            ordp = new_prec
+        else:
+            moments = self._moments[:new_prec - ordp]
+        return CoeffMod_OMS_element(moments, self.parent(), ordp, check=False)
+    
     def lift(self, DD=None):
         #RH: should be good
         r"""
@@ -654,45 +770,67 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
     
     def solve_diff_eqn(self):
         r"""
-            Solves the difference equation.
+        Solves the difference equation.
+        
+        See Theorem 4.5 and Lemma 4.4 of [PS].
+        
+        INPUT:
+        
+        - ``self`` - an overconvergent distribution `\mu` of absolute
+            precision `M`
+        
+        OUTPUT:
+        
+        - an overconvergent distribution `\nu` of absolute precision
+            `M - \lfloor\log_p(M)\rfloor - 1` such that
+        
+        .. math::
+        
+            \nu|\Delta = \mu,\text{ where }\Delta=\begin{pmatrix}1&1\\0&1
+            \end{pmatrix} - 1.
+        
+        EXAMPLES::
+        
+            sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
+            sage: D10 = D.change_precision(10)
+            sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
+            sage: nu10 = mu10.solve_diff_eqn()
+            sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+            sage: MR = MS.source()
+            sage: Id = MR.gens()[0]
+            sage: nu10 * MR.gammas[Id] - nu10 - mu10
+            7^8 * ()
+            sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
+            sage: D10 = D.change_precision(10)
+            sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
+            sage: nu10 = mu10.solve_diff_eqn()
+            sage: MS = OverconvergentModularSymbols(14, coefficients=D);
+            sage: MR = MS.source();
+            sage: Id = MR.gens()[0]
+            sage: nu10 * MR.gammas[Id] - nu10 - mu10
+            7^8 * ()
+            sage: R = ZpCA(5, 5); D = OverconvergentDistributions(0,base=R);
+            sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
+            sage: nu.solve_diff_eqn()
+            5 * (1 + 3*5 + O(5^2), O(5))
             
-            See Theorem 4.5 and Lemma 4.4 of [PS].
-            
-            OUTPUT:
-            
-            - a distribution v so that self = v | Delta, where Delta = [1, 1; 0, 1] - 1.
-            
-            EXAMPLES::
-            
-                sage: D = OverconvergentDistributions(0,7,base=ZpCA(7,5))
-                sage: D10 = D.change_precision(10)
-                sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
-                sage: nu10 = mu10.solve_diff_eqn()
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D)
-                sage: MR = MS.source()
-                sage: Id = MR.gens()[0]
-                sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^8 * ()
-                sage: D = OverconvergentDistributions(0,7,base=Qp(7,5))
-                sage: D10 = D.change_precision(10)
-                sage: mu10 = D10((O(7^10), 4 + 6*7 + 5*7^3 + 2*7^4 + 5*7^5 + O(7^9), 5 + 7^3 + 5*7^4 + 6*7^5 + 7^6 + 6*7^7 + O(7^8), 2 + 7 + 6*7^2 + 6*7^4 + 7^5 + 7^6 + O(7^7), 3*7 + 4*7^2 + 4*7^3 + 3*7^4 + 3*7^5 + O(7^6), 5 + 3*7 + 2*7^2 + 7^3 + 3*7^4 + O(7^5), 1 + 7^2 + 7^3 + O(7^4), 6*7 + 6*7^2 + O(7^3), 2 + 3*7 + O(7^2), 1 + O(7)))
-                sage: nu10 = mu10.solve_diff_eqn()
-                sage: MS = OverconvergentModularSymbols(14, coefficients=D);
-                sage: MR = MS.source();
-                sage: Id = MR.gens()[0]
-                sage: nu10 * MR.gammas[Id] - nu10 - mu10
-                7^8 * ()
-                sage: R = ZpCA(5, 5); D = OverconvergentDistributions(0,base=R);
-                sage: nu = D((R(O(5^5)), R(5 + 3*5^2 + 4*5^3 + O(5^4)), R(5 + O(5^3)), R(2*5 + O(5^2), 2 + O(5))));
-                sage: nu.solve_diff_eqn()
-                5 * (1 + 3*5 + O(5^2), O(5))
+        Check input of relative precision 2::
+        
+            sage: from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
+            sage: R = ZpCA(3, 9)
+            sage: D = OverconvergentDistributions(0, base=R, prec_cap=4)
+            sage: V = D.approx_module(2)
+            sage: nu = CoeffMod_OMS_element(V([R(0, 9), R(2*3^2 + 2*3^4 + 2*3^7 + 3^8 + O(3^9))]), D, ordp=0, check=False)
+            sage: mu = nu.solve_diff_eqn()
+            sage: mu
+            3 * ()
         """
         #RH: see tests.sage for randomized verification that this function works correctly
         p = self.parent().prime()
+        abs_prec = ZZ(self.precision_absolute())
         if self.is_zero():
-            M = ZZ(self.precision_absolute())
             mu = self.parent()(0)
-            mu.ordp = M-M.exact_log(p)-1
+            mu.ordp = abs_prec - abs_prec.exact_log(p) - 1
             return mu
         if self._unscaled_moment(0) != 0:
             raise ValueError("Distribution must have total measure 0 to be in image of difference operator.")
@@ -704,6 +842,11 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             if p == 2:
                 raise ValueError("Not enough accuracy to return anything")
             else:
+                out_prec = abs_prec - abs_prec.exact_log(p) - 1
+                if self.ordp >= out_prec:
+                    mu = self.parent()(0)
+                    mu.ordp = out_prec
+                    return mu
                 mu = self.parent()(self._unscaled_moment(1))
                 mu.ordp = self.ordp
                 return mu
@@ -719,7 +862,6 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
                 v[j] += binomial(j,m-1) * bern[(j-m+1)//2] * scalar
         ordp = min(a.valuation() for a in v)
         #Is this correct in ramified extensions of QQp?
-        abs_prec = self.precision_absolute()
         verbose("abs_prec: %s, ordp: %s"%(abs_prec, ordp), level=2)
         if ordp != 0:
             new_M = abs_prec - 1 - (abs_prec).exact_log(p) - ordp
@@ -727,11 +869,115 @@ class CoeffMod_OMS_element(CoefficientModuleElement_generic):
             V = self.parent().approx_module(new_M)
             v = V([R(v[i] >> ordp) for i in range(new_M)])
         else:
-            new_M = abs_prec - 1 - (abs_prec).exact_log(p)
+            new_M = abs_prec - abs_prec.exact_log(p) - 1
             verbose("new_M: %s"%(new_M), level=2)
             V = self.parent().approx_module(new_M)
             v = V([R(v[i]) for i in range(new_M)])
-        v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly
+        v[new_M-1] = v[new_M-1].add_bigoh(1)  #To force normalize to deal with this properly. May not be necessary any more.
         mu = CoeffMod_OMS_element(v, self.parent(), ordp=ordp, check=False)
         verbose("mu.ordp: %s, mu._moments: %s"%(mu.ordp, mu._moments), level=2)
         return mu.normalize()
+
+def test_correctness_and_precision_of_solve_diff_eqn(number=20, verbosity=1):
+    """
+    ``number`` is how many different random distributions to check. 
+    
+    Currently, avoids the prime 2.
+    """
+    from sage.misc.prandom import randint
+    from sage.rings.arith import random_prime
+    from sage.rings.padics.factory import ZpCA
+    from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
+    from sage.structure.sage_object import dumps
+    errors = []
+    munus = []
+    for i in range(number):
+        Mspace = randint(1, 20)    #Moments of space
+        M = randint(max(0, Mspace - 5), Mspace)
+        p = random_prime(13, lbound=3)
+        k = randint(0, 6)
+        Rprec = Mspace + randint(0, 5)
+        R = ZpCA(p, Rprec)
+        D = OverconvergentDistributions(k, base=R, prec_cap=Mspace)
+        S0 = D.action().actor()
+        Delta_mat = S0([1,1,0,1])
+        mu = D.random_element(M)
+        mu_save = dumps(mu)#[deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "\nTest #{0} data (Mspace, M, p, k, Rprec) =".format(i+1), (Mspace, M, p, k, Rprec)
+            print "mu =", mu
+        
+        nu = mu * Delta_mat - mu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        mu2 = nu.solve_diff_eqn()
+        nu_abs_prec = nu.precision_absolute()
+        expected = nu_abs_prec - nu_abs_prec.exact_log(p) - 1
+        if M != 1:
+            try:
+                agree = (mu - mu2).is_zero(expected)
+            except PrecisionError:
+                print (Mspace, M, p, k, Rprec), mu_save._repr_(), nu_save
+                assert False
+        else:
+            agree = mu2.is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       mu2 =", mu2
+            print "        nu = ", nu
+        if not agree:
+            errors.append((i+1, 1))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec)))
+        if verbosity > 0:
+            print "    Test finding mu from mu|Delta accurate: %s"%(agree)
+            print "        nu_abs_prec  soln_abs_prec_expected  actual  agree"
+        mu2_abs_prec = mu2.precision_absolute()
+        agree = (expected == mu2_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(nu_abs_prec, expected, mu2_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 2))
+            munus.append((mu_save, nu_save, mu2, (Mspace, M, p, k, Rprec)))
+        
+        if mu.precision_relative() > 0:
+            mu._moments[0] = R(0, mu.precision_relative())
+        mu_save = [deepcopy(mu.ordp), deepcopy(mu._moments)]
+        if verbosity > 0:
+            print "    mu modified =", mu
+        nu = mu.solve_diff_eqn()
+        mu_abs_prec = mu.precision_absolute()
+        expected = mu_abs_prec - mu_abs_prec.exact_log(p) - 1
+        nud = nu * Delta_mat - nu
+        nu_save = [deepcopy(nu.ordp), deepcopy(nu._moments)]
+        agree = (nud - mu).is_zero(expected)
+        if verbosity > 1:
+            print "    Just so you know:"
+            print "        mu =", mu
+            print "     mured =", mu.reduce_precision_absolute(expected)
+            print "       nud =", nud
+        if not agree:
+            errors.append((i+1, 3))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec)))
+        if verbosity > 0:
+            print "    Test finding nu with nu|Delta == mu: %s"%(agree)
+            print "        mu_abs_prec  soln_abs_prec_expected  actual  agree"
+        nu_abs_prec = nu.precision_absolute()
+        agree = (expected == nu_abs_prec)
+        if verbosity > 0:
+            print "        %s             %s                       %s      %s"%(mu_abs_prec, expected, nu_abs_prec, agree)
+        if not agree:
+            errors.append((i+1, 4))
+            munus.append((mu_save, nu_save, (Mspace, M, p, k, Rprec)))
+    if len(errors) == 0:
+        if verbosity > 0:
+            print "\nTest passed with no errors."
+        return
+    if verbosity > 0:
+        print "\nTest failed with errors: %s\n"%(errors)
+    return errors, munus
+    
+#def create__CoeffMod_OMS_element(moments, parent, ordp):
+#    """
+#    Used for unpickling.
+#    """
+#    return CoeffMod_OMS_element(moments, parent, ordp=ordp, check=False)

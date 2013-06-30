@@ -212,16 +212,10 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         a, b, c, d = self._adjuster(g)
         # if g.parent().base_ring().is_exact():
         #     self._check_mat(a, b, c, d)
-        k = self._k
-        if g.parent().base_ring() is ZZ:
-            if self._symk:
-                base_ring = QQ
-            else:
-                base_ring = Zmod(self._p**M)
-        else:
-            base_ring = self.domain().base_ring()
+        #k = self._k
+        base_ring = self.domain().base_ring()
         #cdef Matrix B = matrix(base_ring,M,M)
-        B = matrix(base_ring,M,M) #
+        B = matrix(base_ring, M, M) #
         if M == 0:
             return B.change_ring(self.codomain().base_ring())
         R = PowerSeriesRing(base_ring, 'y', default_prec = M)
@@ -229,7 +223,8 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         #tim = verbose("Checked, made R",tim)
         # special case for small precision, large weight
         scale = (b+d*y)/(a+c*y)
-        t = (a+c*y)**k # will already have precision M
+        #t = (a+c*y)**k # will already have precision M
+        t = R.one()
         #cdef long row, col #
         #tim = verbose("Made matrix",tim)
         for col in range(M):
@@ -238,12 +233,12 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
                 B[row, col] = t[row]
             t *= scale
         #verbose("Finished loop",tim)
-        # the changering here is annoying, but otherwise we have to change ring each time we multiply
+        # the change_ring here is annoying, but otherwise we have to change ring each time we multiply
         B = B.change_ring(self.codomain().base_ring())
         if self._character is not None:
             B *= self._character(a)
         if self._dettwist is not None:
-            B *= (a*d - b*c)**(self._dettwist)
+            B *= (a*d - b*c) ** (self._dettwist)
         return B
     
     def get_action_matrices(self, g, M):
@@ -272,7 +267,6 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
                     else:
                         AF = auts[maxprec][:M,:M]
                         auts[M] = AF
-        
         A = self.acting_matrix(g, M)
         return [AF, A]
     
@@ -323,15 +317,9 @@ class WeightKAction_OMS(WeightKAction_generic):
         # if g.parent().base_ring().is_exact():
         #     self._check_mat(a, b, c, d)
         k = self._k
-        if g.parent().base_ring() is ZZ:
-            if self._symk:
-                base_ring = QQ
-            else:
-                base_ring = Zmod(self._p**M)
-        else:
-            base_ring = self.domain().base_ring()
+        base_ring = self.domain().base_ring()
         #cdef Matrix B = matrix(base_ring,M,M)
-        B = matrix(base_ring,M,M) #
+        B = matrix(base_ring, M, M) #
         if M == 0:
             return B.change_ring(self.codomain().base_ring())
         R = PowerSeriesRing(base_ring, 'y', default_prec = M)

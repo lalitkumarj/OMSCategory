@@ -1,14 +1,15 @@
 from sage.structure.factory import UniqueFactory
 from sage.misc.misc import verbose
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_method, cached_function
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
+from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.rational_field import QQ
 from sage.rings.padics.factory import Qp
 from sage.rings.finite_rings.constructor import GF
-from sage.functions.other import ceil
 from sage.matrix.constructor import Matrix
+from sage.modules.free_module_element import vector
 from sage.modular.arithgroup.all import Gamma0
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
@@ -16,7 +17,52 @@ from sage.modular.pollack_stevens.modsym_OMS_element import ModSym_OMS_element
 from sage.interfaces.gp import gp
 
 class ModSym_OMS_factory(UniqueFactory):
+    """
+    TESTS::
+    
+        sage: from sage.modular.pollack_stevens.modsym_OMS_space import OverconvergentModularSymbols
+        sage: D = OverconvergentDistributions(4, 3, 10)
+        sage: MS = OverconvergentModularSymbols(14, coefficients=D); MS
+        Space of overconvergent modular symbols for Congruence Subgroup Gamma0(42) with sign 0 and values in Space of 3-adic distributions with k=4 action and precision cap 10
+    """
+#        sage: d0 = MS.__dict__; s0 = d0.keys(); s0.sort()
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS2 = loads(dumps(MS))
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS2 is MS
+#        True
+#        sage: MS2 == MS
+#        sage: type(MS2)
+#        sage: type(MS)
+#        sage: from sage.modular.pollack_stevens.modsym_OMS_space import ModSym_OMS_space
+#        sage: isinstance(MS2, ModSym_OMS_space)
+#        sage: isinstance(MS, ModSym_OMS_space)
+#        sage: d = MS2.__dict__; s = d.keys(); s.sort()
+#        sage: MS2 == MS
+#        sage: s == s0
+#        sage: print s; print s0
+#        sage: for k in s0:
+#        ...     print k, d0[k] is d[k]
+#        ...     print k, d0[k] == d[k]
+#        ...     print k, d0[k], d[k], "\n"
+#        sage: print OverconvergentModularSymbols.reduce_data(MS)
+#        sage: print OverconvergentModularSymbols.reduce_data(MS2)
+#        sage: from sage.modular.pollack_stevens.modsym_OMS_space import TESTER
+#        sage: TESTER()
+#        sage: save(MS, 'MS.obj')
+#        sage: MS2 = load('MS.obj')
+#        sage: MS2 is MS
+#        sage: MS3 = loads(dumps(MS2))
+#        sage: MS3 is MS2
+#        sage: MS0b = load('/Users/rharron/MS0.sobj')
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS0 = OverconvergentModularSymbols(23, 2, -1, 5, 10)
+#        sage: OverconvergentModularSymbols._cache.data
+#        sage: MS0b is MS0
+#        sage: MS0b == MS0
+
     def create_key(self, group, weight=None, sign=0, p=None, prec_cap=None, base=None, coefficients=None):
+        #print group, weight, sign, p, prec_cap, base, coefficients
         if sign not in (-1,0,1):
             raise ValueError("sign must be -1, 0, 1")
         if isinstance(group, (int, Integer)):
@@ -35,10 +81,18 @@ class ModSym_OMS_factory(UniqueFactory):
     def create_object(self, version, key):
         return ModSym_OMS_space(*key)
 
-OverconvergentModularSymbols = ModSym_OMS_factory('ModSym_OMS_space')
+#OverconvergentModularSymbols = ModSym_OMS_factory('sage.modular.pollack_stevens.modsym_OMS_space.OverconvergentModularSymbols')
+OverconvergentModularSymbols = ModSym_OMS_factory('OverconvergentModularSymbols')
 
 class ModSym_OMS_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):
+        """
+        TEST::
+        
+            sage: from sage.modular.pollack_stevens.modsym_OMS_space import OverconvergentModularSymbols
+            sage: MS = OverconvergentModularSymbols(23, 2, -1, 5, 10)
+            sage: TestSuite(MS).run()
+        """
         ModularSymbolSpace_generic.__init__(self, group, coefficients, sign=sign, element_class=ModSym_OMS_element)
     
     def _has_coerce_map_from_(self, other):
@@ -49,8 +103,20 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         else:
             return False
     
+#    def _cmp_(self, other):
+#        if self is other:
+#            return 0
+#        if not isinstance(other, ModSym_OMS_space):
+#            return cmp(type(self), type(other))
+#        return ((self.self._sign, self._group, self._coefficients), (self._sign, self._group, self._coefficients))
+    
     def _repr_(self):
         return "Space of overconvergent modular symbols for %s with sign %s and values in %s"%(self.group(), self.sign(), self.coefficient_module())
+    
+    #def __reduce__(self):
+        #return OverconvergentModularSymbols.reduce_data(self)
+        #print "In __reduce__", (self._group, None, self._sign, None, None, None, self._coefficients)
+        #return (OverconvergentModularSymbols, (self._group, None, self._sign, None, None, None, self._coefficients))
     
     def precision_cap(self):
         return self.coefficient_module().precision_cap()
@@ -85,6 +151,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #if M == 1?
         p = self.prime()
         k = self.weight()
+        k_val = ZZ(k).valuation(p) if k != 0 else ZZ.zero()
         manin = self.source()
         gens = manin.gens()
         Id = gens[0]
@@ -112,15 +179,16 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             if g0 in manin.reps_with_three_torsion():
                 aa = (gam0**2).matrix()[0,0]
                 cc = (gam0**2).matrix()[1,0]
-                gam_shift = max(c.valuation(p),cc.valuation(p))
+                #                gam_shift = max(c.valuation(p),cc.valuation(p)) 
+                gam_shift = (a**(k-1) * c + aa**(k-1) * cc).valuation(p)
             else:
                 gam_shift = c.valuation(p)
         
-        M_in = _prec_for_solve_diff_eqn(M, p, k) + gam_shift
+        M_in = _prec_for_solve_diff_eqn(M, p) + k_val + gam_shift
         verbose("Working with precision %s (M, p, k, gam_shift) = (%s, %s, %s, %s)"%(M_in, M, p, k, gam_shift))
         CM = self.coefficient_module().change_precision(M_in)
         R = CM.base_ring()
-        #verbose("M_in, new base ring R = %s, %s"%(M_in, R))
+        verbose("M_in, new base ring R = %s, %s"%(M_in, R))
         
         ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
@@ -143,6 +211,8 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                     t -= D[g]
                 else:
                     t += D[g] * gammas[g] - D[g]
+
+        verbose("t after first random choices: %s"%(t))
         
         ## If k = 0, then t has total measure zero.  However, this is not true when k != 0  
         ## (unlike Prop 5.1 of [PS1] this is not a lift of classical symbol).  
@@ -171,7 +241,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v = [R(0)] * M_in
             v[1] = R(err)
             err = CM(v)
-
+            verbose("err is: %s"%(err))
             ## In the two and three torsion case, we now adjust err to make it satisfy the torsion Manin relations
             if g0 in manin.reps_with_two_torsion():
                 err = err - err * gam0
@@ -189,8 +259,10 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         #except PrecisionError:
         #    verbose("t"%(t.ordp, t._moments, t.precision_absolute()
         verbose("Shift before mu = %s"%(shift))
-        if shift > 0:
-            t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
+        #if shift > 0:
+        #    t = t.reduce_precision(t.precision_relative() - k.valuation(p) - gam_shift)
+        #        t = t.reduce_precision_absolute(t.precision_absolute() - k_val - gam_shift)
+        t = t.reduce_precision_absolute(_prec_for_solve_diff_eqn(M, p))
         verbose("About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
         t.normalize()
         verbose("After normalize: About to solve diff_eqn with %s, %s"%(t.ordp, t._moments))
@@ -205,16 +277,17 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 err.ordp -= mu_val
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments and mu: %s, %s, %s"%(mu.ordp, mu._moments, mu))
-        mu = mu.reduce_precision(M)
+        mu = mu.reduce_precision_absolute(M)
         mu.normalize()
         verbose("Desired M, mu's M: %s, %s"%(M, mu.precision_relative()))
         verbose("mu.ordp, mu._moments: %s, %s"%(mu.ordp, mu._moments))
-        if mu.precision_relative() < M:
+        if mu.precision_absolute() < M: #Eventually, should just remove this check
             raise ValueError("Insufficient precision after solving the difference equation.")
         D[Id] = -mu
         if shift > 0:
             for h in gens[1:]:
                 D[h].ordp += shift
+        #Should the absolute precision of the other values be lowered as well?
         if k != 0:
             D[g0] += err
         ret = self(D)
@@ -228,7 +301,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             return ret.minus_part()
         return ret
 
-    def is_start_of_basis(self, list):
+    def is_start_of_basis(self, List):
         r"""
         Determines if the inputed list of OMS's can be extended to a basis of this space
 
@@ -240,12 +313,38 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
 
         - True/False
         """
-        for Phi in list:
+        for Phi in List:
             assert Phi.valuation() >= 0, "Symbols must be integral"
         R = self.base()
-        list = [Phi.list_of_total_measures() for Phi in list]
-        d = len(list)
-        A = Matrix(R.residue_field(), d, len(list[0]), list)
+        List = [Phi.list_of_total_measures() for Phi in List]
+        d = len(List)
+        A = Matrix(R.residue_field(), d, len(List[0]), List)
+        return A.rank() == d
+    
+    def is_start_of_basis_new(self, List):
+        r"""
+        Determines if the inputed list of OMS's can be extended to a basis of this space
+
+        INPUT:
+
+        - ``list`` -- a list of OMS's
+
+        OUTPUT:
+
+        - True/False
+        """
+        for Phi in List:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
+        d = len(List)
+        if d == 1:
+            L = List[0].list_of_total_measures()
+            for mu in L:
+                if not mu.is_zero():
+                    return True
+            return False
+        R = self.base()
+        List = [Phi.list_of_total_measures() for Phi in List]
+        A = Matrix(R.residue_field(), d, len(List[0]), List)
         return A.rank() == d
     
     def linear_relation(self, List):
@@ -326,6 +425,30 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             v = [R(v[a]) for a in range(1,len(v)+1)]
             return v + [R(-1)]
     
+    def linear_relation_new(self, List, Psi):
+        # ~40% increase in speed for Npk = 2, 11, 0 sign = 0
+        for Phi in List:
+            assert Phi.valuation() >= 0
+        assert Psi.valuation() >=0
+        R = self.base()
+        d = len(List)
+        if d == 0:
+            if Psi.is_zero():
+                return [None, R(1)]
+            else:
+                return [None, 0]
+        M = Psi.precision_absolute()
+        p = self.prime()
+        V = R**d
+        pM = p**M
+        A = Matrix(Zmod(pM), [Phi.list_of_total_measures() for Phi in List])
+        b = vector(Zmod(pM), Psi.list_of_total_measures())
+        try:
+            x = A.solve_left(b)
+            return [V(x), R(-1)]
+        except:
+            return [V(0), 0]
+    
     @cached_method
     def basis_of_ordinary_subspace(self, d=None):
         r"""
@@ -347,7 +470,7 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
         done = (d <= len(basis))
         M = self.precision_cap()
         p = self.prime()
-
+        
         while not done:
             print "basis has size %s out of %s"%(len(basis),d)
             verbose("Forming a random symbol")
@@ -378,6 +501,57 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
                 done = (d <= len(basis))
         return basis
     
+    @cached_method
+    def basis_of_ordinary_subspace_new(self, d=None):
+        r"""
+        Finds a basis of the ordinary subspace of this space.
+    
+        INPUT:
+
+        - ``d`` -- (optional) integer equal to the dimension of the ordinary subspace; otherwise this number is just computed via Hida theory
+
+        - ``sign`` -- optional variable which if 1 or -1 restricts to the plus or minus subspace
+
+        OUTPUT:
+
+        - A list of OMS's which form the desired basis
+        """
+        if d is None:
+            d = self.dimension_of_ordinary_subspace()
+        basis = []
+        done = (d <= len(basis))
+        M = self.precision_cap()
+        p = self.prime()
+        while not done:
+            #            print "basis has size %s"%(len(basis))
+            verbose("Forming a random symbol")
+            #            print "-----------------------"
+            #            print "Forming a random symbol"
+            Phi = self.random_element()
+
+            verbose("Projecting to ordinary subspace")
+            #            print "projecting"
+            for a in range(M + 2):
+                Phi = Phi.hecke(p)
+            ## Should really check here that we are ordinary
+
+            verbose("Forming U_p-span of this symbol")
+            #            print "Forming U_p-span"
+            Phi_span = [Phi]
+            if not self.is_start_of_basis_new(Phi_span):
+                continue
+            while not done:
+                if self.is_start_of_basis_new(basis + [Phi_span[-1]]):
+                    basis.append(Phi_span[-1])
+                    verbose("basis now has size %s"%(len(basis)))
+                    done = (d <= len(basis))
+                else:
+                    break
+                if done:
+                    break
+                Phi_span.append(Phi_span[-1].hecke(p))
+        return basis
+    
     def hecke_matrix(self, q, basis):
         r"""
         Finds the matrix of T_q wrt to the given basis
@@ -401,37 +575,97 @@ class ModSym_OMS_space(ModularSymbolSpace_generic):
             row.pop()
             T.append(row)
         return Matrix(T).transpose()
+    
+    def hecke_matrix_new(self, q, basis):
+        r"""
+        Finds the matrix of T_q wrt to the given basis
+    
+        INPUT:
 
-#@cached_method
-def _prec_for_solve_diff_eqn(M, p, k):
+        - ``q`` -- a prime
+
+        - ``basis`` -- basis of a T_q-stable subspace
+
+        OUTPUT:
+
+        - d x d matrix where d is the length of basis
+        """
+        #d = len(basis)
+        T = []
+        for Phi in basis:
+            Phi_q = Phi.hecke(q)
+            row, check = self.linear_relation_new(basis, Phi_q)
+            ## Probably should put some check here that it really worked.
+            if check is 0:
+                raise ValueError("Phi.hecke(q) is not in the span of basis.")
+            T.append(row)
+        return Matrix(T).transpose()
+
+@cached_function
+def _prec_for_solve_diff_eqn(M, p):
     r"""
-        A helper function for determining the (relative) precision of the input
-        to solve_diff_eqn required in order obtain an answer with (relative)
-        precision ``M``. The parameter ``p`` is the prime and ``k`` is the weight.
+    A helper function for determining the (absolute) precision of the input
+    to solve_diff_eqn required in order obtain an answer with (absolute)
+    precision ``M``. The parameter ``p`` is the prime.
+    
+    Given input (absolute) precision `M_\text{in}`, the output of
+    solve_diff_eqn has (absolute) precision
+    
+    .. MATH::
         
-        Given input precision `M_\text{in}`, the output has precision
-        
-        .. MATH::
-            
-            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3 - v_p(k),
-        
-        where the latter term only appears if ``k`` is not 0.
-        
-        ::EXAMPLES:
-        
-            sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
-            sage: [_prec_for_solve_diff_eqn(M, p, k) for p in [2,3,11] for M in [1,3,10,20] for k in [0, 2, 6]]
-            [7, 8, 8, 10, 11, 11, 18, 19, 19, 28, 29, 29, 6, 6, 7, 8, 8, 9, 16, 16, 17, 26, 26, 27, 5, 5, 5, 7, 7, 7, 15, 15, 15, 25, 25, 25]
+        M = M_\text{in} - \lfloor\log_p(M_\text{in})\rfloor - 1.
+    
+    ::EXAMPLES:
+    
+        sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
+        sage: [_prec_for_solve_diff_eqn(M, p) for p in [3,7,11,29] for M in [1,3,10,20]]
+        [2, 5, 13, 23, 2, 4, 12, 22, 2, 4, 12, 22, 2, 4, 11, 21]
     """
-    # A good guess to begin:
-    val_k = ZZ(k).valuation(p) if k != 0 else 0
     if M < 1:
         raise ValueError("Desired precision M(=%s) must be at least 1."%(M))
-    Min = ZZ(3 + M + ceil(ZZ(M).log(p)) + val_k)
+    # A good guess to begin:
+    M_in = ZZ(1 + M + ZZ(M).exact_log(p))
     # It looks like usually there are no iterations
-    # For low M, there can be 1 or 2
-    while M > Min - ceil(Min.log(p)) - 3 - val_k:
-        Min += 1
+    while M > M_in - M_in.exact_log(p) - 1:
+        M_in += 1
         #print("An iteration in _prec_solve_diff_eqn")
-    return Min
+    return M_in
 
+#@cached_method
+#def _prec_for_solve_diff_eqn_old(M, p, k):
+#    r"""
+#        A helper function for determining the (relative) precision of the input
+#        to solve_diff_eqn required in order obtain an answer with (relative)
+#        precision ``M``. The parameter ``p`` is the prime and ``k`` is the weight.
+#        
+#        Given input precision `M_\text{in}`, the output has precision
+#        
+#        .. MATH::
+#            
+#            M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3 - v_p(k),
+#        
+#        where the latter term only appears if ``k`` is not 0.
+#        
+#        ::EXAMPLES:
+#        
+#            sage: from sage.modular.pollack_stevens.modsym_OMS_space import _prec_for_solve_diff_eqn
+#            sage: [_prec_for_solve_diff_eqn(M, p, k) for p in [2,3,11] for M in [1,3,10,20] for k in [0, 2, 6]]
+#            [7, 8, 8, 10, 11, 11, 18, 19, 19, 28, 29, 29, 6, 6, 7, 8, 8, 9, 16, 16, 17, 26, 26, 27, 5, 5, 5, 7, 7, 7, 15, 15, 15, 25, 25, 25]
+#    """
+#    # A good guess to begin:
+#    val_k = ZZ(k).valuation(p) if k != 0 else 0
+#    if M < 1:
+#        raise ValueError("Desired precision M(=%s) must be at least 1."%(M))
+#    Min = ZZ(3 + M + ceil(ZZ(M).log(p)) + val_k)
+#    # It looks like usually there are no iterations
+#    # For low M, there can be 1 or 2
+#    while M > Min - ceil(Min.log(p)) - 3 - val_k:
+#        Min += 1
+#        #print("An iteration in _prec_solve_diff_eqn")
+#    return Min
+
+#def TESTER():
+#    from sage.structure.sage_object import loads, dumps
+#    D = OverconvergentDistributions(4, 3, 10)
+#    MS = OverconvergentModularSymbols(14, coefficients=D)
+#    return loads(dumps(MS)) is MS

@@ -25,6 +25,10 @@ class ModularSymbolElement_generic(ModuleElement):
         else:
             self._map = ManinMap(parent._coefficients, parent._source, map_data)
     
+    def __reduce__(self):
+        from sage.modular.pollack_stevens.modsym_element import create__ModSym_element
+        return (create__ModSym_element, (self._map, self.parent()))
+    
     def _repr_(self):
         return "Modular symbol of level %s with values in %s"%(self.parent().level(), self.parent().coefficient_module())
     
@@ -428,14 +432,14 @@ class ModularSymbolElement_generic(ModuleElement):
         for g in MR.reps_with_two_torsion():
             gamg = MR.two_torsion_matrix(g)
             if not (f[g]*gamg + f[g]).is_zero():
-                print f[g]*gamg + f[g]
+                verbose("f[g]*gamg + f[g] equals: %s"%(f[g]*gamg + f[g]))
                 raise ValueError("Two torsion relation failed with",g)
 
         ## Test three torsion relations
         for g in MR.reps_with_three_torsion():
             gamg = MR.three_torsion_matrix(g)
             if not (f[g]*(gamg**2) + f[g]*gamg + f[g]).is_zero():
-                print f[g]*(gamg**2) + f[g]*gamg + f[g]
+                verbose("f[g]*(gamg**2) + f[g]*gamg + f[g] equals: %s"%(f[g]*(gamg**2) + f[g]*gamg + f[g]))
                 raise ValueError("Three torsion relation failed with",g)
 
         ## Test that the symbol adds to 0 around the boundary of the fundamental domain
@@ -453,9 +457,16 @@ class ModularSymbolElement_generic(ModuleElement):
         if f[id]*MR.gammas[id] - f[id] != -t:
             print -t
             print f[id]*MR.gammas[id] - f[id]
+            verbose("Sum around loop is: %s"%(f[id]*MR.gammas[id] - f[id]+t))
             raise ValueError("Does not add up correctly around loop")
 
         print "This modular symbol satisfies the manin relations"
     
-    #def __call__(self):
-    #    pass
+    def __call__(self, a):
+        return self._map(a)
+
+def create__ModSym_element(map_data, parent):
+    """
+    Used for unpickling.
+    """
+    return parent.Element(map_data, parent, construct=True)

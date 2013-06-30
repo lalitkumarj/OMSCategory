@@ -1,5 +1,6 @@
 import sage.rings.ring as ring
 
+from sage.misc.prandom import randint
 from sage.structure.factory import UniqueFactory
 from sage.rings.integer_ring import ZZ
 from sage.misc.cachefunc import cached_method
@@ -11,26 +12,18 @@ from sage.modular.pollack_stevens.coeffmod_element import WeightKAction_OMS
 from sage.modular.pollack_stevens.coeffmod_OMS_element import CoeffMod_OMS_element
 
 class CoeffMod_OMS_factory(UniqueFactory):
+    """
+    EXAMPLES::
+    
+        sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
+        sage: D = OverconvergentDistributions(20, 3, 10); D    # indirect doctest
+        Space of 3-adic distributions with k=20 action and precision cap 10
+        sage: TestSuite(OverconvergentDistributions).run()
+    """
     def create_key(self, k, p=None, prec_cap=None, base=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None):
-        """
-        EXAMPLES::
-        
-            sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
-            sage: OverconvergentDistributions(20, 3, 10)              # indirect doctest
-            Space of 3-adic distributions with k=20 action and precision cap 10
-        """
-            #sage: TestSuite(OverconvergentDistributions).run()
         k = ZZ(k)
-#        if p is None:
-#            try:
-#                p = base.prime()
-#            except AttributeError:
-#                raise ValueError("You must specify a prime")
-#        else:
-#            p = ZZ(p)
-        
         if base is None:
             if p is None:
                 raise ValueError("Must specify a prime or a base ring.")
@@ -40,7 +33,12 @@ class CoeffMod_OMS_factory(UniqueFactory):
                 base = ZpCA(p, prec_cap)
         if prec_cap is None:
             prec_cap = base.precision_cap()
-        p = base.prime()
+        elif prec_cap > base.precision_cap():
+            raise ValueError("Insufficient precision in base ring (%s < %s)."%(base.precision_cap(), prec_cap))
+        if p is None:
+            p = base.prime()
+        elif p != base.prime():
+            raise ValueError("Prime p(=%s) must equal the prime of the base ring(=%s)"%(p, base.prime()))
         if adjuster is None:
             adjuster = _default_adjuster()
         if dettwist is not None:
@@ -54,7 +52,7 @@ class CoeffMod_OMS_factory(UniqueFactory):
         return CoeffMod_OMS_space(k, p=p, prec_cap=prec_cap, base=base, character=character, \
                  adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
-OverconvergentDistributions = CoeffMod_OMS_factory('CoeffMod_OMS_Families_space')
+OverconvergentDistributions = CoeffMod_OMS_factory('OverconvergentDistributions')
 
 class CoeffMod_OMS_space(CoefficientModule_generic):
     r"""
@@ -62,8 +60,11 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
     
         sage: from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
         sage: D = OverconvergentDistributions(0, 5, 10)
+    
+    TEST::
+    
+        sage: TestSuite(D).run()
     """
-        #sage: TestSuite(D).run()
     
     def __init__(self, k, p=None, prec_cap=None, base=None, \
                  character=None, adjuster=None, act_on_left=False, \
@@ -76,6 +77,9 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
                  element_class=CoeffMod_OMS_element, padic=True)
+    
+    #def __reduce__(self):
+    #    return OverconvergentDistributions.reduce_data(self)
     
     def _repr_(self):
         """
@@ -143,10 +147,13 @@ class CoeffMod_OMS_space(CoefficientModule_generic):
             raise ValueError("p_prec must be less than or equal to the p-adic precision cap")
         return self.base_ring()**prec
     
-    def random_element(self, prec=None):
+    def random_element(self, prec=None, total_measure_zero=False):
         #RH: copied from RP's change
         if prec == None:
             prec = self._prec_cap
+        if prec == 0:
+            V = self.approx_module(0)
+            return CoeffMod_OMS_element(V([]), self, ordp=randint(1, self._prec_cap), check=False)
         R = self.base_ring().integer_ring()
         return self((R**prec).random_element())
     

@@ -1,0 +1,69 @@
+# HG changeset patch
+# User Robert Harron <rharron@math.wisc.edu>
+# Date 1364876762 18000
+# Node ID 58067b5a7d2fdf01caf403ad41db7e240dac2be1
+# Parent  69c545dbe978e86abd8cdab06e2b218dfaa5ede3
+Trac 1191: solve_right for matrices over Zmod(n)
+
+diff --git a/sage/matrix/matrix2.pyx b/sage/matrix/matrix2.pyx
+--- a/sage/matrix/matrix2.pyx
++++ b/sage/matrix/matrix2.pyx
+@@ -124,6 +124,12 @@
+             True
+             sage: X
+             (-1, 2, 0, 0)
++            sage: A = Matrix(Zmod(128), 2, 3, [5, 29, 33, 64, 0, 7])
++            sage: B = vector(Zmod(128), [31,39,56])
++            sage: X = A.solve_left(B); X
++            (19, 83)
++            sage: X * A == B
++            True
+         
+         """
+         if is_Vector(B):
+@@ -256,6 +262,24 @@
+             sage: A * X == v
+             True
+         
++        Solving some systems over `\ZZ/n\ZZ`::
++        
++            sage: A = Matrix(Zmod(6), 3, 2, [1,2,3,4,5,6])
++            sage: B = vector(Zmod(6), [1,1,1])
++            sage: A.solve_right(B)
++            (5, 1)
++            sage: B = vector(Zmod(6), [5,1,1])
++            sage: A.solve_right(B)
++            Traceback (most recent call last):
++            ...
++            ValueError: matrix equation has no solutions
++            sage: A = Matrix(Zmod(128), 2, 3, [23,11,22,4,1,0])
++            sage: B = Matrix(Zmod(128), 2, 1, [1,0])
++            sage: A.solve_right(B)
++            [  1]
++            [124]
++            [  1]
++        
+         Solving a system over the p-adics::
+         
+             sage: k = Qp(5,4)
+@@ -298,7 +322,19 @@
+         
+         K = self.base_ring()
+         if not K.is_integral_domain():
+-            raise TypeError, "base ring must be an integral domain"
++            from sage.rings.finite_rings.integer_mod_ring import is_IntegerModRing
++            if is_IntegerModRing(K):
++                from sage.libs.pari.gen import pari
++                A = pari(self.lift())
++                b = pari([c.lift() for c in B]).Col()
++                ret = A.matsolvemod(pari(K.cardinality()), b)
++                if ret.type() == 't_INT':
++                    raise ValueError("matrix equation has no solutions")
++                ret = ret.Vec().sage()
++                if is_Vector(B):
++                    return (K ** self.ncols())(ret)
++                return self.matrix_space(self.ncols(), 1)(ret)
++            raise TypeError, "base ring must be an integral domain or a ring of integers mod n"
+         if not K.is_field():
+             K = K.fraction_field()
+             self = self.change_ring(K)

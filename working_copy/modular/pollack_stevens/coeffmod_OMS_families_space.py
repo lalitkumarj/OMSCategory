@@ -78,6 +78,16 @@ def _prec_cap_parser(prec_cap):
 #    return
 
 class CoeffMod_OMS_Families_factory(UniqueFactory):
+    """
+    EXAMPLES::
+    
+        sage: D = FamiliesOfOverconvergentDistributions(0, prec_cap=[5,3], base_coeffs=ZpCA(7)); D    # indirect doctest
+        Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 7-adic Ring with capped absolute precision 20
+        sage: D = FamiliesOfOverconvergentDistributions(2, prec_cap = [8 ,4], base_coeffs=ZpCA(11, 4))
+        Traceback (most recent call last):
+        ...
+        ValueError: Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.
+    """
     def create_key(self, k, p=None, prec_cap=None, base=None, base_coeffs=None, \
                      character=None, adjuster=None, act_on_left=False, \
                      dettwist=None, variable_name = 'w'):
@@ -95,7 +105,16 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
                 raise ValueError("Must specify a precision cap or a base ring.")
             else:
                 prec_cap = _prec_cap_parser(prec_cap)
+                if base_coeffs.precision_cap() < prec_cap[0]:
+                    raise ValueError("Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.")
             base = PowerSeriesRing(base_coeffs, name=variable_name, default_prec=prec_cap[1])
+        elif prec_cap is None:
+            prec_cap = [ZZ(base.base_ring().precision_cap()), ZZ(base.default_prec())]
+        else:
+            if base.base_ring().precision_cap() < prec_cap[0]:
+                raise ValueError("Precision cap on coefficients of base ring must be at least the p-adic precision cap of this space.")
+            if base.default_prec() < prec_cap[1]:
+                raise ValueError("Default precision on the variable of base ring must be at least the w-adic precision cap of this space.")
         base_coeffs = None
         p = base.base_ring().prime()
         k_shift = 0
@@ -120,14 +139,14 @@ class CoeffMod_OMS_Families_factory(UniqueFactory):
             dettwist = ZZ(dettwist)
             if dettwist == 0: 
                 dettwist = None
-        return (k, p, base, character, adjuster, act_on_left, dettwist)
+        return (k, p, tuple(prec_cap), base, character, adjuster, act_on_left, dettwist)
     
     def create_object(self, version, key):
-        k, p, base, character, adjuster, act_on_left, dettwist = key
-        return CoeffMod_OMS_Families_space(k, p=p, base=base, character=character, \
+        k, p, prec_cap, base, character, adjuster, act_on_left, dettwist = key
+        return CoeffMod_OMS_Families_space(k, p=p, prec_cap=prec_cap, base=base, character=character, \
                  adjuster=adjuster, act_on_left=act_on_left, dettwist=dettwist)
 
-FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('CoeffMod_OMS_Families_space')
+FamiliesOfOverconvergentDistributions = CoeffMod_OMS_Families_factory('FamiliesOfOverconvergentDistributions')
 
 class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     r"""
@@ -139,7 +158,11 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         sage: D.prime()
         3
         sage: D.precision_cap()
-        [10, 5]
+        (10, 5)
+    
+    TEST::
+    
+        sage: TestSuite(D).run()
     """
     
     def __init__(self, k, p=None, prec_cap=[20, 10], base=None, base_coeffs=None, \
@@ -156,13 +179,17 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         #elif not isinstance(base, ring.Ring):
         #    raise TypeError("base must be a ring")
         self._p = base.base_ring().prime()
-        self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
+        #self._prec_cap = [base.base_ring().precision_cap(), base.default_prec()]
+        self._prec_cap = tuple(prec_cap)
         k = k % (self._p - 1)
         #self._cp = (self._p-2) / (self._p-1)
         CoefficientModule_generic.__init__(self, k, base=base, \
                  character=character, adjuster=adjuster, act_on_left=act_on_left, \
                  dettwist=dettwist, action_class=action_class, \
                  element_class=CoeffMod_OMS_Families_element, padic=True)
+    
+    #def __reduce__(self):
+    #    return FamiliesOfOverconvergentDistributions.reduce_data(self)
     
     def _coerce_map_from_(self, other):
         if isinstance(other, CoeffMod_OMS_Families_element) \
@@ -300,7 +327,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
         V = self.approx_module(prec[0], prec[1])
         R = self.base_ring().base_ring()
         if R.is_field():
-            V = V.change_ring()(self.base_ring().change_ring(R.integer_ring()))
+            V = V.change_ring((self.base_ring().change_ring(R.integer_ring())))
         return self(V.random_element()) #Make this better
     
     def clear_cache(self):

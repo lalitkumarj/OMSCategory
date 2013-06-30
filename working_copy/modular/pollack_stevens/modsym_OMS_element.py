@@ -2,7 +2,15 @@ from sage.misc.cachefunc import cached_method
 from sage.misc.misc import verbose
 from sage.modular.pollack_stevens.modsym_element import ModularSymbolElement_generic
 
-class ModSym_OMS_element(ModularSymbolElement_generic):                        
+class ModSym_OMS_element(ModularSymbolElement_generic):
+    """
+    TESTS::
+    
+        sage: D = OverconvergentDistributions(2, 5, 5)
+        sage: MS = OverconvergentModularSymbols(14, coefficients=D)
+        sage: Phi = MS.random_element()
+        sage: TestSuite(Phi).run()
+    """
     def valuation(self, p=None):
         if p is None:
             p = self.parent().prime()
@@ -16,6 +24,9 @@ class ModSym_OMS_element(ModularSymbolElement_generic):
         elif p != self.parent().prime():
             raise ValueError("Specified prime(=%s) must match prime of base ring(=%s)"%(p, self.parent().prime()))
         return min([val.diagonal_valuation() for val in self._map])
+    
+    def precision_absolute(self):
+        return min([mu.precision_absolute() for mu in self.values()])
     
     def precision_relative(self):
         return min([mu.precision_relative() for mu in self.values()])

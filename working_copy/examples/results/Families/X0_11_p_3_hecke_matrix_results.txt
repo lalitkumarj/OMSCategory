@@ -1,0 +1,46 @@
+This script computes the Up matrix for tame level 11, p = 3 with 6 moments and w-adic precision 6.
+It also prints out the Hecke polynomial at p = 3, as well as its discriminant.
+
+Finding basis of ordinary subspace.
+basis has size 0 out of predicted 2
+-----------------------
+Forming a random symbol
+projecting
+0 out of 7
+1 out of 7
+2 out of 7
+3 out of 7
+4 out of 7
+5 out of 7
+6 out of 7
+7 out of 7
+Forming U_p-span
+Basis found.
+Time elapsed: 102.349386215
+
+Finding Hecke matrix at p.
+At 1-th basis element
+Working at coefficient 1
+Working at coefficient 2
+Working at coefficient 3
+Working at coefficient 4
+Working at coefficient 5
+At 2-th basis element
+Working at coefficient 1
+Working at coefficient 2
+Working at coefficient 3
+Working at coefficient 4
+Working at coefficient 5
+[                                                                                                                                                  O(w^6)         2 + 3^2 + 2*3^3 + 2*3^4 + O(3^5) + O(3^5)*w + (3^2 + 3^3 + O(3^5))*w^2 + (2*3^3 + 3^4 + O(3^5))*w^3 + (2*3^4 + O(3^5))*w^4 + O(3^5)*w^5 + O(w^6)]
+[                                                                                                                                     1 + O(3^5) + O(w^6) 1 + 3^2 + 2*3^3 + 2*3^4 + O(3^5) + (3 + 2*3^3 + 2*3^4 + O(3^5))*w + O(3^5)*w^2 + (2*3^3 + 2*3^4 + O(3^5))*w^3 + (3^4 + O(3^5))*w^4 + O(3^5)*w^5 + O(w^6)]
+Time elapsed: 10.0222699642
+
+Finding Hecke polynomial at p and its discriminant.
+
+Char poly:
+(1 + O(3^6))*x^2 + (2 + 2*3 + 3^2 + O(3^5) + (2*3 + 2*3^2 + O(3^5))*w + O(3^5)*w^2 + (3^3 + O(3^5))*w^3 + (2*3^4 + O(3^5))*w^4 + O(3^5)*w^5 + O(w^6))*x + 1 + 2*3 + 3^2 + O(3^5) + O(3^5)*w + (2*3^2 + 3^3 + 2*3^4 + O(3^5))*w^2 + (3^3 + 3^4 + O(3^5))*w^3 + (3^4 + O(3^5))*w^4 + O(3^5)*w^5 + O(w^6)
+
+Discriminant:
+3^2 + 2*3^3 + 2*3^4 + O(3^5) + (2 + 3^3 + O(3^4))*T + (2 + 2*3 + 2*3^2 + O(3^3))*T^2 + (2 + O(3))*T^4 + O(3^0)*T^5 + O(T^6)
+
+Time elapsed: 0.0312490463257

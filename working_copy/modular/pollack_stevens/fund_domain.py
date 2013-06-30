@@ -34,11 +34,14 @@ from sage.rings.integer import Integer
 from sage.rings.integer_ring import ZZ
 from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.rational_field import QQ
+from sage.rings.padics.factory import Qp
 from sage.structure.sage_object import SageObject
 from sage.modules.free_module_element import zero_vector
 from copy import deepcopy
 from sage.misc.cachefunc import cached_method
 from sage.rings.arith import convergents,xgcd,gcd
+from sage.structure.unique_representation import UniqueRepresentation
+from sage.rings.infinity import infinity
 
 from sage.modular.pollack_stevens.sigma0 import Sigma0, Sigma0Element
 
@@ -114,13 +117,6 @@ class PSModularSymbolsDomain(SageObject):
 
             See :class:`PSModularSymbolsDomain`.
         """
-#        EXAMPLES::
-#
-#            sage: from sage.modular.pollack_stevens.fund_domain import PSModularSymbolsDomain
-#            sage: isinstance(ManinRelations(11), PSModularSymbolsDomain) # indirect doctest
-#            True
-#
-#        """
         self._N = ZZ(N)
         self._reps = reps
 
@@ -536,7 +532,7 @@ class PSModularSymbolsDomain(SageObject):
         """
         return self._P
 
-class ManinRelations(PSModularSymbolsDomain):
+class ManinRelations(UniqueRepresentation, PSModularSymbolsDomain):
     r"""
     This class gives a description of `Div^0(P^1(\QQ))` as a
     `\ZZ[\Gamma_0(N)]`-module.
@@ -549,7 +545,7 @@ class ManinRelations(PSModularSymbolsDomain):
 
         sage: ManinRelations(1)
         Manin Relations of level 1
-        sage: ManinRelations(11)
+        sage: MR = ManinRelations(11); MR
         Manin Relations of level 11
 
     Large values of ``N`` are not supported::
@@ -561,8 +557,10 @@ class ManinRelations(PSModularSymbolsDomain):
 
     TESTS:
 
-    ``N`` has to be a positive integer::
+        sage: TestSuite(MR).run()
 
+    ``N`` has to be a positive integer::
+    
         sage: ManinRelations(0)
         Traceback (most recent call last):
         ...
@@ -1508,6 +1506,150 @@ class ManinRelations(PSModularSymbolsDomain):
                    ans[B].append(tmp)
 
         return ans
+    
+    def _nice_gamma(self, p, k):
+        r"""
+        TODO: Only works for even weights right now (and some odd weights).
+        
+        TESTS::
+        
+            sage: for p in prime_range(3,12):
+            ...         MR = ManinRelations(p)
+            ...         for k in range(0, p, 2):
+            ...                 print MR._nice_gamma(p, k % (p-1))
+            ([ 0 -1]
+            [ 1  1], [-2 -1]
+            [ 3  1], 1)
+            ([ 0 -1]
+            [ 1  1], [-2 -1]
+            [ 3  1], 1)
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2], 1)
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2], 0)
+            ([ 0 -1]
+            [ 1  2], [ 2  1]
+            [-5 -2], 1)
+            ([ 0 -1]
+            [ 1  2], [-3 -1]
+            [ 7  2], 1)
+            ([-1 -1]
+            [ 2  1], [-5 -3]
+            [ 7  4], 0)
+            ([-1 -1]
+            [ 2  1], [-5 -3]
+            [ 7  4], 0)
+            ([ 0 -1]
+            [ 1  2], [-3 -1]
+            [ 7  2], 1)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 1)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 0)
+            ([ 0 -1]
+            [ 1  3], [-3 -2]
+            [11  7], 1)
+        """
+        from sage.misc.misc import verbose
+        key = (p, k)
+        try:
+            return self._nice_gamma_dict[key]
+        except AttributeError:
+            self._nice_gamma_dict = {}
+        except KeyError:
+            pass
+        QQp = Qp(p, 20)    #Is this enough precision?
+        gens = self.gens()
+        found = False
+        if k == 0:  # Find gamma with minimal p-adic valuation of its lower-left
+                    # entry. Try to avoid three-torsion elements at all costs.
+            gam_shift = infinity
+            three_tor_found = False
+            three_tor_gam_shift = infinity
+            for g in gens[1:]:
+                threetor = False
+                try:
+                    gam = self.gammas[g]
+                except KeyError:
+                    try:
+                        gam = self.two_torsion_matrix(g)
+                    except KeyError:
+                        gam = self.three_torsion_matrix(g)
+                        threetor = True
+                c = gam.matrix()[1,0]
+                if c == 0:
+                    continue
+                if threetor:
+                    three_tor_found = True
+                    cc = (gam ** 2).matrix()[1,0]
+                    ## RP:  This doesn't look right.  I think this was copied from old wrong code of mine (see random for OMS)
+                    val = max(QQp(c).valuation(), QQp(cc).valuation())
+                    if val < three_tor_gam_shift:
+                        three_tor_gam_shift = val
+                        three_tor_g0 = g
+                        three_tor_gam0 = gam
+                else:
+                    found = True
+                    val = QQp(c).valuation()
+                    if val < gam_shift:
+                        gam_shift = val
+                        g0 = g
+                        gam0 = gam
+            if not found:
+                if not three_tor_found:
+                    raise NotImplementedError
+                verbose("Must use a three-torsion generator.")
+                self._nice_gamma_dict[key] = (three_tor_g0, three_tor_gam0, three_tor_gam_shift)
+            else:    
+                self._nice_gamma_dict[key] = (g0, gam0, gam_shift)
+        else:   # Find gamma such that omega(a)^k != 1
+            Id = gens[0]
+            gam_keys = self.gammas.keys()
+            gam_keys.remove(Id)
+            # Try to find a non-torsion generator first.
+            for g0 in gam_keys:
+                gam0 = self.gammas[g0]
+                a = gam0.matrix()[0, 0]
+                if QQp.teichmuller(a) ** k != 1:
+                    self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
+                    found = True
+                    break
+            if not found:   #Then try torsion generators and void three-torsion at all costs
+                three_tor_found = False
+                for g0 in gens[1:]:
+                    three_tor = False
+                    if not g0 in gam_keys:
+                        if g0 in self.reps_with_two_torsion():
+                            gam0 = self.two_torsion_matrix(g0)
+                        else:
+                            three_tor = True
+                            gam0 = self.three_torsion_matrix(g0)
+                        a = gam0.matrix()[0,0]
+                        if QQp.teichmuller(a) ** k != 1:
+                            self._nice_gamma_dict[key] = (g0, gam0, ZZ.zero())
+                            if three_tor:
+                                three_tor_found = True
+                            else:
+                                found = True
+                                break
+                if not found:
+                    if not three_tor_found:
+                        raise NotImplementedError
+                    verbose("Must use a three-torsion generator.")
+        return self._nice_gamma_dict[key]
 
 def basic_hecke_matrix(a, l):
     r"""

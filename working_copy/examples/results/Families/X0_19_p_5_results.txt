@@ -1,0 +1,67 @@
+This script computes the Hida family of X_0(19) at p = 5 with 4 moments and w-adic precision 4.
+It verifies the computation by specializing to weight (2,) and checking Hecke eigenvalues for primes up to 11.
+
+Generating random modular symbol.
+Time elapsed: 25.8468468189
+
+Normalizing the symbol.
+Modular symbol of level 95 with values in Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 5-adic Ring with capped absolute precision 4
+Time elapsed: 0.02827501297
+Projecting to ordinary subspace.
+    Iteration 1 of Up
+    Iteration 2 of Up
+    Iteration 3 of Up
+    Iteration 4 of Up
+    Iteration 5 of Up
+    Iteration 6 of Up
+Time elapsed: 41.4722518921
+Isolating connected component of X_0(19).
+Time elapsed: 64.8990359306
+
+Normalizing the symbol again.
+Modular symbol of level 95 with values in Families of overconvergent distributions on the disc 0 over Power Series Ring in w over 5-adic Ring with capped absolute precision 4
+Time elapsed: 0.0133519172668
+
+Compute the Hecke eigenvalues:
+
+a_2 = O(5^3) + (3*5 + 3*5^2 + O(5^3))*w + (4*5^2 + O(5^3))*w^2 + O(5^3)*w^3 + O(w^4)
+
+a_3 = 3 + 4*5 + 4*5^2 + O(5^3) + (2*5 + 3*5^2 + O(5^3))*w + (4*5^2 + O(5^3))*w^2 + O(5^3)*w^3 + O(w^4)
+
+a_5 = 3 + 3*5 + 3*5^2 + O(5^3) + (5 + O(5^3))*w + (3*5^2 + O(5^3))*w^2 + O(5^3)*w^3 + O(w^4)
+
+a_7 = 4 + 4*5 + 4*5^2 + O(5^3) + (3*5 + 3*5^2 + O(5^3))*w + (5^2 + O(5^3))*w^2 + O(5^3)*w^3 + O(w^4)
+
+a_11 = 3 + O(5^3) + (2*5 + 5^2 + O(5^3))*w + (3*5^2 + O(5^3))*w^2 + O(5^3)*w^3 + O(w^4)
+Time elapsed: 62.4160950184
+
+Compare to known weights (2,)
+
+Weight 2:
+
+a_2:
+Known: O(5^4)
+Us:    O(5^3)
+Valuation of difference: 3
+
+a_3:
+Known: 3 + 4*5 + 4*5^2 + 4*5^3 + O(5^4)
+Us:    3 + 4*5 + 4*5^2 + O(5^3)
+Valuation of difference: 3
+
+a_5:
+Known: 3 + O(5^4)
+Us:    3 + O(5^3)
+Valuation of difference: 3
+
+a_7:
+Known: 4 + 4*5 + 4*5^2 + 4*5^3 + O(5^4)
+Us:    4 + 4*5 + 4*5^2 + O(5^3)
+Valuation of difference: 3
+
+a_11:
+Known: 3 + O(5^4)
+Us:    3 + O(5^3)
+Valuation of difference: 3
+
+Total time elapsed: 194.712054014
