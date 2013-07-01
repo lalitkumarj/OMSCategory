@@ -1,4 +1,5 @@
 import sys
+from sage.modular.pollack_stevens.modsym_OMS_families_space import Iwasawa_invariants
 
 start_time = walltime()
 
@@ -7,7 +8,7 @@ p = 3
 N = 19
 k = 2
 r = (k-2) % (p-1)
-M = 6  #Number of moments
+M = 8  #Number of moments
 var_prec = M    #Precision on the variable
 max_iter = 50   #Maximum number of iterations of Up in projection to ordinary part
 
@@ -16,6 +17,12 @@ max_iter = 50   #Maximum number of iterations of Up in projection to ordinary pa
 
 DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
 MM = FamiliesOfOMS(N, r, coefficients=DD, sign=-1)
+
+print "This example looks at p=3 and N=19"
+print "In weight 2, there are 4 ordinary forms --- 3 are newforms and 1 is an oldform.  Two of the newforms are congruent and there are no other congruences."
+print "The Hida algebra should then be Lambda \oplus Lambda \oplus T"
+print "\nIn what follows, we compute the characteristic polynomial of U_3 projected to the two-dimensional local piece of the Hecke algebra (i.e. T)"
+print "We are using precision: %s"%([M,var_prec])
 
 B = []
 
@@ -37,7 +44,7 @@ while len(B) < 2:
     sys.stdout.flush()
     before = walltime()
     for i in range(M+4):
-        print "    Iteration %s of Up"%(i+1)
+        #print "    Iteration %s of Up"%(i+1)
         sys.stdout.flush()
         Phis = Phis.hecke(p)
     print "Time elapsed:", walltime() - before
@@ -69,9 +76,33 @@ while len(B) < 2:
     else:
         print "FAILED. Symbol combined with previous basis does not generate free module"
 
-
-T3_poly = MM.hecke_polynomial_in_T_variable(3,basis=B)
+print "\nComputing U_3"
+sys.stdout.flush()
+before = walltime()
+T3_poly = MM.hecke_polynomial_in_T_variable(3,basis=B,verbose=False)
 b = T3_poly.padded_list()[1]
 c = T3_poly.padded_list()[0]
+print "Time elapsed:", walltime() - before
 
+print "\nThe characteristic polynomial of U_3 is: %s"%(T3_poly)
 print "The discriminant of char poly of U_3 is: %s"%(b^2-4*c)
+print "The Iwasawa invariants (mu,lambda) of the discriminant are",(Iwasawa_invariants(b^2-4*c))
+
+
+for q in primes(10):
+    if q != p:
+        print "\nComputing T_%s"%(q)
+        sys.stdout.flush()
+        before = walltime()
+        Tq_poly = MM.hecke_polynomial_in_T_variable(q,basis=B,verbose=False)
+        b = Tq_poly.padded_list()[1]
+        c = Tq_poly.padded_list()[0]
+        print "Time elapsed:", walltime() - before
+
+        print "The characteristic polynomial of T_%s is: %s"%(q,Tq_poly)
+        print "The discriminant of char poly of T_%s is: %s"%(q,b^2-4*c)
+        print "The Iwasawa invariants (mu,lambda) of the discriminant are",Iwasawa_invariants(b^2-4*c)
+        print "Time elapsed:", walltime() - before
+
+
+

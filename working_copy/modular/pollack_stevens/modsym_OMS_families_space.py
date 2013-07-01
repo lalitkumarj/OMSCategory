@@ -533,6 +533,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 row, extra = self.linear_relation(basis, h, verbose=verbose, prec=[M, var_prec])
                 if extra is None:
                     M -= 1
+                    print "PRECISION LOSS!!!!"
                     if verbose:
                         print "Reducing p-adic precision to %s."%(M)
             if extra is None:
