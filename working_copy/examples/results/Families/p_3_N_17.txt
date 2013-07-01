@@ -1,0 +1,56 @@
+This example looks at p=3 and N=17
+In weight 2, there are 3 ordinary forms (all newforms).  One is defined over Q_3 and the other two are conjugate over Q_9.
+The Hida algebra should then be Lambda \oplus (Lambda \otimes Z_9).
+
+In what follows, we compute the characteristic polynomial of U_3 projected to the two-dimensional local piece of the Hecke algebra.
+We are using precision: [8, 8]
+
+Generating a random modular symbol.
+Time elapsed: 29.219835043
+Projecting to ordinary subspace.
+Time elapsed: 210.037388086
+Isolating connected component of rank 2.
+  Killing off newform defined over Z_3 (applying U_3 - 1)
+Time elapsed: 209.128823042
+Adding this new symbol to our basis
+
+Generating a random modular symbol.
+Time elapsed: 29.0811209679
+Projecting to ordinary subspace.
+Time elapsed: 231.315109015
+Isolating connected component of rank 2.
+  Killing off newform defined over Z_3 (applying U_3 - 1)
+Time elapsed: 252.322625875
+FAILED. Symbol combined with previous basis does not generate free module
+
+Generating a random modular symbol.
+Time elapsed: 36.112169981
+Projecting to ordinary subspace.
+Time elapsed: 257.694705963
+Isolating connected component of rank 2.
+  Killing off newform defined over Z_3 (applying U_3 - 1)
+Time elapsed: 254.252100945
+Adding this new symbol to our basis
+
+Computing U_3
+Time elapsed: 42.7409720421
+
+The characteristic polynomial of U_3 is: (1 + O(3^8))*x^2 + (2 + O(3^6) + (1 + 3 + 3^3 + 2*3^4 + O(3^5))*T + (1 + 3 + 3^2 + O(3^4))*T^2 + (1 + 3 + O(3^3))*T^3 + (2 + 3 + O(3^2))*T^4 + (1 + O(3))*T^5 + O(T^8))*x + 1 + O(3^6) + (1 + 3 + 3^3 + 2*3^4 + O(3^5))*T + (2 + 2*3 + 3^2 + 2*3^3 + O(3^4))*T^2 + (3 + 3^2 + O(3^3))*T^3 + (3 + O(3^2))*T^4 + (1 + O(3))*T^5 + O(T^8)
+The discriminant of char poly of U_3 is: O(3^6) + O(3^5)*T + O(3^4)*T^2 + (2*3^2 + O(3^3))*T^3 + (2 + O(3^2))*T^4 + O(3)*T^5 + (1 + O(3))*T^6 + O(T^8)
+The Iwasawa invariants (mu,lambda) of the discriminant are (0, 4)
+
+Computing T_2
+Time elapsed: 16.8700170517
+The characteristic polynomial of T_2 is: (1 + O(3^8))*x^2 + (1 + O(3^6) + (1 + 3^2 + 2*3^4 + O(3^5))*T + (1 + 2*3^2 + O(3^4))*T^2 + (3^2 + O(3^3))*T^3 + (3 + O(3^2))*T^4 + (2 + O(3))*T^5 + O(T^8))*x + 2 + 3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + O(3^6) + (3 + 3^2 + 3^3 + 2*3^4 + O(3^5))*T + (2 + 2*3^3 + O(3^4))*T^2 + (3 + O(3^3))*T^3 + (1 + O(3^2))*T^4 + O(T^8)
+The discriminant of char poly of T_2 is: 2 + 2*3 + 3^2 + O(3^6) + (2 + 2*3 + 2*3^2 + O(3^5))*T + (1 + 3 + 2*3^2 + 2*3^3 + O(3^4))*T^2 + (2 + 2*3 + O(3^3))*T^3 + (3 + O(3^2))*T^4 + (1 + O(3))*T^5 + (1 + O(3))*T^6 + (1 + O(3))*T^7 + O(T^8)
+The Iwasawa invariants (mu,lambda) of the discriminant are (0, 0)
+Time elapsed: 16.8721191883
+
+Computing T_5
+Time elapsed: 133.381886005
+The characteristic polynomial of T_5 is: (1 + O(3^8))*x^2 + (2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + O(3^6) + (2*3^2 + 3^3 + O(3^5))*T + (2 + 2*3 + 2*3^2 + 3^3 + O(3^4))*T^2 + (2 + 2*3^2 + O(3^3))*T^3 + (1 + 3 + O(3^2))*T^4 + O(T^8))*x + 1 + 2*3 + 2*3^2 + 2*3^3 + 2*3^4 + 2*3^5 + O(3^6) + (2*3 + 3^2 + 3^4 + O(3^5))*T + (2*3 + 3^2 + 2*3^3 + O(3^4))*T^2 + (3 + 3^2 + O(3^3))*T^3 + (1 + 2*3 + O(3^2))*T^4 + O(T^8)
+The discriminant of char poly of T_5 is: 2 + 2*3 + 3^2 + O(3^6) + (3 + 2*3^2 + 2*3^3 + O(3^5))*T + (2*3^3 + O(3^4))*T^2 + (3 + 3^2 + O(3^3))*T^3 + (3 + O(3^2))*T^4 + (2 + 3 + 2*3^2 + O(3^3))*T^5 + (2 + 3 + O(3^2))*T^6 + (1 + 2*3 + O(3^2))*T^7 + O(T^8)
+The Iwasawa invariants (mu,lambda) of the discriminant are (0, 0)
+Time elapsed: 133.384366989
+
+
