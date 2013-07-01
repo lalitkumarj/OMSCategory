@@ -44,7 +44,7 @@ while len(B) < 2:
     print "Projecting to ordinary subspace."
     sys.stdout.flush()
     before = walltime()
-    for i in range(2*M+2):
+    for i in range(M+4):
         #print "    Iteration %s of Up"%(i+1)
         sys.stdout.flush()
         Phis = Phis.hecke(p)
@@ -53,10 +53,10 @@ while len(B) < 2:
     print "Isolating connected component of rank 2."
     sys.stdout.flush()
 
-    print "  Killing off newform defined over Z_3 (applying U_3 - 1)"
+    print "  Killing off Eisenstein series and newform defined over Z_3 (applying U_3 - 1)"
     sys.stdout.flush()
     before = walltime()
-    for i in range(2*M+2):
+    for i in range(M+4):
         Phis = Phis.hecke(p) - Phis
     print "Time elapsed:", walltime() - before
 
