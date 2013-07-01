@@ -1,0 +1,56 @@
+This example looks at p=5 and N=23
+In weight 2, there are 7 ordinary forms all new: 1 is defined over Z_5, 2 are conjugate over Q(sqrt(5)) (and thus are congruent), 4 are conjugate over a quartic extension K/Q in which 5 is inert.
+Moreover, there are no other congruences.  Thus, the Hida algebra has 4 local pieces: T = T_1 + T_2 + T_4 as ordered above.
+We know that T_1 is Lambda and T_4 is Lambda \otimes O where O is a quartic unramified extension of Z_5.
+
+In what follows, we compute the characteristic polynomial of various Hecke operators projected to T_2.
+We are using precision: [3, 3]
+
+Generating a random modular symbol.
+Time elapsed: 11.1539449692
+Projecting to ordinary subspace.
+Time elapsed: 63.5189621449
+Isolating T_1
+  Killing off rank 1 piece (applying T_2 - 2)
+Time elapsed: 48.516710043
+  Killing off rank 4 piece (applying U_5 - 1)
+Time elapsed: 61.6778800488
+Adding this new symbol to our basis
+
+Generating a random modular symbol.
+Time elapsed: 11.7895259857
+Projecting to ordinary subspace.
+Time elapsed: 63.9586107731
+Isolating T_1
+  Killing off rank 1 piece (applying T_2 - 2)
+Time elapsed: 47.3197500706
+  Killing off rank 4 piece (applying U_5 - 1)
+Time elapsed: 62.8849198818
+Adding this new symbol to our basis
+
+Computing U_5
+Time elapsed: 12.8008491993
+The characteristic polynomial of U_5 is: (1 + O(5^3))*x^2 + (2 + O(5^3) + (1 + O(5^2))*T + O(T^3))*x + 1 + O(5^3) + (1 + O(5^2))*T + (4 + O(5))*T^2 + O(T^3)
+The discriminant of char poly of U_5 is: O(T^3)
+The Iwasawa invariants (mu,lambda) of the discriminant are (+Infinity, 3)
+
+Computing T_2
+Time elapsed: 3.80733084679
+The characteristic polynomial of T_2 is: (1 + O(5^3))*x^2 + (3 + O(5^3) + (1 + 4*5 + O(5^2))*T + (2 + O(5))*T^2 + O(T^3))*x + 1 + O(5^3) + (4*5 + O(5^2))*T + (1 + O(5))*T^2 + O(T^3)
+The discriminant of char poly of T_2 is: 5 + O(5^3) + (1 + 4*5 + O(5^2))*T + (4 + O(5))*T^2 + O(T^3)
+The Iwasawa invariants (mu,lambda) of the discriminant are (0, 1)
+Time elapsed: 3.80889487267
+
+Computing T_3
+Time elapsed: 8.24724602699
+The characteristic polynomial of T_3 is: (1 + O(5^3))*x^2 + (2 + O(5^3) + (4 + 2*5 + O(5^2))*T + O(T^3))*x + 1 + O(5^3) + (4 + 2*5 + O(5^2))*T + (4 + O(5))*T^2 + O(T^3)
+The discriminant of char poly of T_3 is: O(T^3)
+The Iwasawa invariants (mu,lambda) of the discriminant are (+Infinity, 3)
+Time elapsed: 8.24836397171
+
+Computing T_7
+Time elapsed: 22.4288229942
+The characteristic polynomial of T_7 is: (1 + O(5^3))*x^2 + (2 + O(5^3) + (2 + O(5^2))*T + (1 + O(5))*T^2 + O(T^3))*x + 1 + 4*5 + 4*5^2 + O(5^3) + (1 + 2*5 + O(5^2))*T + (4 + O(5))*T^2 + O(T^3)
+The discriminant of char poly of T_7 is: 4*5 + O(5^3) + (4 + 2*5 + O(5^2))*T + (2 + O(5))*T^2 + O(T^3)
+The Iwasawa invariants (mu,lambda) of the discriminant are (0, 1)
+Time elapsed: 22.4303379059

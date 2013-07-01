@@ -8,7 +8,7 @@ p = 5
 N = 23
 k = 2
 r = (k-2) % (p-1)
-M = 3  #Number of moments
+M = 10  #Number of moments
 var_prec = M    #Precision on the variable
 max_iter = 50   #Maximum number of iterations of Up in projection to ordinary part
 
