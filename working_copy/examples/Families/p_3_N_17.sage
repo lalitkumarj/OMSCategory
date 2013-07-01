@@ -16,7 +16,7 @@ max_iter = 50   #Maximum number of iterations of Up in projection to ordinary pa
 #print "It verifies the computation by specializing to weight {0} and checking Hecke eigenvalues for primes up to {1}.".format(weights, max_ell)
 
 DD = FamiliesOfOverconvergentDistributions(0, base_coeffs=ZpCA(p, M), prec_cap=[M,var_prec])
-MM = FamiliesOfOMS(N, r, coefficients=DD, sign=-1)
+MM = FamiliesOfOMS(N, r, coefficients=DD, sign=1)
 
 print "This example looks at p=3 and N=17"
 print "In weight 2, there are 3 ordinary forms (all newforms).  One is defined over Q_3 and the other two are conjugate over Q_9."
@@ -50,6 +50,12 @@ while len(B) < 2:
         Phis = Phis.hecke(p)
     print "Time elapsed:", walltime() - before
 
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
+
     print "Isolating connected component of rank 2."
     sys.stdout.flush()
 
@@ -59,6 +65,12 @@ while len(B) < 2:
     for i in range(M+4):
         Phis = Phis.hecke(p) - Phis
     print "Time elapsed:", walltime() - before
+
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
 
     Phis.normalize()
 

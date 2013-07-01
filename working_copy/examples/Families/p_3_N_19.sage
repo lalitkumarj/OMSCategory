@@ -49,6 +49,14 @@ while len(B) < 2:
         Phis = Phis.hecke(p)
     print "Time elapsed:", walltime() - before
 
+    Phis.normalize()
+
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
+
     print "Isolating connected component of rank 2."
     sys.stdout.flush()
 
@@ -61,12 +69,24 @@ while len(B) < 2:
 
     Phis.normalize()
 
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
+
     print "  Killing off oldform (applying T_2)"
     sys.stdout.flush()
     before = walltime()
     for i in range(M+4):
         Phis = Phis.hecke(2) 
     print "Time elapsed:", walltime() - before
+
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
 
     Phis.normalize()
 

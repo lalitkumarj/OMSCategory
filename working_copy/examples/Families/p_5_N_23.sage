@@ -8,7 +8,7 @@ p = 5
 N = 23
 k = 2
 r = (k-2) % (p-1)
-M = 8  #Number of moments
+M = 10  #Number of moments
 var_prec = M    #Precision on the variable
 max_iter = 50   #Maximum number of iterations of Up in projection to ordinary part
 
@@ -52,12 +52,24 @@ while (len(B2) < 2) or (len(B3) < 3):
         Phis = Phis.hecke(p)
     print "Time elapsed:", walltime() - before
 
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
+
     print "  Killing off rank 4 piece (applying U_5 - 1)"
     sys.stdout.flush()
     before = walltime()
     for i in range(M+3):
         Phis = Phis.hecke(5) - Phis
     print "Time elapsed:", walltime() - before
+
+    print "Positive valuation after projection.  Scaling away"
+    val = Phis.valuation()
+    if val > 0:
+        for key in Phis._map._dict.keys():
+            Phis._map._dict[key].ordp -= val
 
     if len(B2) < 2:
         print "Isolating T_2"
@@ -72,6 +84,12 @@ while (len(B2) < 2) or (len(B3) < 3):
         print "Time elapsed:", walltime() - before
 
         Phis2.normalize()
+
+        print "Positive valuation after projection.  Scaling away"
+        val = Phis2.valuation()
+        if val > 0:
+            for key in Phis2._map._dict.keys():
+                Phis2._map._dict[key].ordp -= val
 
         if MM.is_start_of_basis(B2 + [Phis2]):
             B2 = B2 + [Phis2]
@@ -92,6 +110,12 @@ while (len(B2) < 2) or (len(B3) < 3):
         print "Time elapsed:", walltime() - before
 
         Phis3.normalize()
+
+        print "Positive valuation after projection.  Scaling away"
+        val = Phis3.valuation()
+        if val > 0:
+            for key in Phis3._map._dict.keys():
+                Phis3._map._dict[key].ordp -= val
 
         if MM.is_start_of_basis(B3 + [Phis3]):
             B3 = B3 + [Phis3]
