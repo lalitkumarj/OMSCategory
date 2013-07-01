@@ -143,7 +143,7 @@ print "The Iwasawa invariants (mu,lambda) of the discriminant are",(Iwasawa_inva
 
 for q in primes(10):
     if q != p:
-        print "\nComputing T_%s on rank 2 piece:"%(q)
+        print "\nComputing T_%s on rank 3 piece:"%(q)
         sys.stdout.flush()
         before = walltime()
         Tq_poly = MM.hecke_polynomial_in_T_variable(q,basis=B3,verbose=False)
