@@ -142,37 +142,36 @@ class ModularSymbolSpace_generic(Module):
             self._ord_dim_dict = {}
         except KeyError:
             pass
+        from sage.modular.dirichlet import DirichletGroup
         try:
             chi = self.character()
         except AttributeError:
-            chi = None
-        
-        if chi != None:
-            raise NotImplementedError("Need to include character here.")
+            chi = DirichletGroup(self.level(), GF(p))[0]
         
         from sage.modular.modsym.modsym import ModularSymbols
         from sage.rings.finite_rings.constructor import GF
         r = self.weight() % (p-1)
-        N = self.level()
-        if N % p != 0:
+        if chi.is_trivial():
+            N = chi.modulus()
+            if N % p != 0:
                 N *= p
-        else:
-            e = N.valuation(p)
-            N.divide_knowing_divisible_by(p ** (e-1))
+            else:
+                e = N.valuation(p)
+                N.divide_knowing_divisible_by(p ** (e-1))
+            chi = DirichletGroup(N, GF(p))[0]
+        elif chi.modulus() % p != 0:
+            chi = DirichletGroup(chi.modulus() * p, GF(p))(chi)
+        DG = DirichletGroup(chi.modulus(), GF(p))
         if r == 0:
             from sage.modular.arithgroup.congroup_gamma0 import Gamma0_constructor as Gamma0
-            verbose("in dim: %s, %s, %s"%(self.sign(), N, p))
-            M = ModularSymbols(Gamma0(N), 2, self.sign(), GF(p))
-            if cusp:
-                M = M.cuspidal_subspace()
+            verbose("in dim: %s, %s, %s"%(self.sign(), chi, p))
+            M = ModularSymbols(DG(chi), 2, self.sign(), GF(p))
         else:
-            from sage.modular.dirichlet import DirichletGroup
-            DG = DirichletGroup(N, GF(p))
-            chi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
-            chi = DG(chi)
-            M = ModularSymbols(chi, 2, self.sign(), GF(p))
-            if cusp:
-                M = M.cuspidal_subspace()
+            psi = [GF(p)(u) ** r for u in DG.unit_gens()]    #mod p Teichmuller^r
+            psi = DG(psi)
+            M = ModularSymbols(DG(chi) * psi, 2, self.sign(), GF(p))
+        if cusp:
+            M = M.cuspidal_subspace()
         hecke_poly = M.hecke_polynomial(p)
         verbose("in dim: %s"%(hecke_poly))
         x = hecke_poly.parent().gen()

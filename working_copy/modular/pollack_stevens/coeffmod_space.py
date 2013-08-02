@@ -12,8 +12,8 @@ class CoefficientModule_generic(Module):
         Parent.__init__(self, base, category=MSCoefficientModules(base))
         self._k = k
         self._character = character
-        self._adjuster=adjuster
-        self._dettwist=dettwist
+        self._adjuster = adjuster
+        self._dettwist = dettwist
         self._act = action_class(self, character, adjuster, act_on_left, dettwist, padic=padic)
         self._populate_coercion_lists_(action_list=[self._act])
     

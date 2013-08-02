@@ -10,6 +10,7 @@ from sage.rings.padics.factory import Qp
 from sage.rings.finite_rings.constructor import GF
 from sage.matrix.constructor import Matrix
 from sage.modules.free_module_element import vector
+from sage.modular.dirichlet import DirichletCharacter
 from sage.modular.arithgroup.all import Gamma0
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_space import OverconvergentDistributions
@@ -67,12 +68,19 @@ class ModSym_OMS_factory(UniqueFactory):
             raise ValueError("sign must be -1, 0, 1")
         if isinstance(group, (int, Integer)):
             character = None
+        elif isinstance(group, DirichletCharacter):
+            character = group
         if coefficients is None:
-            #WHERE TO GET CHARACTER?
             #OverconvergentDistributions can handle prec_cap and base being None
             coefficients = OverconvergentDistributions(weight, p, prec_cap, base, character)
         if isinstance(group, (int, Integer)):
             p = coefficients.prime()
+            if group % p != 0:
+                group *= p
+            group = Gamma0(group)
+        elif isinstance(group, DirichletCharacter):
+            p = coefficients.prime()
+            group = group.modulus()
             if group % p != 0:
                 group *= p
             group = Gamma0(group)

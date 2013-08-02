@@ -171,7 +171,7 @@ class WeightKAction_OMS_fam(WeightKAction_generic):
         self._autfactors = {}
         WeightKAction_generic.__init__(self, Dk, character, adjuster, on_left, dettwist)
         self._Np = self._Np.lcm(Dk._p)
-        Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring().base_ring(), \
+        Action.__init__(self, Sigma0(Dk._p ** self._Np.valuation(Dk._p), base_ring=Dk.base_ring().base_ring(), \
                         adjuster=self._adjuster), Dk, on_left, operator.mul)
     
     def clear_cache(self):
@@ -286,7 +286,7 @@ class WeightKAction_OMS(WeightKAction_generic):
         self._autfactors = {}
         WeightKAction_generic.__init__(self, Dk, character, adjuster, on_left, dettwist)
         self._Np = self._Np.lcm(Dk._p)
-        Action.__init__(self, Sigma0(self._Np, base_ring=Dk.base_ring().base_ring(), \
+        Action.__init__(self, Sigma0(Dk._p ** self._Np.valuation(Dk._p), base_ring=Dk.base_ring().base_ring(), \
                         adjuster=self._adjuster), Dk, on_left, operator.mul)
     
     def clear_cache(self):

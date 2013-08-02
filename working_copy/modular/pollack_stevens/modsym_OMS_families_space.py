@@ -8,6 +8,7 @@ from sage.functions.other import ceil
 from sage.functions.log import log
 from sage.modular.arithgroup.all import Gamma0
 from sage.matrix.constructor import Matrix
+from sage.modular.dirichlet import DirichletCharacter
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
 from sage.modular.pollack_stevens.modsym_OMS_families_element import ModSym_OMS_Families_element
@@ -26,11 +27,18 @@ class ModSym_OMS_Families_factory(UniqueFactory):
             raise ValueError("sign must be -1, 0, 1")
         if isinstance(group, (int, Integer)):
             character = None
+        elif isinstance(group, DirichletCharacter):
+            character = group
         if coefficients is None:
-            #WHERE TO GET CHARACTER?
             coefficients = FamiliesOfOverconvergentDistributions(weight, p, prec_cap, base, base_coeffs, character)
         if isinstance(group, (int, Integer)):
             p = coefficients.prime()
+            if group % p != 0:
+                group *= p
+            group = Gamma0(group)
+        elif isinstance(group, DirichletCharacter):
+            p = coefficients.prime()
+            group = group.modulus()
             if group % p != 0:
                 group *= p
             group = Gamma0(group)
