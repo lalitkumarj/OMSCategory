@@ -143,13 +143,15 @@ class ModularSymbolSpace_generic(Module):
         except KeyError:
             pass
         from sage.modular.dirichlet import DirichletGroup
+        from sage.rings.finite_rings.constructor import GF
         try:
             chi = self.character()
         except AttributeError:
             chi = DirichletGroup(self.level(), GF(p))[0]
+        if chi is None:
+            chi = DirichletGroup(self.level(), GF(p))[0]
         
         from sage.modular.modsym.modsym import ModularSymbols
-        from sage.rings.finite_rings.constructor import GF
         r = self.weight() % (p-1)
         if chi.is_trivial():
             N = chi.modulus()
