@@ -1,4 +1,4 @@
-def compute_dims_of_ord_subspace(Nbound=30, ps=[3,5,7,11,13], ks=None, input_dict={}, cusp=False):
+def compute_dims_of_ord_subspace(Nbound=30, ps=[3,5,7,11,13], ks=None, input_dict={}, cusp=False, sign=-1):
     if len(input_dict) > 0:
         raise NotImplementedError
     else:
@@ -11,7 +11,7 @@ def compute_dims_of_ord_subspace(Nbound=30, ps=[3,5,7,11,13], ks=None, input_dic
             verbose("    Prime %s"%(p))
             for k in range(p-1 if ks is None else ks[p]):
                 verbose("    Computing dim for weight %s"%(k))
-                M = OverconvergentModularSymbols(N, k, p=p, prec_cap=5)
+                M = OverconvergentModularSymbols(N, k, p=p, prec_cap=5, sign=sign)
                 d = M.dimension_of_ordinary_subspace(cusp=cusp)
                 verbose("    Got: %s"%(d))
                 if d not in input_dict:
