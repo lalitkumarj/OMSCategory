@@ -277,12 +277,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             M = self.precision_cap()
         p = self.prime()
         Phis = self.random_element(M)
-        for i in range(M+2):
+        for i in range(M[0]+2):
             Phis = Phis.hecke(p)
         if data is None:
             return Phis
         for q, alpha in data:
-            for i in range(M+2):
+            for i in range(M[0]+2):
                 Phis = Phis.hecke(q) - alpha * Phis
         return Phis
 
