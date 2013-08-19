@@ -273,6 +273,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         return ret
     
     def random_ordinary_element_with_congruences(self, M=None, data=None):
+        if M is None:
+            M = self.precision_cap()
         p = self.prime()
         Phis = self.random_element(M)
         for i in range(M+2):
