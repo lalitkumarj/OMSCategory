@@ -129,7 +129,15 @@ class ModularSymbolSpace_generic(Module):
             1
             sage: M.dimension_of_ordinary_subspace()
             2
-
+        
+        An example with odd weight and hence non-trivial character::
+        
+            sage: K = Qp(11, 6)
+            sage: DG = DirichletGroup(11, K)
+            sage: chi = DG([K(378703)])
+            sage: MM = FamiliesOfOMS(chi, 1, p=11, prec_cap=[4, 4], base_coeffs=ZpCA(11, 4), sign=-1)
+            sage: MM.dimension_of_ordinary_subspace()
+            1
         """
         try:
             p = self.prime()

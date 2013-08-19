@@ -163,11 +163,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         c = gam0.matrix()[1,0]
         
         shift = 0
-        if CM._character != None:
-            raise NotImplementedError
-            chara = CM._character(a)
-        else:
-            chara = 1
+        #if CM._character != None:
+        #    raise NotImplementedError
+        #    chara = CM._character(a)
+        #else:
+        #    chara = 1
         from sage.modular.pollack_stevens.families_util import automorphy_factor_vector
         R = CM.base_ring()
         Verbose("Compute automorphy factor.")

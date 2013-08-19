@@ -218,9 +218,38 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
         return self._lmul_(left)
     
     def __cmp__(left, right):
+        r"""
+        TESTS::
+        
+            sage: DD = FamiliesOfOverconvergentDistributions(4, prec_cap=[4,6], base_coeffs=ZpCA(7))
+            sage: mus = DD(0)
+            sage: mus == DD.zero()
+            True
+            sage: mus = DD(2)
+            sage: nus = DD(1)
+            sage: nus == mus
+            False
+            sage: mus == nus
+            False
+            sage: K = Qp(11, 6)
+            sage: DG = DirichletGroup(11, K)
+            sage: chi = DG([K(378703)]) 
+            sage: DD = FamiliesOfOverconvergentDistributions(1, p=11, prec_cap=[6, 4], base_coeffs=ZpCA(11, 6), character=chi)
+            sage: mus = DD(0)
+            sage: mus == DD.zero()
+            True
+            sage: mus = DD(2)
+            sage: nus = DD(1)
+            sage: nus == mus
+            False
+            sage: mus == nus
+            False
+        """
         #RH: adapted from coeffmod_OMS_element.py
-        left = deepcopy(left)
-        right = deepcopy(right)
+        #left = deepcopy(left)
+        #right = deepcopy(right)
+        left = CoeffMod_OMS_Families_element(left._moments, left.parent(), ordp=left.ordp, check=False, var_prec=left._var_prec)
+        right = CoeffMod_OMS_Families_element(right._moments, right.parent(), ordp=right.ordp, check=False, var_prec=right._var_prec)
         left.normalize()
         right.normalize()
         lrprec = left.precision_relative()[0]

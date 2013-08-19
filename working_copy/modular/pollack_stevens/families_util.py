@@ -98,8 +98,8 @@ def automorphy_factor_vector(p, a, c, k, chi, p_prec, var_prec, R):
         arg = (a / ta - 1) / p + c / (p * ta) * z
         aut += LB(arg).truncate(p_prec) * (w ** n)
     aut *= (ta ** k)
-    if not (chi is None):
-        aut *= chi(a)
+    #if not (chi is None):
+    #    aut *= chi(a)
     aut = aut.list()
     len_aut = len(aut)
     if len_aut == p_prec:
