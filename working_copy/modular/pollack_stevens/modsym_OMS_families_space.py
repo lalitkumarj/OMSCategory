@@ -271,6 +271,18 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if self.sign() == -1:
             return ret.minus_part()
         return ret
+    
+    def random_ordinary_element_with_congruences(self, M=None, data=None):
+        p = self.prime()
+        Phis = self.random_element(M)
+        for i in range(M+2):
+            Phis = Phis.hecke(p)
+        if data is None:
+            return Phis
+        for q, alpha in data:
+            for i in range(M+2):
+                Phis = Phis.hecke(q) - alpha * Phis
+        return Phis
 
     def is_start_of_basis(self, List):
         r"""
@@ -367,6 +379,66 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 done = (d <= len(basis))
         self._ord_basis = tuple(basis)
         return self._ord_basis
+    
+    def basis_of_congruence_subspace(self, data=None, verbose=True):
+        r"""
+        INPUT::
+        
+            - ``data`` -- a pair whose first entry is the dimension of the
+            desired space and whose second entry is a list of pairs `[q, \alpha]`
+            where `q` is a prime and `alpha` is an element of the base ring. The
+            output will then be a basis of the subspace that is left over after
+            killing off the forms where the `q`th Hecke operator acts by
+            `\alpha`.
+        """
+        if data is None:
+            return self.basis_of_ordinary_subspace(verbose=verbose)
+        q_alpha = [tuple(dat) for dat in data[1]]
+        q_alpha.sort()
+        q_alpha = tuple(q_alpha)
+        try:
+            return self._congruence_subspace[q_alpha]
+        except AttributeError:
+            self._congruence_subspace = {}
+        except KeyError:
+            pass
+        
+        d = data[0]
+        basis = []
+        done = (d <= len(basis))
+        M = self.precision_cap()[0]
+        p = self.prime()
+        
+        while not done:
+            if verbose:
+                print "basis has size %s out of desired %s"%(len(basis),d)
+            Verbose("Forming a random symbol")
+            if verbose:
+                print "-----------------------"
+                print "Forming a random symbol"
+            Phi = self.random_ordinary_element_with_congruences(data=q_alpha)
+            val = Phi.valuation()
+            if val > 0:
+                for key in Phi._map._dict.keys():
+                    Phi._map._dict[key].ordp -= val
+            
+            Verbose("Forming U_p-span of this symbol")
+            if verbose:
+                print "Forming U_p-span"
+            Phi_span = [Phi]
+            LI = self.is_start_of_basis(Phi_span)
+            if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
+                basis += [Phi_span[-1]]
+                Verbose("basis now has size %s"%(len(basis)))
+            done = (d <= len(basis))
+            while LI and (not done):
+                Phi_span += [Phi_span[-1].hecke(p)]
+                LI = self.is_start_of_basis(Phi_span)
+                if LI and self.is_start_of_basis(basis + [Phi_span[-1]]):
+                    basis += [Phi_span[-1]]
+                done = (d <= len(basis))
+        self._congruence_subspace[q_alpha] = tuple(basis)
+        return self._congruence_subspace[q_alpha]
 
     def linear_relation_old(self, List, verbose=True):
         r"""
