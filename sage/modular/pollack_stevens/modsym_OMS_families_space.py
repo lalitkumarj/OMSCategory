@@ -675,7 +675,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             prec = c.prec()
             cL = c.padded_list()
             length = len(cL)
-            poly_coeffs.append(RT([c[i] >> i for i in range(length)], prec))
+            cL = [cL[i] >> i for i in range(length)]
+            j = 0
+            while j < length:
+                if cL[j].precision_absolute() <= 0:
+                    break
+                j += 1
+            poly_coeffs.append(RT(cL, j))
         return R(poly_coeffs)
         
 #@cached_method
