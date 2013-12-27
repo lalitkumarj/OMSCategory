@@ -6,7 +6,7 @@ The goal of this project is to implement overconvergent modular symbols and fami
 
 I. Installation instructions
 
-The code in this repository is meant to be added to an already existing Sage installation. The working copy of the code is appropriately located in the folder named "working_copy". In that folder, you will find a file named "INSTALLATION_INSTRUCTIONS.txt" that explains the steps involved in installing this code into Sage 5.9.
+The code in this repository is meant to be added to an already existing Sage installation. The working copy of the code is in the folder named "sage". A "more" stable version is kept at http://github.com/rharron/OMS-sage.
 
 
 II. Copyright
