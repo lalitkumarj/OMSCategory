@@ -15,6 +15,7 @@ def ps_normalize(f, p, p_prec):
     S = f.parent()
     return S(v)
 
+@cached_function
 def logp_fcn(p, p_prec, a):
     r"""
     INPUT:
@@ -44,7 +45,7 @@ def logpp_gam(p, p_prec):
     loggam = ZZ(logp_fcn(p, p_prec * (p ** 2), 1 + p))
     return ps_normalize(L / loggam, p, p_prec)
 
-#@cached_function
+@cached_function
 def logpp_binom(n, p, p_prec):
     """returns the (integral) power series p^n*(log_p(1+p*z)/log_p(1+p) choose n)"""
     #prod=1+0*z
