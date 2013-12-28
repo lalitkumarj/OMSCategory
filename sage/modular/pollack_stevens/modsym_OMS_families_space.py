@@ -682,6 +682,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     break
                 j += 1
             poly_coeffs.append(RT(cL, j))
+        poly_coeffs[-1] = RT.one()
         return R(poly_coeffs)
         
 #@cached_method
