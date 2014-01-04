@@ -1,6 +1,6 @@
 from sage.misc.cachefunc import cached_function
 from sage.structure.sequence import Sequence
-from sage.rings.padics.factory import Qp
+from sage.rings.padics.factory import Qp, Zp
 from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
@@ -15,22 +15,22 @@ def ps_normalize(f, p, p_prec):
     S = f.parent()
     return S(v)
 
-@cached_function
-def logp_fcn(p, p_prec, a):
-    r"""
-    INPUT:
-    
-    - ``p``: prime
-    - ``p_prec: desired ``p``-adic precision
-    - ``z``
-    
-    OUTPUT:
-    
-    - The ``p``-adic logarithm of 
-    this is the *function* on Z_p^* which sends z to log_p(z) using a power series truncated at p_prec terms"""
-    R = Qp(p, 2 * p_prec)
-    a = a / R.teichmuller(a)
-    return sum([((-1) ** (m - 1)) * ((a - 1) ** m) / m for m in range(1, p_prec)])
+#@cached_function
+#def logp_fcn(p, p_prec, a):
+#    r"""
+#    INPUT:
+#    
+#    - ``p``: prime
+#    - ``p_prec: desired ``p``-adic precision
+#    - ``z``
+#    
+#    OUTPUT:
+#    
+#    - The ``p``-adic logarithm of 
+#    this is the *function* on Z_p^* which sends z to log_p(z) using a power series truncated at p_prec terms"""
+#    R = Qp(p, 2 * p_prec)
+#    a = a / R.teichmuller(a)
+#    return sum([((-1) ** (m - 1)) * ((a - 1) ** m) / m for m in range(1, p_prec)])
 
 def logpp(p, p_prec):
     """returns the (integral) power series for log_p(1+p*z) -- extra p here!"""
@@ -41,8 +41,8 @@ def logpp(p, p_prec):
 def logpp_gam(p, p_prec):
     """returns the (integral) power series log_p(1+p*z)*(1/log_p(1+p)) where the denominator is computed with some accuracy"""
     L = logpp(p, p_prec)
-    ## RP: what is that p^2 factor doing there?
-    loggam = ZZ(logp_fcn(p, p_prec * (p ** 2), 1 + p))
+    ZZp = Zp(p, 2 * p_prec)
+    loggam = ZZ(ZZp(1+p).log(0))
     return ps_normalize(L / loggam, p, p_prec)
 
 @cached_function
