@@ -52,6 +52,7 @@ class CoeffMod_OMS_Families_element(CoefficientModuleElement_generic):
     """
     def __init__(self, moments, parent, ordp=0, check=True, var_prec=None):
         CoefficientModuleElement_generic.__init__(self, parent)
+        #TODO: for sage 6.2+, will need to make parent the argument after self
         #TODO: finish this
         #if var_prec == None:
         #    var_prec = parent._prec_cap[1]
