@@ -7,7 +7,7 @@ p = 3
 N = 11
 k = 2
 r = (k-2) % (p-1)
-M = 6  #Number of moments
+M = 12  #Number of moments
 var_prec = M    #Precision on the variable
 
 print "This script computes the Up matrix for tame level {0}, p = {1} with {2} moments and w-adic precision {3}.".format(N, p, M, var_prec)

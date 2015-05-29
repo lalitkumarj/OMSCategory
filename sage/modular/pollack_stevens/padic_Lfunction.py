@@ -9,8 +9,8 @@ class padic_Lfunction_one_variable(padic_Lfunction):
         pass
 
 class padic_Lfunction_two_variable(padic_Lfunction):
-    def __init__(self, Phis, var='T'):
-        #Should we add prec? Default it to None would make us compute it.
+    def __init__(self, Phis, var='T', prec=None):
+        #TODO: prec: Default it to None would make us compute it.
         self._Phis = Phis    #should we create a copy of Phis, in case Phis changes?
         self._coefficient_ring = Phis.base_ring()
         self._base_ring = PowerSeriesRing(self._coefficient_ring, var)    #What precision?
