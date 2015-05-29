@@ -4,5 +4,11 @@
 *.pyc
 .release
 .git
-.gitignore
+/*
+!/.gitignore
+!/sage/modular/pollack_stevens/*
+!/sage/rings/padics/*
+!/sage/rings/polynomial/*
+!/sage/matrix/*
+!/sage/categories/*
 
