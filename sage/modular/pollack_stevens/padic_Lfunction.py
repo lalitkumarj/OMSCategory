@@ -1,7 +1,8 @@
 from sage.structure.sage_object import SageObject
 from sage.rings.power_series_ring import PowerSeriesRing
 from sage.modular.pollack_stevens.manin_map import M2Z
-from sage.modular.pollack_stevens.families_util import logpp_binom
+from sage.modular.pollack_stevens.families_util import logp_binom
+from sage.all import cached_method
 
 class padic_Lfunction(SageObject):
     pass
@@ -30,18 +31,32 @@ class padic_Lfunction_two_variable(padic_Lfunction):
     def _basic_integral(self, a, j):
         #is this the negative of what we want?
         #if Phis is fixed for this p-adic L-function, we should make this method cached
-        p = Phis.parent().prime()
+        p = self._Phis.parent().prime()
         Da = M2Z([1,a,0,p])
         onDa = self(Da)
-        aminusat = a - self.parent().base_ring().base_ring().teichmuller(a)
+        aminusat = a - self._Phis.parent().base_ring().base_ring().teichmuller(a)
         try:
             ap = self._ap
-        except:
-            ap = self.Tq_eigenvalue(p) #catch exception if not eigensymbol
+        except AttributeError:
+            self._ap = self.Tq_eigenvalue(p) #catch exception if not eigensymbol
+            ap = self._ap
         ans = onDa.moment(0)
         for r in range(1, j+1):
             ans += binomial(j, r) * (aminusat ** (j - r)) * (p ** r) * onDa.moment(r)
         return (~ap) * ans
+    
+    @cached_method
+    def _compute_nth_coeff(self, n, twist=None):
+        r"""
+        Computes the coefficient of T^n.
+        """
+        #TODO: Check that n is not too big
+        #TODO implement twist
+        p = self._Phis.parent().prime()
+        prec = self._Phis.precision_absolute()[0] #Not quite right, probably
+        cjns = list(logp_binom(n, p, prec+1))
+        teich = self._Phis.parent().base_ring().base_ring().teichmuller
+        return sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j) for a in range(1,p)]) for j in range(prec)])
     
     def coefficient(self, index, twist=None):
         r"""
@@ -57,4 +72,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         r"""
         returns a power series in base_ring, up to given precision, or max prec if prec is None
         """
-        pass
+        p = self._Phis.parent().prime()
+        prec = self._Phis.precision_absolute()[0] #Not quite right, probably
+        R = PowerSeriesRing(self._Phis.parent().base_ring(), 'T')
+        return R([self._compute_nth_coeff(n, twist) for n in range(prec)])
