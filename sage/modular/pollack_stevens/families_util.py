@@ -43,7 +43,15 @@ def ps_normalize(f, p, p_prec):
 
 #Should we add a 'y-prec' parameter?
 def logp(p, p_prec):
-    """returns the (integral) power series for log_p(1+z)"""
+    """
+    Returns the (integral) power series for log_p(1+z) as a polynomial in y over the rationals of degree < p_prec.
+    
+    EXAMPLES::
+        
+        sage: from sage.modular.pollack_stevens.families_util import logp
+        sage: logp(11, 5)
+        -1/4*y^4 + 1/3*y^3 - 1/2*y^2 + y
+    """
     SS = PolynomialRing(QQ, 'y')
     y = SS.gen()
     return sum([((-1) ** (m - 1)) * (y ** m) / m for m in range(1, p_prec)])
@@ -56,7 +64,9 @@ def logpp(p, p_prec):
 
 @cached_function
 def logp_gam(p, p_prec):
-    """returns the (integral) power series log_p(1+z)*(1/log_p(1+p)) where the denominator is computed with some accuracy"""
+    """
+    Returns the (integral) power series log_p(1+z) / log_p(1+p)) where the denominator is computed with some accuracy.
+    """
     L = logp(p, p_prec)
     ZZp = Zp(p, 2 * p_prec)
     loggam = ZZ(ZZp(1+p).log(0))
