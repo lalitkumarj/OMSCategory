@@ -1,5 +1,6 @@
 from sage.structure.sage_object import SageObject
 from sage.rings.power_series_ring import PowerSeriesRing
+from sage.rings.arith import binomial
 from sage.modular.pollack_stevens.manin_map import M2Z
 from sage.modular.pollack_stevens.families_util import logp_binom
 from sage.all import cached_method
@@ -33,12 +34,12 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         #if Phis is fixed for this p-adic L-function, we should make this method cached
         p = self._Phis.parent().prime()
         Da = M2Z([1,a,0,p])
-        onDa = self(Da)
+        onDa = self._Phis(Da)
         aminusat = a - self._Phis.parent().base_ring().base_ring().teichmuller(a)
         try:
             ap = self._ap
         except AttributeError:
-            self._ap = self.Tq_eigenvalue(p) #catch exception if not eigensymbol
+            self._ap = self._Phis.Tq_eigenvalue(p) #catch exception if not eigensymbol
             ap = self._ap
         ans = onDa.moment(0)
         for r in range(1, j+1):
@@ -56,7 +57,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         prec = self._Phis.precision_absolute()[0] #Not quite right, probably
         cjns = list(logp_binom(n, p, prec+1))
         teich = self._Phis.parent().base_ring().base_ring().teichmuller
-        return sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j) for a in range(1,p)]) for j in range(prec)])
+        return sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j) for a in range(1,p)]) for j in range(min(prec,len(cjns)))])
     
     def coefficient(self, index, twist=None):
         r"""
@@ -74,5 +75,4 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         """
         p = self._Phis.parent().prime()
         prec = self._Phis.precision_absolute()[0] #Not quite right, probably
-        R = PowerSeriesRing(self._Phis.parent().base_ring(), 'T')
-        return R([self._compute_nth_coeff(n, twist) for n in range(prec)])
+        return self._base_ring([self._compute_nth_coeff(n, twist) for n in range(prec)])
