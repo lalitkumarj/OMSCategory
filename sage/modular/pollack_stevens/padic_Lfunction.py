@@ -52,6 +52,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
             ap = self._ap
         #print "j =", j, "a = ", a
         ans = onDa.moment(0) * (aminusat ** j)
+        #ans = onDa.moment(0)
         #print "\tr =", 0, " ans =", ans
         for r in range(1, j+1):
             ans += binomial(j, r) * (aminusat ** (j - r)) * (p ** r) * onDa.moment(r)
@@ -70,6 +71,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         prec = self._Phis.precision_absolute()[0] #Not quite right, probably
         #print "@@@@n =", n, "prec =", prec
         cjns = list(logp_binom(n, p, prec+1))
+        #print cjns
         teich = self._Phis.parent().base_ring().base_ring().teichmuller
         return sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j) for a in range(1,p)]) for j in range(min(prec,len(cjns)))])
     
