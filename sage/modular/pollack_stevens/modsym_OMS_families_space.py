@@ -363,6 +363,14 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                     print "%s out of %s"%(a,M+1)
                 Phi = Phi.hecke(p)
             ## Should really check here that we are ordinary
+            ## Figure out why valuation might increase (example: N=11, p=3, prec>=9)
+            val = Phi.valuation()
+            if val > 0:
+                Verbose("Valuation drop: val=%s"%(val))
+                if verbose:
+                    print "Valuation drop val=%s"%(val)
+                for key in Phi._map._dict.keys():
+                    Phi._map._dict[key].ordp -= val
 
             Verbose("Forming U_p-span of this symbol")
             if verbose:
@@ -611,13 +619,21 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             r = r + 1
             h = Phi.hecke(q)
             extra = None
+            p_prec_dec = False
             while extra is None and M > 0:
                 row, extra = self.linear_relation(basis, h, verbose=verbose, prec=[M, var_prec])
                 if extra is None:
-                    M -= 1
                     print "PRECISION LOSS!!!!"
-                    if verbose:
-                        print "Reducing p-adic precision to %s."%(M)
+                    if p_prec_dec:
+                        M -= 1
+                        if verbose:
+                            print "Reducing p-adic precision to %s."%(M)
+                        p_prec_dec = False
+                    else:
+                        var_prec -= 1
+                        if verbose:
+                            print "Reducing w-adic precision to %s."%(M)
+                        p_prec_dec = True
             if extra is None:
                 raise ValueError("basis does not span a T_q-stable subspace")
             row = [-a / extra for a in row]
