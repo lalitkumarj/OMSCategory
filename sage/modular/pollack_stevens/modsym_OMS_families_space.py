@@ -193,6 +193,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             else:
                 err = -t.moment(0) / (K[1])
             err_val = _padic_val_of_pow_series(err) ###
+			Verbose("err_val: %s"%(err_val))
             if err_val < 0:
                 shift -= err_val
                 err = _shift_coeffs(err, shift, right=False)
@@ -574,6 +575,50 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             #print "ans at %s=\n%s\n"%(j, ans)
         #print ans
         return [V(ans[:-1]), ans[-1]]
+    
+    def linear_relation_laurent_series(self, List, Psi, verbose=True, prec=None):
+        for Phi in List:
+            assert Phi.valuation() >= 0, "Symbols must be integral"
+        assert Psi.valuation() >= 0
+        R = self.base()
+        Rbase = R.base()
+        w = R.gen()
+        d = len(List)
+        if d == 0:
+            if Psi.is_zero():
+                return [None, R(1)]
+            else:
+                return [None, 0]
+        if prec is None:
+            M, var_prec = Psi.precision_absolute()
+        else:
+            M, var_prec = prec
+        p = self.prime()
+        V = R**d
+        RSR = LaurentSeriesRing(Rbase, R.variable_name())
+        VSR = RSR**self.source().ngens()
+        List_TMs = [VSR(Phi.list_of_total_measures()) for Phi in List]
+        Psi_TMs = VSR(Psi.list_of_total_measures())
+        A = Matrix(RSR, List_TMs).transpose()
+        try:
+            sol = V(A.solve_right(Psi_TMs))
+        except ValueError:
+            #try "least squares"
+            if verbose:
+                print "Trying least squares."
+            sol = (A.transpose() * A).solve_right(A.transpose() * Psi_TMs)
+            #check precision (could make this better, checking each power of w)
+            p_prec = M
+            diff = Psi_TMs - sum([sol[i] * List_TMs[i] for i in range(len(List_TMs))])
+            for i in diff:
+                for j in i.list():
+                    if p_prec > j.valuation():
+                        p_prec = j.valuation()
+            if verbose:
+                print "p-adic precision is now", p_prec
+            #Is this right?
+            sol = V([R([j.add_bigoh(p_prec) for j in i.list()]) for i in sol])
+        return [sol, R(-1)]
     
     #@cached_method
     def hecke_matrix(self, q, basis=None, verbose=True):
