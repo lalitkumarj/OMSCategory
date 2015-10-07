@@ -18,7 +18,7 @@ from sage.interfaces.gp import gp
 class ModSym_OMS_Families_factory(UniqueFactory):
     """
     TESTS::
-    
+
         sage: D = FamiliesOfOverconvergentDistributions(4, prec_cap=[5,3], base_coeffs=ZpCA(11))
         sage: MS = FamiliesOfOMS(11, coefficients=D)
     """
@@ -43,7 +43,7 @@ class ModSym_OMS_Families_factory(UniqueFactory):
                 group *= p
             group = Gamma0(group)
         return (group, coefficients, sign)
-    
+
     def create_object(self, version, key):
         return ModSym_OMS_Families_space(*key)
 
@@ -53,13 +53,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def __init__(self, group, coefficients, sign=0):
         """
         TEST::
-        
+
             sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import FamiliesOfOMS
             sage: MS = FamiliesOfOMS(14, 0, -1, 3, [5, 4], base_coeffs=ZpCA(3))
             sage: TestSuite(MS).run()
         """
         ModularSymbolSpace_generic.__init__(self, group, coefficients, sign=sign, element_class=ModSym_OMS_Families_element)
-    
+
     def _has_coerce_map_from_(self, other):
         if isinstance(other, ModularSymbolSpace_generic):
             if other.group() == self.group() \
@@ -67,30 +67,30 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 return True
         else:
             return False
-    
+
     #def __reduce__(self):
     #    return FamiliesOfOMS.reduce_data(self)
-    
+
     def _repr_(self):
         return "Space of families of overconvergent modular symbols for %s with sign %s and values in %s"%(self.group(), self.sign(), self.coefficient_module())
-    
+
     def precision_cap(self):
         return self.coefficient_module().precision_cap()
-    
+
     def prime(self):
         return self.coefficient_module().prime()
-    
+
     def change_ring(self, new_base_ring):
         return FamiliesOfOMS(self.group(), coefficients=self.coefficient_module().change_ring(new_base_ring), sign=self.sign())
-    
+
     def _an_element_(self):
         #CHANGE THIS TO AN ACTUAL ELEMENT?
         return self(self.coefficient_module().an_element())
-    
+
     def random_element(self, M=None):
         r"""
         EXAMPLES::
-        
+
             sage: DD = FamiliesOfOverconvergentDistributions(4, base_coeffs=Qp(11, 6), prec_cap=[6,4])
             sage: MM = FamiliesOfOMS(11, 4, coefficients=DD)
             sage: Phis = MM.random_element()
@@ -116,7 +116,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         gammas = manin.gammas
         Id = gens[0]
         g0, gam0, gam_shift = manin._nice_gamma(p, k)
-        
+
         # RP: _prec_for_solve... isn't working right
         #M_in = _prec_for_solve_diff_eqn_families(M[0], p)
         #print "M_in", M_in
@@ -130,8 +130,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         CM = self.coefficient_module().change_precision([M_in, M[1]+1])  ## RP: the +1 here on M[1] is only need for k=0
 
         R = CM.base_ring()
-        
-        ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution 
+
+        ## this loop runs thru all of the generators (except (0)-(infty)) and randomly chooses a distribution
         ## to assign to this generator (in the 2,3-torsion cases care is taken to satisfy the relevant relation)
         D = {}
         t = CM(0)
@@ -156,12 +156,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 else:
                     Verbose("Generator is non-torsion")
                     t += D[g] * gammas[g] - D[g]
-        
+
         ## Fill in this comment?
-        
+
         a = gam0.matrix()[0,0]
         c = gam0.matrix()[1,0]
-        
+
         shift = 0
         #if CM._character != None:
         #    raise NotImplementedError
@@ -177,8 +177,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if g0 in manin.reps_with_three_torsion():
             aa = (gam0**2).matrix()[0,0]
             cc = (gam0**2).matrix()[1,0]
-            KK = automorphy_factor_vector(p, aa, cc, k, CM._character, CM.length_of_moments(M_in), M_in, R) 
-            
+            KK = automorphy_factor_vector(p, aa, cc, k, CM._character, CM.length_of_moments(M_in), M_in, R)
+
         if k != 0:
             if g0 in manin.reps_with_three_torsion():
                 err = -t.moment(0)/ (2 - K[0] - KK[0])
@@ -193,7 +193,8 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             else:
                 err = -t.moment(0) / (K[1])
             err_val = _padic_val_of_pow_series(err) ###
-			Verbose("err_val: %s"%(err_val))
+            Verbose("err_val: %s"%(err_val))
+			##RP: I'm confused by the negatives here
             if err_val < 0:
                 shift -= err_val
                 err = _shift_coeffs(err, shift, right=False)
@@ -201,7 +202,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             Verbose("shift after err_val: %s"%(shift))
             v = [R(0), err] + [R(0)] * (CM.length_of_moments(M_in) - 2)
             err = CM(v)
-        
+
         if g0 in manin.reps_with_two_torsion():
             err = err - err * gam0
             t -= err
@@ -210,9 +211,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             t -= err
         else:
             t += err * gam0 - err
-        
+
         Verbose("Solve difference equation.")
-        
+
         #print "t",t
         #Are the following two lines even necessary?
         #        err_pa = err.precision_absolute()
@@ -225,15 +226,21 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         #    t = t.reduce_precision([t_pr[0] - ADD, t_pr[1] - ADD])
         t_pa = t.precision_absolute()
         t = t.reduce_precision_absolute([t_pa[0] - gam_shift - ADD, M[1]])
-        
+
         t.normalize()
         #print "M_in =", M_in
         #print "t[0] =", t.moment(0)
         mu = t.solve_diff_eqn()
+
+		## The following code (I (RP) think) takes into account the fact that (a) mu might have negative valuation
+		## and (b) after truncating mu's valuation might go up
         val, val_vector = mu._valuation(val_vector=True)
+        Verbose("val: %s"%(val))
+        Verbose("val_vector: %s"%(val_vector))
         if val < 0:
             Dmu = mu.parent()
             length = Dmu.length_of_moments(M[0])
+            Verbose("length: %s"%(length))
             mu_val = val_vector[length - 1] + mu.ordp   #This is >= val
             shift -= mu_val
             err.ordp -= mu_val
@@ -244,7 +251,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             else:
                 from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element, _shift_coeffs
                 V = Dmu.approx_module(M[0], M[1])
-                mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=mu_val, check=False, var_prec=mu._var_prec)
+                mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=0, check=False, var_prec=mu._var_prec)
         Verbose("shift after mu_val: %s"%(shift))
         mu.normalize()
         #print "mu.ordp:", mu.ordp
@@ -272,18 +279,24 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if self.sign() == -1:
             return ret.minus_part()
         return ret
-    
+
     def random_ordinary_element_with_congruences(self, M=None, data=None):
         if M is None:
             M = self.precision_cap()
         p = self.prime()
         Phis = self.random_element(M)
         for i in range(M[0]+2):
+            print "Applying U_p for the %s-th time"%(i)
+            print "Applying U_p for the %s-th time"%(i)
             Phis = Phis.hecke(p)
         if data is None:
             return Phis
         for q, alpha in data:
+            print "Now killing off with T_%s + %s"%(q,alpha)
+            print "Now killing off with T_%s + %s"%(q,alpha)
             for i in range(M[0]+2):
+                print "Step %s"%(i)
+                print "Step %s"%(i)
                 Phis = Phis.hecke(q) - alpha * Phis
         return Phis
 
@@ -314,7 +327,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def basis_of_ordinary_subspace(self, d=None, verbose=True):
         r"""
         Finds a basis of the ordinary subspace of this space.
-    
+
         INPUT:
 
         - ``d`` -- (optional) integer equal to the dimension of the ordinary subspace; otherwise this number is just computed via Hida theory
@@ -324,13 +337,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         OUTPUT:
 
         - A tuple of OMS families which form the desired basis
-        
+
         EXAMPLES:
-        
+
         sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 4))
         sage: MM.basis_of_ordinary_subspace()
         ()
-        
+
         """
         if d is None:
             d = self.dimension_of_ordinary_subspace()
@@ -390,11 +403,11 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 done = (d <= len(basis))
         self._ord_basis = tuple(basis)
         return self._ord_basis
-    
+
     def basis_of_congruence_subspace(self, data=None, verbose=True):
         r"""
         INPUT::
-        
+
             - ``data`` -- a pair whose first entry is the dimension of the
             desired space and whose second entry is a list of pairs `[q, \alpha]`
             where `q` is a prime and `alpha` is an element of the base ring. The
@@ -413,13 +426,13 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             self._congruence_subspace = {}
         except KeyError:
             pass
-        
+
         d = data[0]
         basis = []
         done = (d <= len(basis))
         M = self.precision_cap()[0]
         p = self.prime()
-        
+
         while not done:
             if verbose:
                 print "basis has size %s out of desired %s"%(len(basis),d)
@@ -432,7 +445,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             if val > 0:
                 for key in Phi._map._dict.keys():
                     Phi._map._dict[key].ordp -= val
-            
+
             Verbose("Forming U_p-span of this symbol")
             if verbose:
                 print "Forming U_p-span"
@@ -454,7 +467,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
     def linear_relation_old(self, List, verbose=True):
         r"""
         Finds a linear relation between the given list of OMSs.  If they are LI, returns a list of all 0's.
-    
+
         INPUT:
 
         - ``List`` -- a list of OMSs
@@ -479,7 +492,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         c = [R(c[a]).add_bigoh(var_prec) for a in range(len(c))]
         #print "c = "
         #print c
-        
+
         if c == []:
             return []
         for j in range(1,var_prec):
@@ -502,24 +515,24 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 c[r] += c_coef[r] * w**j
             #print "c at %s:\n%s\n"%(j, c)
         return c
-    
+
     def linear_relation(self, List, Psi, verbose=True, prec=None):
         r"""
         INPUT::
-        
+
             - ``List`` -- a list of families of OMSs
             - ``Psi`` -- a family of OMSs
-        
+
         OUTPUT::
-        
+
             - `[v`, `c`]`, where `v` is a vector (over the base ring of self,
             with ``len(List)`` entries) and c is a scalar (over the base ring
             of self) such that
-            
+
             .. MATH::
-            
+
                 c\Psi + \sum_{i}v_i\Phi_i = 0,
-            
+
             where `\Phi_i` is the `i`th element of ``List`` and `v_i` is the
             `i`th entry of `v`. If there is a non-trivial such relation, it is
             returned, otherwise the pair [``None``, ``None``] is returned. If ``List``
@@ -552,7 +565,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         Psi_coef = [TM.padded_list()[0] if TM != 0 else Rbase(0, M) for TM in Psi_TMs]
         vectors_TMs = List_TMs + [Psi_TMs]
         vectors_coef = List_coef + [Psi_coef]
-        
+
         v, c = _find_linear_relation(List_coef, Psi_coef, p, M)
         if c is None: #no relation found
             return [None, None]
@@ -575,7 +588,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             #print "ans at %s=\n%s\n"%(j, ans)
         #print ans
         return [V(ans[:-1]), ans[-1]]
-    
+
     def linear_relation_laurent_series(self, List, Psi, verbose=True, prec=None):
         for Phi in List:
             assert Phi.valuation() >= 0, "Symbols must be integral"
@@ -619,12 +632,12 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             #Is this right?
             sol = V([R([j.add_bigoh(p_prec) for j in i.list()]) for i in sol])
         return [sol, R(-1)]
-    
+
     #@cached_method
     def hecke_matrix(self, q, basis=None, verbose=True):
         r"""
         Finds the matrix of T_q wrt to the given basis
-    
+
         INPUT:
 
         - ``q`` -- a prime
@@ -634,9 +647,9 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         OUTPUT:
 
         - d x d matrix where d is the length of basis
-        
+
         EXAMPLES::
-        
+
             sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 4))
             sage: MM.hecke_matrix(7)
             []
@@ -688,14 +701,14 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
         if basis_was_None:
             self._hecke_matrices[(q, None)] = self._hecke_matrices[(q, tuple(basis))]
         return self._hecke_matrices[(q, tuple(basis))]
-    
+
     #@cached_method
     def hecke_polynomial(self, q, var='x', basis=None, verbose=True):
         r"""
         Note: I (RH) think that the p-adic precision on the base ring of self should be > prec_cap[0] + prec_cap[1]
         because w = pT. (Or using relative precision p-adics could work too I guess).
         EXAMPLES::
-        
+
             sage: MM = FamiliesOfOMS(3, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
             sage: MM.hecke_polynomial(29)
             1 + O(3^4) + O(w^4)
@@ -711,16 +724,16 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             prec_cap = self.precision_cap()
             return PolynomialRing(R ,var)(R(R.base_ring()(1, prec_cap[0]), prec_cap[1]))
         return self.hecke_matrix(q, basis).charpoly(var)
-    
+
     def hecke_polynomial_in_T_variable(self, q, var='x', basis=None, verbose=True):
         r"""
         The function hecke_polynomial returns a polynomial whose coefficients
         are power series in the variable `w`, which represents an element in the
         disc of radius `1/p`. This function instead uses the more standard
         variable `T`, which represents an element in the disc of radius `1`.
-        
+
         EXAMPLES::
-        
+
             sage: MM = FamiliesOfOMS(11, 0, sign=-1, p=3, prec_cap=[4, 4], base_coeffs=ZpCA(3, 8))
             sage: HP = MM.hecke_polynomial_in_T_variable(3, verbose=False); HP
             (1 + O(3^8))*x^2 + (2 + 2*3 + 3^2 + O(3^4) + (2 + 2*3 + O(3^3))*T + O(3^2)*T^2 + (1 + O(3))*T^3 + O(T^4))*x + 1 + 2*3 + 3^2 + O(3^4) + O(3^3)*T + (2 + 3 + O(3^2))*T^2 + (1 + O(3))*T^3 + O(T^4)
@@ -745,7 +758,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
             poly_coeffs.append(RT(cL, j))
         poly_coeffs[-1] = RT.one()
         return R(poly_coeffs)
-        
+
 #@cached_method
 def _prec_for_solve_diff_eqn_families(M, p):
     #UPDATE THIS with valuation of K[0]-1 and K[1]
@@ -753,11 +766,11 @@ def _prec_for_solve_diff_eqn_families(M, p):
         A helper function for determining the (relative) precision of the input
         to solve_diff_eqn required in order obtain an answer with (relative)
         precision ``M``. The parameter ``p`` is the prime and ``k`` is the weight.
-        
+
         Given input precision `M_\text{in}`, the output has precision
-        
+
         .. MATH::
-            
+
             M = M_\text{in} - \lceil\log_p(M_\text{in}) - 3.
 
     """
@@ -777,13 +790,13 @@ def _prec_for_solve_diff_eqn_families(M, p):
 def find_linear_relation(vs, p, M): #This is the old version. The new one is _find_linear_relation
     r"""
     Finds a linear relation between a given list of vectors over Z/p^MZ.  If they are LI, returns an empty list.
-    
+
     INPUT:
 
     - ``vs`` -- a list of vectors over Z/p^MZ
     - ``p`` -- a prime
     - ``M`` -- positive integer
-    
+
     OUTPUT:
 
     - A list of p-adic numbers describing the linear relation of the vs
@@ -791,7 +804,7 @@ def find_linear_relation(vs, p, M): #This is the old version. The new one is _fi
     d = len(vs)
     R = Qp(p, M)
     V = R**d
-        
+
     if d == 1:
         z = True
         for r in range(len(vs[0])):
@@ -818,7 +831,7 @@ def find_linear_relation(vs, p, M): #This is the old version. The new one is _fi
 
     if z:
         return [R(0, M) for a in range(len(vs)-1)] + [1]
-        
+
     s = '['
     for c in range(d-1):
         v = vs[c]
@@ -829,14 +842,14 @@ def find_linear_relation(vs, p, M): #This is the old version. The new one is _fi
         if c < d - 2:
             s += ';'
     s = s + ']'
-        
+
     Verbose("s = %s"%(s))
-        
+
     A = gp(s)
     Verbose("A = %s"%(A))
     if len(vs) == 2:
         A = A.Mat()
-        
+
     s = '['
     v = vs[d-1]
     for r in range(len(v)):
@@ -844,17 +857,17 @@ def find_linear_relation(vs, p, M): #This is the old version. The new one is _fi
         if r < len(v) - 1:
             s += ','
     s += ']~'
-        
+
     Verbose("s = %s"%(s))
-        
+
     B = gp(s)
-        
+
     Verbose("B = %s"%(B))
 
     v = A.mattranspose().matsolvemod(p**M,B)
-        
+
     Verbose("v = %s"%(v))
-        
+
     if v == 0:
         return []
     else:
@@ -865,19 +878,19 @@ def find_linear_relation(vs, p, M): #This is the old version. The new one is _fi
 def _find_linear_relation(Alist, B, p, M):    #new!
     r"""
     Finds a linear relation between a given list of vectors over Z/p^MZ.  If they are LI, returns an empty list.
-    
+
     INPUT:
 
     - ``vs`` -- a list of vectors over Z/p^MZ
     - ``p`` -- a prime
     - ``M`` -- positive integer
-    
+
     OUTPUT:
 
     - A list of p-adic numbers describing the linear relation of the vs
-    
+
     TESTS::
-    
+
         sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import _find_linear_relation
         sage: R = ZpCA(3, 4)
         sage: List = [Sequence([O(3^4), 2*3 + 3^2 + 3^3 + O(3^4), 2 + 3 + 3^2 + 2*3^3 + O(3^4), O(3^4), 1 + 3 + 3^2 + O(3^4), 2 + O(3^4), 1 + 3^2 + 3^3 + O(3^4), 2 + O(3^4), 1 + 3 + 3^2 + O(3^4)], universe=R), Sequence([O(3^4), 1 + 3^2 + O(3^4), 2 + 3 + 3^3 + O(3^4), O(3^4), 1 + 3 + 2*3^2 + 3^3 + O(3^4), 1 + 2*3^2 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 1 + 2*3^2 + O(3^4), 1 + 3 + 2*3^2 + 3^3 + O(3^4)], universe=R), Sequence([O(3^4), 2 + O(3^4), 3 + 3^2 + 3^3 + O(3^4), O(3^4), 2*3 + 3^2 + 3^3 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 3^3 + O(3^4), 1 + 2*3 + 2*3^2 + 3^3 + O(3^4), 2*3 + 3^2 + 3^3 + O(3^4)], universe=R)]
@@ -898,7 +911,7 @@ def _find_linear_relation(Alist, B, p, M):    #new!
     d = len(vs)
     R = Qp(p,M)
     V = R**d
-        
+
     if d == 1:
         z = True
         for r in range(len(vs[0])):
@@ -925,7 +938,7 @@ def _find_linear_relation(Alist, B, p, M):    #new!
 
     if z:
         return [R(0, M) for a in range(len(vs)-1)], 1
-        
+
     s = '['
     for c in range(d-1):
         v = vs[c]
@@ -936,14 +949,14 @@ def _find_linear_relation(Alist, B, p, M):    #new!
         if c < d - 2:
             s += ';'
     s = s + ']'
-        
+
     Verbose("s = %s"%(s))
-        
+
     A = gp(s)
     Verbose("A = %s"%(A))
     if len(vs) == 2:
         A = A.Mat()
-        
+
     s = '['
     v = vs[d-1]
     for r in range(len(v)):
@@ -951,17 +964,17 @@ def _find_linear_relation(Alist, B, p, M):    #new!
         if r < len(v) - 1:
             s += ','
     s += ']~'
-        
+
     Verbose("s = %s"%(s))
-        
+
     B = gp(s)
-        
+
     Verbose("B = %s"%(B))
 
     v = A.mattranspose().matsolvemod(p**M,B)
-        
+
     Verbose("v = %s"%(v))
-        
+
     if v == 0:
         return [], None
     else:
@@ -980,16 +993,16 @@ def Iwasawa_invariants(F):
     Computes the Iwasawa invariants of the power series `F`. It returns a pair
     `(\mu, \lambda)` where `\mu` is the `\mu`-invariant and `\lambda` is the
     `\lambda`-invariant.
-    
+
     The `\mu`-invariant is is maximum power of `p` dividing the coefficients of
     `F` and the `\lambda`-invariant is the least power of `T` exactly divisible
     by `p^\mu`.
-    
+
     Since the power series is represented by a finite amount of data, what is
     returned is an upper-bound on `\mu` and a lower-bound on `\lambda`.
-    
+
     EXAMPLES::
-    
+
         sage: from sage.modular.pollack_stevens.modsym_OMS_families_space import Iwasawa_invariants
         sage: R = PowerSeriesRing(ZpCA(3, 4), 'T')
         sage: F = R([1,0,1])

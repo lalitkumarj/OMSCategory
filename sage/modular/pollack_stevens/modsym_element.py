@@ -24,44 +24,44 @@ class ModularSymbolElement_generic(ModuleElement):
             self._map = map_data
         else:
             self._map = ManinMap(parent._coefficients, parent._source, map_data)
-    
+
     def __reduce__(self):
         from sage.modular.pollack_stevens.modsym_element import create__ModSym_element
         return (create__ModSym_element, (self._map, self.parent()))
-    
+
     def _repr_(self):
         return "Modular symbol of level %s with values in %s"%(self.parent().level(), self.parent().coefficient_module())
-    
+
     def dict(self):
         D = {}
         for g in self.parent().source().gens():
             D[g] = self._map[g]
         return D
-    
+
     def weight(self):
         return self.parent().weight()
-    
+
     def values(self):
         return [self._map[g] for g in self.parent().source().gens()]
-    
+
     def _normalize(self):
         for val in self._map:
             val.normalize()
         return self
-    
+
     def is_zero(self, prec=None):
         for mu in self.values():
             if not mu.is_zero(prec):
                 return False
         return True
-    
+
     def __cmp__(self, other):
         gens = self.parent().source().gens()
         for g in gens:
             c = cmp(self._map[g], other._map[g])
             if c: return c
         return 0
-    
+
     def _add_(self, right):
         """
         Returns self + right
@@ -128,7 +128,7 @@ class ModularSymbolElement_generic(ModuleElement):
 #            [0, 0, 0]
 #        """
         return self.__class__(self._map - right._map, self.parent(), construct=True)
-    
+
     def plus_part(self):
         r"""
         Returns the plus part of self -- i.e. self + self | [1,0,0,-1].
@@ -138,9 +138,9 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self + self | [1,0,0,-1]
-        
+
         EXAMPLES::
-            
+
             sage: MS = OverconvergentModularSymbols(3, p=5, prec_cap=5, weight=2)
             sage: Phi = MS.random_element()
             sage: Phi_p = Phi.plus_part()
@@ -176,9 +176,9 @@ class ModularSymbolElement_generic(ModuleElement):
         OUTPUT:
 
         - self - self | [1,0,0,-1]
-        
+
         EXAMPLES::
-            
+
             sage: MS = OverconvergentModularSymbols(11, p=3, prec_cap=5, weight=0)
             sage: Phi = MS.random_element()
             sage: Phi_p = Phi.plus_part()
@@ -203,7 +203,7 @@ class ModularSymbolElement_generic(ModuleElement):
 #        """
         S0N = Sigma0(self.parent().level())
         return self - self * S0N(minusproj)
-    
+
     def hecke(self, ell, algorithm="prep"):
         r"""
         Returns self | `T_{\ell}` by making use of the precomputations in
@@ -251,17 +251,17 @@ class ModularSymbolElement_generic(ModuleElement):
 #            True
 #        """
         return self.__class__(self._map.hecke(ell, algorithm), self.parent(), construct=True)
-    
+
     def valuation(self, p):
         if p is None:
             raise ValueError("Must specify p.")
         return min([val.valuation(q) for val in self._map])
-    
+
     def diagonal_valuation(self, p):
         if p is None:
             raise ValueError("Must specify p.")
         return min([val.diagonal_valuation(p) for val in self._map])
-    
+
     @cached_method
     def is_Tq_eigensymbol(self,q,p=None,M=None):
         r"""
@@ -369,7 +369,7 @@ class ModularSymbolElement_generic(ModuleElement):
             elif (qhecke - aq * self).valuation(p) < M:
                 raise ValueError("not a scalar multiple")
         return aq
-    
+
     def is_ordinary(self, p=None):
         has_prime = True
         try:
@@ -386,7 +386,7 @@ class ModularSymbolElement_generic(ModuleElement):
             return ap.valuation() == 0
         else:
             return ap.valuation(p) == 0
-    
+
     def reduce_precision(self, M):
         r"""
         Only holds on to `M` moments of each value of self
@@ -398,7 +398,7 @@ class ModularSymbolElement_generic(ModuleElement):
         Returns the number of moments of each value of self
         """
         return min([a.precision_absolute() for a in self._map])
-    
+
     def normalize(self):
         for val in self._map:
             val.normalize()
@@ -449,19 +449,22 @@ class ModularSymbolElement_generic(ModuleElement):
                 t += f[g] * MR.gammas[g] - f[g]
             else:
                 if g in MR.reps_with_two_torsion():
-                    t -= f[g] 
+                    t -= f[g]
                 else:
                     t -= f[g]
-                    
+
         id = MR.gens()[0]
         if f[id]*MR.gammas[id] - f[id] != -t:
             print -t
+            print "------------"
             print f[id]*MR.gammas[id] - f[id]
+            print "------------"
+            print f[id]*MR.gammas[id] - f[id]+t
             verbose("Sum around loop is: %s"%(f[id]*MR.gammas[id] - f[id]+t))
             raise ValueError("Does not add up correctly around loop")
 
         print "This modular symbol satisfies the manin relations"
-    
+
     def __call__(self, a):
         return self._map(a)
 

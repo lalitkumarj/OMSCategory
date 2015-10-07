@@ -229,7 +229,7 @@ class CoeffMod_OMS_Families_space(CoefficientModule_generic):
     @cached_method
     def filtration_precisions(self, M=None):
 #        r"""
-#        Returns a tuple whose `i`th entry is `M-\lfloori(p-2)/(p-1)\rfloor`,
+#        Returns a tuple whose `i`th entry is `M-\lfloor i(p-2)/(p-1)\rfloor`,
 #        the `p`-adic precision of the `i`th moment of an element of this space.
 #        If ``M`` is None, uses the precision cap of this space.
 #        """

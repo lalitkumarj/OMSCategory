@@ -4,6 +4,7 @@ from sage.rings.arith import binomial
 from sage.modular.pollack_stevens.manin_map import M2Z
 from sage.modular.pollack_stevens.families_util import logp_binom
 from sage.rings.integer_ring import ZZ
+from sage.rings.big_oh import O
 from sage.modular.dirichlet import kronecker_character
 from sage.all import cached_method
 
@@ -20,6 +21,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         self._Phis = Phis    #should we create a copy of Phis, in case Phis changes? probably
         self._coefficient_ring = Phis.base_ring()
         self._base_ring = PowerSeriesRing(self._coefficient_ring, var)    #What precision?
+        self._prec = prec
     
     def base_ring(self):
         return self._base_ring
@@ -30,6 +32,17 @@ class padic_Lfunction_two_variable(padic_Lfunction):
     def variables(self):
         #returns (T, w)
         return (self._base_ring.gens()[0], self._coefficient_ring.gens()[0])
+    
+    def _max_coeff(self):
+        Phis = self._Phis
+        p = Phis.parent().prime()
+        p_prec, var_prec = Phis.precision_absolute()
+        max_j = Phis.parent().coefficient_module().length_of_moments(p_prec)
+        n = 0
+        while True:
+            if max_j - (n / (p-1)).floor() - min(max_j, n) - (max_j / p).floor() <= 0:
+                return n - 1
+            n += 1
     
     def _on_Da(self, a, twist):
         r"""
@@ -89,12 +102,20 @@ class padic_Lfunction_two_variable(padic_Lfunction):
             ap = self._ap
         if not twist is None:
             ap *= twist(p)
+        if j == 0:
+            return (~ap) * onDa.moment(0)
+        if a == 1:
+            #aminusat is 0, so only the j=r term is non-zero
+            return (~ap) * (p ** j) * onDa.moment(j)
         #print "j =", j, "a = ", a
         ans = onDa.moment(0) * (aminusat ** j)
         #ans = onDa.moment(0)
         #print "\tr =", 0, " ans =", ans
         for r in range(1, j+1):
-            ans += binomial(j, r) * (aminusat ** (j - r)) * (p ** r) * onDa.moment(r)
+            if r == j:
+                ans += binomial(j, r) * (p ** r) * onDa.moment(r)
+            else:
+                ans += binomial(j, r) * (aminusat ** (j - r)) * (p ** r) * onDa.moment(r)
             #print "\tr =", r, " ans =", ans
         #print " "
         return (~ap) * ans
@@ -106,13 +127,39 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         """
         #TODO: Check that n is not too big
         #TODO implement twist
-        p = self._Phis.parent().prime()
-        prec = self._Phis.precision_absolute()[0] #Not quite right, probably
+        Phis = self._Phis
+        p = Phis.parent().prime()
+        if n == 0:
+            return sum([self._basic_integral(a, 0, twist) for a in range(1, p)])
+        p_prec, var_prec = Phis.precision_absolute()
+        max_j = Phis.parent().coefficient_module().length_of_moments(p_prec)
+        ans_prec = max_j - (n / (p-1)).floor() - min(max_j, n) - (max_j / p).floor()
+        if ans_prec == 0:
+            return self._coefficient_ring(0)
+        #prec = self._Phis.parent()#precision_absolute()[0] #Not quite right, probably
         #print "@@@@n =", n, "prec =", prec
-        cjns = list(logp_binom(n, p, prec+1))
+        cjns = list(logp_binom(n, p, max_j+1))
         #print cjns
-        teich = self._Phis.parent().base_ring().base_ring().teichmuller
-        return sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j, twist) for a in range(1,p)]) for j in range(min(prec,len(cjns)))])
+        teich = Phis.parent().base_ring().base_ring().teichmuller
+        #Next line should work but loses precision!!!
+        ans = sum([cjns[j] * sum([((~teich(a)) ** j) * self._basic_integral(a, j, twist) for a in range(1,p)]) for j in range(1, min(max_j, len(cjns)))])
+        #Instead do this messed up thing
+        w = ans.parent().gen()
+        #ans = 0*w
+        #for j in range(1,min(max_j, len(cjns))):
+        #    ans_term = [0*w] * var_prec
+        #    for a in range(1,p):
+        #        term = (((~teich(a)) ** j) * self._basic_integral(a, j, twist)).list()
+        #        for i in range(min(var_prec, len(term))):
+        #            ans_term[i] += term[i]
+        #    ans += cjns[j] * sum([ans_term[i] * w**i for i in range(var_prec)])
+        #print ans_prec
+        ans_prec = O(p**ans_prec)
+        #print ans_prec
+        #print ans
+        for i in range(ans.degree() + 1):
+            ans += ans_prec * w**i
+        return ans
     
     def coefficient(self, index, twist=None):
         r"""
@@ -130,7 +177,7 @@ class padic_Lfunction_two_variable(padic_Lfunction):
         """
         p = self._Phis.parent().prime()
         if prec is None:
-            prec = self._Phis.precision_absolute()[0] #Not quite right, probably
+            prec = self._max_coeff()#Phis.precision_absolute()[0] #Not quite right, probably
         else:
             pass #do some checks on inputted prec
-        return self._base_ring([self._compute_nth_coeff(n, twist) for n in range(prec)])
+        return self._base_ring([self._compute_nth_coeff(n, twist) for n in range(prec + 1)])
