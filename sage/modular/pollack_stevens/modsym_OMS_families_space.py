@@ -8,6 +8,7 @@ from sage.functions.other import ceil
 from sage.functions.log import log
 from sage.modular.arithgroup.all import Gamma0
 from sage.matrix.constructor import Matrix
+from sage.rings.laurent_series_ring import LaurentSeriesRing
 from sage.modular.dirichlet import DirichletCharacter
 from sage.modular.pollack_stevens.modsym_space import ModularSymbolSpace_generic
 from sage.modular.pollack_stevens.coeffmod_OMS_families_space import FamiliesOfOverconvergentDistributions
@@ -252,6 +253,7 @@ class ModSym_OMS_Families_space(ModularSymbolSpace_generic):
                 from sage.modular.pollack_stevens.coeffmod_OMS_families_element import CoeffMod_OMS_Families_element, _shift_coeffs
                 V = Dmu.approx_module(M[0], M[1])
                 mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=0, check=False, var_prec=mu._var_prec)
+                #mu = CoeffMod_OMS_Families_element(V([_shift_coeffs(mu._moments[i], val_vector[length - 1]) for i in range(length)]), Dmu, ordp=mu_val, check=False, var_prec=mu._var_prec)
         Verbose("shift after mu_val: %s"%(shift))
         mu.normalize()
         #print "mu.ordp:", mu.ordp

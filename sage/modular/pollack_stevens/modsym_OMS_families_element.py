@@ -77,7 +77,14 @@ class ModSym_OMS_Families_element(ModularSymbolElement_generic):
     #@cached_method
     def Tq_eigenvalue(self, q, p=None, M=None, check=True):
         #TODO: deal with var_prec
+        if self == 0:
+            raise ValueError("0 cannot be an eigenvector")
         qhecke = self.hecke(q)
+        if True:
+            rel = self.parent().linear_relation([self], qhecke)
+            if rel[-1] is None:
+                raise ValueError("not a scalar multiple")
+            return -rel[0][0] / rel[1]
         gens = self.parent().source().gens()
         if p is None:
             p = self.parent().prime()   #CHANGE THIS
